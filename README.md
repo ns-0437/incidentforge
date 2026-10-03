@@ -1,122 +1,280 @@
-# IncidentForge
+<div align="center">
 
-Autonomous incident investigation and behavioral repair validation. The original
-scope is preserved in `docs/ORIGINAL_BRIEF.md`.
+![IncidentForge — investigate, repair, verify](docs/assets/incidentforge-banner.svg)
 
-## Current implementation
+**Autonomous incident investigation. Reviewable repairs. Independent behavioral evidence.**
 
-T0 through T7 are implemented as development stages. The bounded Nemotron controller
-supports both incident families, B0/B1/B2 protocols, evidence records, patch review,
-and a local launch/cancel UI. Generated repairs passed 6 IF-001 and 8 IF-002
-protected development cases on Nebius Sandbox. These are not final comparison results.
-See `docs/PRE_T8_STATUS.md` for current evidence, failed pilots and remaining gates.
+[![Python](https://img.shields.io/badge/Python-3.12%2B-3776AB?logo=python&logoColor=white)](pyproject.toml)
+[![MIT](https://img.shields.io/badge/License-MIT-65cbb1)](LICENSE)
+[![Sandbox](https://img.shields.io/badge/Execution-Nebius%20Sandbox-ff9d5c)](docs/ARCHITECTURE.md)
+[![Nemotron](https://img.shields.io/badge/Model-NVIDIA%20Nemotron-76b900)](src/incidentforge/llm.py)
 
-Start the local UI with `python scripts/serve-ui.py --port 8765` and open
-http://127.0.0.1:8765. Recorded history is free to browse. UI launches use Docker.
+[Quick start](#try-it) · [Architecture](#architecture) · [Experiments](#two-incidents-three-protocols) · [Results](#measured-results) · [Trust](#trust-boundaries)
 
-For an explicitly budgeted live Sandbox run:
+</div>
+
+---
+
+## Why this exists
+
+A payment response disappears **after the charge commits**. A retry uses a fresh
+identity. The order looks healthy—and the customer is charged twice.
+
+IncidentForge asks a coding agent to do more than make an error disappear:
+reproduce a distributed failure, compare explanations, run a controlled
+experiment, edit the application, and submit a frozen patch to an evaluator
+it cannot rewrite.
+
+**The deliverable is a patch for human review, validated under declared conditions.**
+Passing tests is not proof of universal correctness. A correct patch is not
+proof that the model's explanation was correct, either.
+
+> Built for the **Coding and Agentic Engineering Track** of the Nebius Global AI
+> Hackathon, using real Token Factory inference and real Sandbox execution.
+> This repository remains private during development.
+
+## Follow an incident
+
+| Step | What happens | Evidence you can inspect |
+| :--- | :--- | :--- |
+| **Reproduce** | Fresh stores and a witnessed failure | HTTP observations, durable effects, reset evidence |
+| **Investigate** | Competing hypotheses and precommitted predictions | Source references, conditions, measured facts |
+| **Repair** | Bounded edits and optional developer assertions | Exact diff, rejected actions, candidate revision |
+| **Challenge** | B2 receives property-only feedback | Violated properties, without private schedule text |
+| **Verify** | Frozen candidate meets withheld schedules | Independent verdicts, hashes, boundary receipts |
+| **Review** | Local dashboard presents patch and limitations | Timeline, hypothesis cards, diff, review ZIP |
+
+<details>
+<summary><b>What makes this different from an ordinary edit/test loop?</b></summary>
+
+The evaluator checks charges, stock and compensation against protected
+transactional effect history—not just HTTP status codes or agent-authored tests.
+Candidate users cannot read private schedules or modify the audit. Unknown
+inference usage or remote execution blocks redispatch.
+
+Existing work such as [AIOpsLab](https://github.com/microsoft/AIOpsLab) explores
+agentic incident environments and evaluation. IncidentForge's claim is the
+tested combination here, not that agents have never investigated incidents or
+executed tests before.
+
+</details>
+
+## Architecture
+
+```mermaid
+flowchart TB
+    User[Engineer / local dashboard] --> Controller[Bounded host controller]
+    Controller <--> Model[Nebius Token Factory<br/>NVIDIA Nemotron Nano]
+    Controller --> Workspace[Allowlisted source<br/>exact edits + assertions]
+    Controller --> Budget[(Persistent inference budget)]
+    Controller --> Evidence[(Hash-chained evidence)]
+    Workspace --> Harness
+    subgraph Sandbox[Nebius Sandbox - guest network disabled]
+        Harness[Trusted harness / root-only evaluator]
+        Order[Order / isolated UID] --> Inventory[Inventory / isolated UID]
+        Order --> Proxy[Response-loss proxy]
+        Proxy --> Payment[Payment / isolated UID]
+        Order --> Broker[Protected persistence broker]
+        Inventory --> Broker
+        Payment --> Broker
+        Broker --> Stores[(Separate stores<br/>effects + transactional audit)]
+        Harness --> Order
+        Harness --> Stores
+    end
+    Stores --> Export[Bounded evidence archive]
+    Export --> Reader[Independent Docker reader<br/>no network / read-only inputs]
+    Reader --> Verdict[Accept for review / reject / unresolved]
+    Verdict --> User
+```
+
+<details>
+<summary><b>Explore the agent loop and final-evaluation boundary</b></summary>
+
+```mermaid
+sequenceDiagram
+    participant C as Controller
+    participant M as Nemotron
+    participant S as Sandbox
+    participant V as Independent verifier
+    C->>S: Reproduce with fresh state
+    S-->>C: Measured observations
+    C->>M: Public source, contract and observations
+    M-->>C: Hypotheses and precommitted experiment
+    C->>S: Execute intervention
+    S-->>C: Condition-level measurements
+    C->>M: Facts and required factual conclusion
+    M-->>C: Interpretation and source edit
+    C->>S: B2-only development validation
+    S-->>C: Property-only feedback
+    C->>C: Freeze candidate revision
+    C->>S: Withheld final schedules
+    S->>V: Effects, snapshots and manifests
+    V-->>C: Recomputed final verdict
+    Note over C,M: Final results never become repair feedback
+```
+
+B0 may investigate voluntarily. B1 requires investigation. B2 adds development
+feedback. The final evaluator runs outside the model loop for all three.
+
+</details>
+
+## Two incidents, three protocols
+
+| Incident | Failure mechanism | What a plausible bad fix misses |
+| :--- | :--- | :--- |
+| **IF-001 · duplicate charging** | Committed response loss; retry changes operation key | HTTP success can conceal multiple charges |
+| **IF-002 · stranded compensation** | Durable intent is scheduled by a volatile process-local set | Clean decline works; restart strands stock |
+
+| Variant | Required workflow | Protected feedback while editing |
+| :--- | :--- | :---: |
+| **B0** | Competent inspect / edit / test baseline | No |
+| **B1** | B0 + hypotheses and controlled experiment | No |
+| **B2** | B1 + behavioral feedback | Once |
+
+All share model, source visibility, public contract, tools and resource limits.
+Failed attempts remain in the denominator.
+
+## Measured results
+
+**T8 is incomplete: 4 of 12 planned runs launched.** An inference timeout left
+usage unknown, so the persisted budget guard stopped further dispatch.
+All four launched attempts were unresolved before candidate freeze. No final
+agent-patch verdict was produced, and **no variant ranking is supported**.
+
+Development and evaluator readiness are separate from that campaign:
+
+- Reference controls passed **4/4 final schedules per family**, locally and on Sandbox.
+- The same schedules rejected **5/5 authored harmful controls**.
+- A prior live B2 development repair passed **8/8 protected cases twice**,
+  including fresh verification after freeze. It is not a T8 comparison score.
+- Factual conclusions are checked against measurements; causal prose remains unverified.
+
+See [T8 results](docs/T8_RESULTS.md), [protocol](docs/T8_PROTOCOL.md),
+[pre-T8 review](docs/PRE_T8_STATUS.md), and [curated data](benchmarks/t8/summary.json).
+
+## Try it
+
+**Prerequisites:** Python 3.12+, Docker with Linux containers, and a cached
+`python:3.12-slim` image. Sandbox execution also needs enabled Nebius access and an
+authenticated ConTree SDK environment.
+
+```powershell
+git clone https://github.com/ns-0437/incidentforge.git
+cd incidentforge
+python scripts/serve-ui.py --port 8765
+```
+
+Open **http://127.0.0.1:8765**. Select an incident and variant, launch or cancel a
+run, inspect hypotheses, measured observations, diffs and validation, then export
+a review ZIP. Fresh clones start with empty local history; curated benchmark
+results are included, while raw runs stay local.
+
+<details>
+<summary><b>Run checks without spending inference credits</b></summary>
+
+```powershell
+python -m unittest tests.test_t4 tests.test_t5 tests.test_t6_controller tests.test_t7 tests.test_prefreeze tests.test_t8
+
+# Linux isolation and behavioral fixture checks
+.\scripts\run-t0-linux.ps1 -Stage t6
+```
+
+Add `-PullImage` if the base image is missing. Each execution pins its resolved
+image ID. Containers and volumes are removed by exact ID, never global prune.
+Windows-only tests do not establish Linux boundary protection.
+
+</details>
+
+<details>
+<summary><b>Run a live investigation on Nebius Sandbox</b></summary>
+
+Authenticate ConTree with your own Token Factory key and project ID. Keep those
+in its profile or environment, never in this repository. Set `CONTREE_PYTHON`
+to the Python executable in your ConTree environment when it differs from the
+default Windows location.
 
 ```powershell
 python scripts/run-t4.py --live --variant B2 --incident IF-002 --backend contree
 ```
 
-This uses the existing ConTree profile and installed SDK Python. Set CONTREE_PYTHON
-if that runtime is elsewhere. Docker is still required for independent exported
-evidence verification. The persisted $0.20 cumulative inference allocation is enforced;
-unknown usage or execution prevents redispatch. Do not delete unresolved guards.
+The persisted inference allocation is **$0.20 per project**, not a promise that
+inference is free. Sandbox beta execution was confirmed free for the development
+account; confirm your account terms. Docker is still needed to independently
+verify exported remote evidence.
 
-- Order, Inventory and Payment run as separate Linux processes and UIDs with
-  separate durable stores. Order recovers pending work after restart.
-- IF-001 drops a Payment response only after correlating it with a committed
-  audit effect. The faulty retry generates a new key and duplicates the charge.
-- A manually authored reference strategy reuses the logical payment identity.
-  This is a test control, not an agent-generated repair.
+The UI currently launches Docker; this command selects Sandbox. Both use the
+same controller. There is no hosted public demo.
 
-- Explicit SQLite transaction sessions through a protected broker.
-- Charge audit captured by a trusted trigger in the same transaction.
-- SQL authorizer denies audit access, effect deletion/update, DDL, unsafe PRAGMAs,
-  extension loading and attached databases.
-- The broker intentionally permits duplicate payment effects. It does not fix
-  operation identity, retry logic or application deduplication.
-- Linux Unix-domain transport authenticates kernel peer UIDs and bounds session
-  lifetime, requests, output, SQL length, query steps and connection count.
+</details>
 
-The fixture and local controller use Python 3.12+ without third-party dependencies.
-Remote execution additionally uses the installed ConTree SDK environment.
-
-## Run the portable checks
-
-From this repository root:
+<details>
+<summary><b>Reproduce the comparison protocol</b></summary>
 
 ```powershell
-python -m probes.run_t0 --output runs/t0-local
+# Authored controls only: no model calls
+python scripts/check-t8-schedules.py
+python scripts/check-t8-remote.py
+
+# New campaign name required; live execution consumes inference credits
+python scripts/run-t8.py my-campaign --freeze
+python scripts/run-t8.py my-campaign
 ```
 
-Windows can validate SQLite/transaction behavior and actual abrupt writer-process
-death. Linux UID/socket/isolation tests are explicitly skipped on Windows, and
-the report is PARTIAL. Skips are not evidence that isolation works.
+Never modify frozen source during a campaign. Stopped campaigns have no automatic
+resume or retry. Reconcile unknown usage first; do not delete the reservation or
+start a fresh budget database to bypass the guard.
 
-## Run the Linux acceptance gate
+</details>
 
-With a working Docker Desktop Linux engine:
+## Trust boundaries
 
-```powershell
-.\scripts\run-t0-linux.ps1 -PullImage
+| Boundary | Enforcement |
+| :--- | :--- |
+| Private schedules, evaluator, Git history | Candidate allowlist and root-only harness paths |
+| Canonical effects and audit | Broker authorization and transactional triggers |
+| Other service stores | Separate UIDs and authenticated Unix sockets |
+| Host credentials and guest network | Host-only credentials; guest egress disabled |
+| Costs and retries | Persistent reservations, caps and unknown-state guards |
+| Frozen patch | Revision hashes and independently checked exports |
+
+This is selected tested coverage, not proof against every malicious program or
+kernel exploit. See [SECURITY.md](SECURITY.md).
+
+## Explore the code
+
+```text
+src/incidentforge/    Controller, model, evidence, budget, backends, UI
+fixture/app/         Order, Inventory and Payment application
+fixture/harness/     Trusted orchestration, isolation and persistence
+evaluation/          Protected verifier, controls and withheld schedules
+contracts/public/    Business contract visible to the agent
+probes/              Bounded runners and archive verification
+tests/               Controller, isolation and behavioral tests
+scripts/             Operator entry points and campaign drivers
+benchmarks/t8/       Curated freeze and results; no raw prompts or databases
+docs/                Original brief, design, protocol and stage reviews
 ```
 
-For the T1 fixture plus all T0 regressions, using the cached image:
+<details>
+<summary><b>Limitations and next steps</b></summary>
 
-```powershell
-.\scripts\run-t0-linux.ps1 -Stage t1
-```
+- Two synthetic defect implementations; final tests vary schedules, not defect classes.
+- T8 lacks a complete matched sample. No superiority or statistical-significance claim.
+- Causal reasoning remains a model claim even when a repair passes.
+- IF-002 restarts Inventory as well as Order to discard old queued requests.
+- Local operator console, not a production multi-user platform.
+- Judge access, video and submission packaging are T9 work. Trial credits are not
+  assumed to last through judging.
 
-T1 also exports clean, unpatched IF-001 and reference-control scenarios with
-proxy logs, terminal orders, protected effect history and SQLite backups.
+The [original brief](docs/ORIGINAL_BRIEF.md) remains the scope authority.
+Historical stage documents describe their checkpoint; the latest result report
+takes precedence for status.
 
-Run the T2 contract, migrations, private verifier and harmful-control gate:
+</details>
 
-```powershell
-.\scripts\run-t0-linux.ps1 -Stage t2
-```
+---
 
-T2 uses a separate versioned service/schema so the T0/T1 regression fixtures
-remain reproducible. Candidate processes receive only copied app code and
-`contracts/public/CONTRACT.md`. Private harness, tests and evaluator mounts sit
-behind a root-only directory. Case exports contain manifests, database hashes,
-boundary receipts and per-property validation reports. They are private
-development evidence, not material to include in a model's incident bundle.
+Built by **Navin Kumar** · [MIT license](LICENSE) · [Contributing](CONTRIBUTING.md)
 
-The flag downloads an ordinary local Python container image if needed. It does
-not create cloud resources. Subsequent runs can omit it. The script resolves the
-image to its local immutable ID and records image metadata. It runs with no
-network, a read-only root filesystem and source mounts, bounded memory/processes,
-no-new-privileges and only the launcher capabilities needed for UID separation.
-Services drop all capabilities before execution. Evidence is copied after the
-test exits, and only this test's disposable container and uniquely named evidence
-volume are removed. No volume or image pruning is performed.
-
-Reports contain interpreter/SQLite/platform versions, source hashes, counts,
-failures/skips, duration and limitations. Logs and reports are under `runs/`.
-No credentials belong in this repository or its evidence.
-
-## Scope and limits
-
-The T0 schema is a payment-effect test fixture plus an independent order store;
-it is not the final application schema. Runtime migrations are intentionally
-unsupported until a separate trusted migration interface is implemented and
-tested. Application-owned state/claims can change; canonical effects and audit
-cannot. Broker initialization only creates new stores and never overwrites one.
-
-The test suite is selected boundary coverage, not a proof against arbitrary
-malicious code or kernel exploits. Local Docker results do not establish ConTree
-compatibility. Full application readiness, topology/fault delivery, inventory
-history, schema migrations and complete behavioral properties come in later gates.
-
-T1 preserves its original single-item slice. T2 adds canonical multi-item/currency
-payloads, durable cancellation and refunds, transaction-level inventory history,
-bounded retry backoff, public bundle export and harmful-repair controls.
-Structured pre-run migrations allow app tables and indexes while protecting
-canonical effect/audit schemas. The original contract remains unchanged.
-
-See `docs/T0_STATUS.md`, `docs/T1_STATUS.md` and `docs/T2_STATUS.md` for measured status, and the execution backlog for
-the next gate. No inference or remote Sandbox workload is used by these tests.
+*Initial commits import real milestones at their actual import time. They are
+not backdated development history.*
