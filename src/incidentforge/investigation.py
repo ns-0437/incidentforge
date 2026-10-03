@@ -100,6 +100,9 @@ terminal status/held stock and replay stock counts. No charge identity experimen
 Name hypotheses H1 and H2 in prediction objects, and state a distinct falsifying observation.'''
     prompt={'incident':workspace.read('INCIDENT.json'),'source':workspace.read('fixture/app/service.py'),'contract':workspace.read('CONTRACT.md'),
             'observed_reproduction':reproduction,'baseline_revision':workspace.revision()}
+    from .trace_focus import focus
+    prompt['execution_path_focus']=focus(reproduction.get('observations',[]),
+        workspace.path('fixture/app/service.py').read_bytes())
     prompt['source_line_index']='\n'.join('L'+str(n)+': '+line for n,line in enumerate(prompt['source'].splitlines(),1))
     system+='''\nExactly TWO hypotheses, H1 then H2.
 Every condition prediction must be {"H1":"expected measured outcome","H2":"different expected outcome"}.
@@ -119,6 +122,9 @@ claimed failed side effect, including earlier returns and prerequisite state.
 For each source-based mechanism, explain why that path is reachable under the
 failing condition and what state is reconstructed after restart. If not known,
 state the missing evidence rather than inferring it from a final status alone.
+Use execution_path_focus first to compare observed return sites and surrounding guards.
+Cite source identifiers from those contexts when relevant; do not assume every
+return is a defect. Then compare the hypotheses with the full observations.
 When execution_trace is available, compare process generations and inspect the
 source at executed return lines. These bounded candidate-process diagnostics can
 be spoofed or disabled; they are not protected evidence. Missing lines alone do

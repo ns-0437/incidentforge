@@ -169,6 +169,9 @@ protected behavioral feedback during repair.'''
                         'observed_facts':measured_facts,'supported':'Your hypothesis assessment',
                         'weakened':'Your alternative assessment','uncertainty':'What remains unverified'}
                     value['instruction']='Copy conclusion and observed_facts exactly; write your own three commentary fields. Do not nest the action.'
+                from .trace_focus import focus
+                value['execution_path_focus']=focus(developer_observations,
+                    self.workspace.path('fixture/app/service.py').read_bytes())
                 value['developer_test_schema']={'action':'developer_test','spec':{'assertions':[
                     {'name':'description','condition':'observed condition or fault label','path':'observed.field','equals':'expected scalar'}]},'reason':'regression purpose'}
                 value['test_operators']='Only equals is supported. No not_equal, shell, expressions or invented observation conditions.'
