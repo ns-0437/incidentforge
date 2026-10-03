@@ -192,7 +192,7 @@ class Manager:
             if not path.exists(): raise ValueError('Run is preparing; retry cancellation shortly')
             (path/'CANCEL').touch()
             return {'requested':True,'terminal_confirmed':False,
-                    'message':'Cancellation requested. An in-flight model request can take up to 60 seconds to return; execution cleanup must finish.'}
+                    'message':'Cancellation requested. An in-flight model request can take up to 120 seconds to return; execution cleanup must finish.'}
 
 def make_server(root=ROOT,port=8765,manager=None):
     manager=manager or Manager(root);token=secrets.token_urlsafe(32)

@@ -1,0 +1,37 @@
+{
+  "schema_version": 1,
+  "date": "2026-10-03",
+  "source_commit": "f16dd7e660e2edf6280f8790073c882573962a31",
+  "checkout": "fresh local git clone --no-local; no credentials or raw runs copied",
+  "portable_tests": {
+    "tests": 61,
+    "failures": 0,
+    "errors": 0
+  },
+  "linux_checks": {
+    "tests": 16,
+    "failures": 0,
+    "errors": 0,
+    "skips": 0,
+    "mode": "authored controls, no inference",
+    "complete": true
+  },
+  "linux_report_sha256": "d9a5d29391cdd5592fced214518540ebc5acbc34be6b4f4115e98d80423f2de9",
+  "image_id": "sha256:dddfd7e07f9d15aeeca61529320492139d21cac7f0070c00609243e51e4e0016",
+  "ui_smoke": {
+    "routes_200": [
+      "/",
+      "/app.js",
+      "/style.css",
+      "/api/state"
+    ],
+    "fresh_history_empty": true
+  },
+  "inference_calls": 0,
+  "limitations": [
+    "Local clone rehearsal, not signed-out public GitHub access.",
+    "HTTP startup check does not establish visual browser usability.",
+    "Authored Linux controls are not autonomous model evaluation.",
+    "Latest completion changes still need a live pilot."
+  ]
+}

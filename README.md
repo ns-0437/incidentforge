@@ -144,7 +144,7 @@ final evaluation. B0 repaired IF-001 once; B2 repaired IF-002 once. Three
 inference timeouts triggered the predeclared infrastructure-invalidity threshold,
 so **no variant ranking is supported**. All failed attempts remain in the results.
 
-Project exposure is **$0.155573 / $0.20**, including the full reservations for
+At the close of T8, project exposure was **$0.155573 / $0.20**, including the full reservations for
 three calls with unknown usage. The disclosed [continuation amendment](docs/T8_CONTINUATION.md)
 preserved the frozen source and all twelve original slots.
 
@@ -170,6 +170,12 @@ unchanged; repair-quality improvement is not yet established.
 
 ## Try it
 
+Start with the [judge guide](docs/JUDGE_GUIDE.md). The
+[release checklist](docs/RELEASE_CHECKLIST.md), [submission draft](docs/DEVPOST_DRAFT.md)
+and [video script](docs/VIDEO_SCRIPT.md) track the remaining handoff work.
+A [fresh-checkout rehearsal](benchmarks/release/rehearsal.json) passed 61 portable
+tests, 16 Linux checks and local HTTP startup without model calls.
+
 **Prerequisites:** Python 3.12+, Docker with Linux containers, and a cached
 `python:3.12-slim` image. Sandbox execution also needs enabled Nebius access and an
 authenticated ConTree SDK environment.
@@ -189,7 +195,7 @@ results are included, while raw runs stay local.
 <summary><b>Run checks without spending inference credits</b></summary>
 
 ```powershell
-python -m unittest tests.test_t4 tests.test_t5 tests.test_t6_controller tests.test_t7 tests.test_prefreeze tests.test_t8
+python -m unittest tests.test_t4 tests.test_t5 tests.test_t6_controller tests.test_t7 tests.test_prefreeze tests.test_t8 tests.test_reliability
 
 # Linux isolation and behavioral fixture checks
 .\scripts\run-t0-linux.ps1 -Stage t6
@@ -219,7 +225,8 @@ account; confirm your account terms. Docker is still needed to independently
 verify exported remote evidence.
 
 The UI currently launches Docker; this command selects Sandbox. Both use the
-same controller. There is no hosted public demo.
+same controller. The public Pages demo is a recorded replay; there is no hosted
+public inference service.
 
 </details>
 
