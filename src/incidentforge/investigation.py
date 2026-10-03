@@ -60,7 +60,10 @@ def validate_plan(obj,intervention='identity_probe',conditions=None,source=None)
         symbols|={n.id for n in ast.walk(tree) if isinstance(n,ast.Name)}
         symbols|={n.attr for n in ast.walk(tree) if isinstance(n,ast.Attribute)}
         for h in hs:
-            if not h['symbols'] or any(s not in symbols for s in h['symbols']): raise ValueError('symbols must name actual AST identifiers in supplied source')
+            invalid=[s for s in h['symbols'] if s not in symbols]
+            if not h['symbols'] or invalid:
+                raise ValueError('symbols must name actual AST identifiers. Invalid: '+repr(invalid)+
+                                 '. Choose only from: '+', '.join(sorted(symbols)))
             if not h['supporting_refs']: raise ValueError('supporting_refs must contain exact source excerpts')
             resolved=[]
             for ref in h['supporting_refs']:

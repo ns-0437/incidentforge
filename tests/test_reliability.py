@@ -254,3 +254,18 @@ class TraceTests(unittest.TestCase):
             result=observation(SimpleNamespace(root=root,bundle=root/'public',started_ids=[{'service':'order','pid':1}]))
             self.assertEqual([{'event':'return','line':2,'source':'    return'}],result['processes'][0]['events'])
             self.assertIn('spoofed',result['trust'])
+
+class SymbolFeedbackTests(unittest.TestCase):
+    def test_invalid_identifiers_report_exact_choices_without_accepting_them(self):
+        from incidentforge.investigation import validate_plan
+        h={'mechanism':'cause','symbols':['invented'],'supporting_refs':['L1'],
+           'counterevidence':[],'alternatives':[],'predicted_signatures':[],
+           'distinguishing_experiment':'identity_probe','confidence_basis':'limited'}
+        experiment={'question':'q','baseline':'b','reset':'fresh','intervention':'identity_probe',
+                    'controlled_variables':[],'workload':'w','predictions':{'one':{'H1':'yes','H2':'no'}},
+                    'repetitions':1,'reason':'r','limits':{'seconds':100}}
+        with self.assertRaises(ValueError) as caught:
+            validate_plan({'hypotheses':[dict(h),dict(h)],'experiment':experiment},
+                          conditions={'one'},source='def step(order):\n    return order\n')
+        self.assertIn("Invalid: ['invented']",str(caught.exception))
+        self.assertIn('Choose only from: order, step',str(caught.exception))
