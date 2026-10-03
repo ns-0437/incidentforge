@@ -1,0 +1,264 @@
+"""Loopback-only operator interface. No candidate code executes in this server."""
+import argparse
+from contextlib import closing
+from datetime import datetime,timezone
+import hashlib
+from http.server import BaseHTTPRequestHandler,ThreadingHTTPServer
+import io
+import json
+import os
+from pathlib import Path
+import re
+import secrets
+import sqlite3
+import subprocess
+import sys
+import threading
+from urllib.parse import urlparse
+import uuid
+import zipfile
+from .evidence import verify
+
+ROOT=Path(__file__).resolve().parents[2]
+STATIC=Path(__file__).with_name('web')
+ID=re.compile(r'[a-zA-Z0-9][a-zA-Z0-9_-]{0,100}')
+INCIDENTS=[{'id':'IF-001','title':'Duplicate payment','description':'A committed payment response is lost. Retries create duplicate charges.'},
+           {'id':'IF-002','title':'Stranded compensation','description':'A declined order keeps inventory reserved after services restart.'}]
+
+def read_json(path,limit=2_000_000):
+    if path.is_symlink() or path.stat().st_size>limit: raise ValueError('File outside evidence limits')
+    return json.loads(path.read_text(encoding='utf-8'))
+
+def run_path(root,run_id):
+    if not ID.fullmatch(run_id): raise ValueError('Invalid run ID')
+    base=(root/'runs').resolve();path=base/run_id
+    if path.is_symlink() or path.resolve().parent!=base: raise ValueError('Invalid run path')
+    return path
+
+def events_for(path):
+    source=path/'events.jsonl'
+    if not source.exists(): return []
+    if source.is_symlink() or source.stat().st_size>8_000_000: raise ValueError('Event stream exceeds bounds')
+    raw=source.read_bytes()
+    # The last append may be in progress. Never turn a partial line into an event.
+    lines=raw.split(b'\n')[:-1]
+    return [json.loads(line.decode('utf-8')) for line in lines if line]
+
+def artifact(path,ref):
+    sha=ref.get('sha256','')
+    if not re.fullmatch('[a-f0-9]{64}',sha): raise ValueError('Invalid artifact hash')
+    target=path/'artifacts'/sha
+    if target.is_symlink() or target.stat().st_size>2_000_000: raise ValueError('Artifact outside bounds')
+    raw=target.read_bytes()
+    if hashlib.sha256(raw).hexdigest()!=sha: raise ValueError('Artifact hash mismatch')
+    return raw.decode('utf-8')
+
+def budget_status(root):
+    path=root/'runs/t4-budget.sqlite'
+    if not path.exists(): return {'cap_usd':.20,'estimated_usd':0,'reserved_usd':0,'pending':0,'remaining_usd':.20}
+    with closing(sqlite3.connect(path.resolve().as_uri()+'?mode=ro',uri=True)) as db:
+        cap=db.execute('SELECT cap FROM settings').fetchone()[0]
+        spent,reserved,pending=db.execute("SELECT COALESCE(SUM(actual),0),COALESCE(SUM(CASE WHEN actual IS NULL THEN cap ELSE actual END),0),COALESCE(SUM(status='reserved'),0) FROM calls").fetchone()
+    return {'cap_usd':cap/1e6,'estimated_usd':spent/1e6,'reserved_usd':reserved/1e6,
+            'pending':pending,'remaining_usd':max(0,cap-reserved)/1e6}
+
+def overview(root,run_id):
+    path=run_path(root,run_id);events=events_for(path)
+    report=read_json(path/'report.json') if (path/'report.json').exists() else None
+    receipt_path=root/'runs/ui-launches'/(run_id+'.json')
+    receipt=read_json(receipt_path) if receipt_path.exists() else {}
+    if report and 'model_claim_unverified' not in report:
+        report={**report,'model_claim_unverified':report.get('reason'),
+                'reason':'Legacy report: use the independent verdict and validation records below. Original narrative is an unverified model claim.'}
+    state=next((e['payload']['to'] for e in reversed(events) if e['kind']=='transition'),'PREPARING')
+    bundle=None
+    for e in events:
+        if e['kind']=='record':
+            r=json.loads(artifact(path,e['payload']['record']))
+            if r['kind']=='IncidentBundle': bundle=r['data'];break
+    incident=receipt.get('incident','IF-001')
+    candidate=path/'candidate/INCIDENT.json'
+    if candidate.exists(): incident=read_json(candidate).get('incident_id',incident)
+    return {'run_id':run_id,'incident':incident,'variant':(report or {}).get('variant',(bundle or {}).get('config',{}).get('variant',receipt.get('variant','unknown'))),
+            'process_terminal':receipt.get('terminal_confirmed',False),'process_exit':receipt.get('exit_code'),
+            'decision':(report or {}).get('decision'),'state':state,'report':report,
+            'started':events[0]['time_utc'] if events else None,'event_count':len(events)}
+
+def details(root,run_id):
+    path=run_path(root,run_id);result=overview(root,run_id);events=events_for(path)
+    records=[];diffs=[];timeline=[];interpretations=[]
+    for e in events:
+        kind=e['kind'];payload=e['payload']
+        if kind=='record':
+            r=json.loads(artifact(path,payload['record']))
+            if r['kind']=='PatchCandidate':
+                for ref in r['artifacts']: diffs.append(artifact(path,ref))
+            if r['kind']=='ValidationReport':
+                # Operator summary/export deliberately excludes private case names/schedules.
+                data=r['data'];properties={}
+                for case in data.get('properties',[]):
+                    for values in case.values():
+                        for name,item in values.items():
+                            properties.setdefault(name,[]).append(item.get('status','unknown'))
+                r={**r,'artifacts':[],'data':{**data,'properties':properties}}
+            records.append(r)
+        if kind=='model_interpretation': interpretations.append(payload)
+        if kind in ('transition','action_rejected','stopped','execution_reserved','execution_cleanup','model_response'):
+            label=(payload.get('to') if kind=='transition' else payload.get('reason') if kind in ('action_rejected','stopped')
+                   else payload.get('mode') if kind=='execution_reserved' else
+                   'Terminal confirmed' if kind=='execution_cleanup' and payload.get('terminal_confirmed') else kind)
+            timeline.append({'time':e['time_utc'],'kind':kind,'label':label,'sequence':e['seq']})
+    integrity='pending'
+    if result['report']:
+        try:
+            verify(path)
+            if not events or events[-1]['kind']!='report' or events[-1]['payload']!=read_json(path/'report.json'):
+                raise ValueError('Terminal report missing or mismatched')
+            integrity='verified'
+        except (ValueError,OSError): integrity='failed'
+    result.update(records=records,diffs=diffs,timeline=timeline,interpretations=interpretations,integrity=integrity,
+                  scope='Development evidence; not a final holdout or comparative study.')
+    return result
+
+def export_run(root,run_id):
+    data=details(root,run_id)
+    if not data['report']: raise ValueError('Wait for the run to finish before exporting')
+    if data['integrity']!='verified': raise ValueError('Evidence integrity failed; export blocked')
+    # Curated operator export, never a recursive archive of runs, credentials or private schedules.
+    files={'review.json':json.dumps(data,indent=2).encode('utf-8'),
+           'patch.diff':'\n'.join(data['diffs']).encode('utf-8'),
+           'README.txt':b'IncidentForge development review export. Recorded evidence, not a live execution.\nModel claims are unverified; independent validation decides the verdict.\nPrivate schedules, raw prompts, databases and credentials are excluded.\n'}
+    files['SHA256SUMS.txt']=''.join(hashlib.sha256(raw).hexdigest()+'  '+name+'\n' for name,raw in files.items()).encode()
+    buffer=io.BytesIO()
+    with zipfile.ZipFile(buffer,'w',zipfile.ZIP_DEFLATED) as archive:
+        for name,raw in files.items(): archive.writestr(name,raw)
+    return buffer.getvalue()
+
+class Manager:
+    def __init__(self,root,spawn=None):
+        self.root=root;self.lock=threading.Lock();self.process=None;self.current=None
+        self.spawn=spawn or self._spawn
+        self.meta=root/'runs/ui-launches';self.meta.mkdir(parents=True,exist_ok=True)
+        self.guard=self.meta/'active.json'
+
+    def _spawn(self,run_id,incident,variant,log):
+        check=subprocess.run(['docker','image','inspect','python:3.12-slim'],capture_output=True,timeout=15)
+        if check.returncode: raise ValueError('Docker or the cached python:3.12-slim image is unavailable')
+        args=[sys.executable,str(self.root/'scripts/run-t4.py'),'--live','--incident',incident,'--variant',variant,'--run-id',run_id]
+        return subprocess.Popen(args,stdout=log,stderr=log,stdin=subprocess.DEVNULL,cwd=self.root,
+                                creationflags=subprocess.CREATE_NO_WINDOW if os.name=='nt' else 0)
+
+    def active(self):
+        if not self.guard.exists(): return None
+        data=read_json(self.guard)
+        data['status']='live' if self.current==data['run_id'] else 'unknown'
+        data['cancel_requested']=(run_path(self.root,data['run_id'])/'CANCEL').exists()
+        return data
+
+    def launch(self,incident,variant):
+        if incident not in ('IF-001','IF-002') or variant not in ('B0','B1','B2'): raise ValueError('Unsupported incident or variant')
+        with self.lock:
+            if self.guard.exists(): raise ValueError('A live or unconfirmed launch already exists')
+            budget=budget_status(self.root)
+            if budget['pending']: raise ValueError('An inference call is pending or unreconciled; new launch blocked')
+            from .llm import CALL_RESERVATION
+            if budget['remaining_usd']<CALL_RESERVATION/1e6: raise ValueError('Insufficient remaining project allocation')
+            run_id='ui-'+uuid.uuid4().hex
+            metadata={'run_id':run_id,'incident':incident,'variant':variant,'started':datetime.now(timezone.utc).isoformat()}
+            # Exclusive creation also guards against a second local UI server.
+            with self.guard.open('x',encoding='utf-8') as file: json.dump(metadata,file)
+            log=(self.meta/(run_id+'.log')).open('wb')
+            try: process=self.spawn(run_id,incident,variant,log)
+            except Exception:
+                log.close();self.guard.unlink();raise
+            self.current=run_id;self.process=process
+            threading.Thread(target=self._watch,args=(process,run_id,log),daemon=True).start()
+            return metadata
+
+    def _watch(self,process,run_id,log):
+        code=process.wait();log.close()
+        metadata=read_json(self.guard) if self.guard.exists() else {}
+        receipt={**metadata,'run_id':run_id,'exit_code':code,'terminal_confirmed':True}
+        (self.meta/(run_id+'.json')).write_text(json.dumps(receipt),encoding='utf-8')
+        with self.lock:
+            self.current=None;self.process=None
+            if self.guard.exists() and read_json(self.guard)['run_id']==run_id: self.guard.unlink()
+
+    def cancel(self,run_id):
+        with self.lock:
+            active=self.active()
+            if not active or active['run_id']!=run_id: raise ValueError('This run is not active')
+            path=run_path(self.root,run_id)
+            if not path.exists(): raise ValueError('Run is preparing; retry cancellation shortly')
+            (path/'CANCEL').touch()
+            return {'requested':True,'terminal_confirmed':False,
+                    'message':'Cancellation requested. An in-flight model request can take up to 60 seconds to return; execution cleanup must finish.'}
+
+def make_server(root=ROOT,port=8765,manager=None):
+    manager=manager or Manager(root);token=secrets.token_urlsafe(32)
+    class Handler(BaseHTTPRequestHandler):
+        def log_message(self,*_): pass
+        def send(self,code,data,mime='application/json',download=None):
+            raw=json.dumps(data).encode() if mime=='application/json' else data
+            self.send_response(code);self.send_header('Content-Type',mime);self.send_header('Content-Length',str(len(raw)))
+            self.send_header('Cache-Control','no-store');self.send_header('X-Content-Type-Options','nosniff')
+            self.send_header('Content-Security-Policy',"default-src 'self'; script-src 'self'; style-src 'self'; connect-src 'self'; frame-ancestors 'none'; base-uri 'none'; form-action 'self'")
+            if download: self.send_header('Content-Disposition','attachment; filename="'+download+'"')
+            self.end_headers();self.wfile.write(raw)
+        def trusted(self):
+            return self.headers.get('Host') in ('127.0.0.1:'+str(self.server.server_port),'localhost:'+str(self.server.server_port))
+        def do_GET(self):
+            if not self.trusted(): return self.send(403,{'error':'Loopback host required'})
+            path=urlparse(self.path).path
+            try:
+                if path in ('/','/app.js','/style.css'):
+                    file={'/':'index.html','/app.js':'app.js','/style.css':'style.css'}[path]
+                    return self.send(200,(STATIC/file).read_bytes(),{'/':'text/html; charset=utf-8','/app.js':'text/javascript; charset=utf-8','/style.css':'text/css; charset=utf-8'}[path])
+                if path=='/api/state':
+                    runs=[]
+                    for p in (root/'runs').iterdir():
+                        if p.is_dir() and not p.is_symlink() and (p/'events.jsonl').exists():
+                            try:
+                                item=overview(root,p.name)
+                                if item['variant'] in ('B0','B1','B2'): runs.append(item)
+                            except (ValueError,OSError,KeyError): continue
+                    known={r['run_id'] for r in runs}
+                    for p in manager.meta.glob('ui-*.json'):
+                        if p.stem not in known:
+                            item=overview(root,p.stem)
+                            if item['variant'] in ('B0','B1','B2'): runs.append(item)
+                    return self.send(200,{'token':token,'incidents':INCIDENTS,'budget':budget_status(root),'active':manager.active(),
+                        'runs':sorted(runs,key=lambda r:r['started'] or '',reverse=True)})
+                match=re.fullmatch(r'/api/runs/([A-Za-z0-9_-]+)(/export)?',path)
+                if match:
+                    run_id=match[1]
+                    if match[2]: return self.send(200,export_run(root,run_id),'application/zip',run_id+'-review.zip')
+                    return self.send(200,details(root,run_id))
+                self.send(404,{'error':'Not found'})
+            except (ValueError,OSError,KeyError,sqlite3.Error) as exc: self.send(400,{'error':str(exc)[:200]})
+        def do_POST(self):
+            origin=self.headers.get('Origin')
+            if not self.trusted() or self.headers.get('X-IncidentForge-Token')!=token or (origin and origin not in (
+                'http://127.0.0.1:'+str(self.server.server_port),'http://localhost:'+str(self.server.server_port))):
+                return self.send(403,{'error':'Local session token and same origin required'})
+            try:
+                size=int(self.headers.get('Content-Length','0'))
+                if not 0<size<=2048: raise ValueError('Request size bound')
+                body=json.loads(self.rfile.read(size));path=urlparse(self.path).path
+                if path=='/api/launch' and set(body)=={'incident','variant'}: return self.send(202,manager.launch(**body))
+                if path=='/api/cancel' and set(body)=={'run_id'}: return self.send(202,manager.cancel(body['run_id']))
+                self.send(400,{'error':'Unsupported action'})
+            except (ValueError,OSError,TypeError,KeyError,subprocess.SubprocessError) as exc: self.send(400,{'error':str(exc)[:200]})
+    server=ThreadingHTTPServer(('127.0.0.1',port),Handler)
+    server.daemon_threads=True
+    return server
+
+def main():
+    parser=argparse.ArgumentParser();parser.add_argument('--port',type=int,default=8765);args=parser.parse_args()
+    server=make_server(port=args.port)
+    print('IncidentForge: http://127.0.0.1:'+str(server.server_port),flush=True)
+    try: server.serve_forever()
+    except KeyboardInterrupt: pass
+    finally: server.server_close()
+
+if __name__=='__main__': main()

@@ -1,0 +1,26 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>IncidentForge · Investigation console</title><link rel="stylesheet" href="/style.css"><script src="/app.js" defer></script></head>
+<body>
+<header><a class="brand" href="/">◈ <span>IncidentForge</span></a><span class="environment">LOCAL LAB <i></i> Synthetic services</span><span id="connection">Connecting…</span></header>
+<main>
+<section class="intro"><div><p class="eyebrow">AUTONOMOUS INCIDENT INVESTIGATION</p><h1>From failure to evidence.</h1><p class="muted">Reproduce an incident. Challenge an explanation. Review the repair.</p></div><div class="budget"><span>INFERENCE ALLOCATION</span><strong id="spend">—</strong><small id="budget-note">Loading persisted usage…</small><progress id="budget-progress" max="0.20" value="0"></progress></div></section>
+<div id="notice" role="status" aria-live="polite" hidden></div>
+<div class="workspace">
+<aside>
+<section class="panel launch"><p class="eyebrow">START AN INVESTIGATION</p><label for="incident">Incident</label><select id="incident"><option value="IF-001">IF-001 · Duplicate payment</option><option value="IF-002">IF-002 · Stranded compensation</option></select><p id="incident-description" class="hint"></p>
+<label for="variant">Investigation protocol</label><select id="variant"><option value="B0">B0 · Coding loop</option><option value="B1">B1 · Hypotheses + experiment</option><option value="B2" selected>B2 · Investigation + protected feedback</option></select><p id="protocol-note" class="hint"></p>
+<button id="launch" class="primary" disabled>Launch live investigation <span>↗</span></button><p class="hint">Uses real Nebius inference and local Docker. Shares the $0.20 project cap. Up to 10 model calls per run.</p><button id="cancel" class="danger" hidden>Request cancellation</button><p id="active-note" class="hint"></p></section>
+<section class="history"><div class="section-heading"><h2>Run history</h2><span id="run-count"></span></div><label class="sr-only" for="filter">Filter run history</label><select id="filter"><option value="all">Both incidents</option><option>IF-001</option><option>IF-002</option></select><div id="runs" aria-label="Recorded and live runs"></div></section>
+</aside>
+<section class="detail" aria-label="Investigation details">
+<div class="panel empty" id="empty"><span class="empty-icon">◇</span><h2>Your investigation workspace</h2><p>Select a recorded run to inspect its evidence, or launch a live investigation.</p><p class="hint">Recorded results do not make model calls.</p></div>
+<div id="selected" hidden><section class="panel run-head"><div><p id="run-mode" class="eyebrow"></p><h2 id="run-title"></h2><p id="run-id" class="mono muted"></p></div><a id="export" class="button" href="#">Export review ↓</a><div class="metrics"><div><span>VERDICT</span><strong id="verdict"></strong></div><div><span>MODEL CALLS</span><strong id="calls"></strong></div><div><span>ESTIMATED COST</span><strong id="cost"></strong></div><div><span>EVIDENCE</span><strong id="integrity"></strong></div></div><p id="reason"></p><p class="hint">Development conditions only. A passing result is a candidate for human review, not proof of universal correctness.</p></section>
+<nav class="tabs" aria-label="Evidence views"><button data-tab="overview" class="active">Overview</button><button data-tab="hypotheses">Hypotheses</button><button data-tab="experiments">Experiments</button><button data-tab="patch">Patch</button><button data-tab="validation">Validation</button></nav>
+<section id="tab-overview" class="tab panel"><h3>Investigation timeline</h3><div id="timeline"></div><h3>Model summary <span class="tag">UNVERIFIED CLAIM</span></h3><p id="model-summary"></p></section>
+<section id="tab-hypotheses" class="tab panel" hidden><h3>Competing explanations <span class="tag">MODEL-GENERATED</span></h3><div id="hypotheses"></div><h3>Interpretation of measurements</h3><div id="interpretations"></div></section>
+<section id="tab-experiments" class="tab panel" hidden><h3>Planned interventions & measured results</h3><div id="experiments"></div></section>
+<section id="tab-patch" class="tab panel" hidden><h3>Candidate diff</h3><p class="hint">Proposed source edits retained for review. They are not automatically promoted.</p><div id="diffs"></div></section>
+<section id="tab-validation" class="tab panel" hidden><h3>Independent behavioral validation</h3><div id="validation"></div></section></div>
+</section></div>
+<footer>IncidentForge / Development console <span>Order → Inventory → Payment · Evidence before acceptance</span></footer>
+</main></body></html>
