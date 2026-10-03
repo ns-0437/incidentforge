@@ -61,7 +61,8 @@ python scripts/run-t4.py --live --variant B2 --incident IF-001 --backend contree
 The local UI launches Docker; the command above uses real Nebius Sandbox. The
 persisted budget blocks dispatch that is not funded or has unknown pending usage.
 Never delete the ledger or start a fresh one to evade the project allocation.
-The current development allocation cannot fund another call. Judge credentials
+The owner approved a $0.40 cumulative development allocation; remaining capacity
+depends on the persisted ledger. Judge credentials
 and funding through December 15 are not yet confirmed; do not require judges to
 purchase credits. The public replay does not resolve this access requirement.
 

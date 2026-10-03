@@ -163,10 +163,12 @@ Post-T8 [reliability work](docs/POST_T8_RELIABILITY.md) adds state-specific acti
 guidance, native JSON facts, a quote-free factual conclusion, net-change and
 authored-test execution gates, persistent property-only feedback, assertion target
 checks, a developer-field catalog, explicit completion readiness, idempotent test
-specification saves, and a bounded 120-second inference wait. **61 local
-tests pass.** A revised live development pilot cleared the format gates with zero
-action rejections, but its repair failed protected validation. T8 results remain
-unchanged; repair-quality improvement is not yet established.
+specification saves, and a bounded 120-second inference wait. **62 local tests
+pass.** Two follow-up B2 pilots completed: IF-001 produced an accepted frozen
+repair that passed all four previously used final schedules; IF-002 produced a
+rejected compensation repair. Neither authored developer tests. These are
+separate development results, not a new benchmark or evidence of reliable repair
+across incidents. T8 results remain unchanged.
 
 ## Try it
 
@@ -219,7 +221,8 @@ default Windows location.
 python scripts/run-t4.py --live --variant B2 --incident IF-002 --backend contree
 ```
 
-The persisted inference allocation is **$0.20 per project**, not a promise that
+The owner-approved cumulative inference ceiling is **$0.40** for this development
+project (new ledgers default to $0.20); it is not a promise that
 inference is free. Sandbox beta execution was confirmed free for the development
 account; confirm your account terms. Docker is still needed to independently
 verify exported remote evidence.

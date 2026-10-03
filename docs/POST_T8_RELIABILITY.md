@@ -200,3 +200,27 @@ calls; exposure before this amendment is **$0.183098**. See
 [the audit record](../benchmarks/reliability/allocation-amendment.json).
 Historical T8 caps and results are unchanged. Access is confirmed by the owner
 through submission only; December judging access remains unresolved.
+
+
+## Live completion checks after the allocation amendment
+
+At revision `212d95b`, two separately declared B2 attempts tested the completion
+flow. IF-001 (`b2-if-001-20261003T160414Z-6c7d7c`) completed in five calls with one
+source edit and no action rejections. The frozen repair passed development
+validation and all four previously used final schedules. Inference: **$0.005378**.
+
+IF-002 (`b2-if-002-20261003T160752Z-e8b71a`) completed in seven calls with one source
+edit but failed protected compensation property P4. The model acknowledged the
+failure and submitted a rejected candidate rather than claiming acceptance.
+Final schedule follow-up also rejected the frozen candidate.
+Inference: **$0.008102**. The edit changed handling of a failed release instead of
+repairing restart recovery; completion-flow improvements do not ensure repair quality.
+
+Neither attempt authored developer tests, so neither exercised the new authored-test
+completion path live. These two development attempts do not replace any T8 outcome
+or establish a comparative success rate. Curated records are `v6-pilot.json` and
+`v7-pilot.json` under `benchmarks/reliability/`.
+
+Cumulative exposure is **$0.196578 / $0.40**, including **$0.053085** in conservative
+unknown-call reservations. No calls remain pending. The remaining allocation is
+**$0.203422**. The unallocated portion of the original trial is reserved, not committed.

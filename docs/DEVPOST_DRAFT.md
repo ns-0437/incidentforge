@@ -33,7 +33,9 @@ two rejected frozen candidates and eight unresolved attempts. Three inference
 timeouts crossed our predeclared infrastructure threshold, so we make no variant
 ranking claim. Later development reduced JSON-escaping friction, added explicit
 completion guidance, and prevented unrun or placeholder tests from masquerading
-as completed work. Those changes pass 61 local checks but are not a new benchmark.
+as completed work. Those changes pass 62 local checks. Two follow-up B2 attempts completed: an
+accepted IF-001 repair and a rejected IF-002 repair. These are development results,
+not a new benchmark.
 
 ## What we learned
 Correct measurements, plausible explanations, useful edits and a completed agent
@@ -41,7 +43,7 @@ workflow are different outcomes. We retain failures and costs rather than select
 only successful demos. Intermediate feedback cannot replace post-freeze validation.
 
 ## What's next
-Validate the latest completion changes with a separately funded pilot, extend
+Improve compensation-repair reliability, extend
 fault coverage with new incident mechanisms, and finish durable judge access.
 The current system does not establish universal repair correctness or reliable
 completion on arbitrary repositories.
