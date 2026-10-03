@@ -218,3 +218,39 @@ class AllocationTests(unittest.TestCase):
             with sqlite3.connect(path) as db: db.execute('UPDATE settings SET cap=400001')
             db.close()
             with self.assertRaises(ValueError): Budget.existing(path)
+
+class TraceTests(unittest.TestCase):
+    def test_only_executed_lines_without_local_values(self):
+        import sys,tempfile
+        from pathlib import Path
+        from fixture.harness.trace_runtime import Recorder
+        with tempfile.TemporaryDirectory() as d:
+            target=Path(d)/'candidate.py'
+            source="def step(flag):\n    secret='DO_NOT_CAPTURE'\n    if flag:\n        return\n    return 7\n"
+            scope={};exec(compile(source,str(target),'exec'),scope)
+            rows=[];recorder=Recorder(target,rows.append)
+            previous=sys.gettrace()
+            try:
+                sys.settrace(recorder.trace)
+                for _ in range(4): scope['step'](True)
+            finally: sys.settrace(previous)
+            self.assertTrue(any(r['event']=='return' and r['line']==4 for r in rows))
+            self.assertFalse(any(r['line']==5 for r in rows))
+            self.assertEqual(len(rows),len({(r['event'],r['line']) for r in rows}))
+            self.assertNotIn('DO_NOT_CAPTURE',json.dumps(rows))
+
+    def test_trace_reader_rejects_malformed_and_wrong_process_rows(self):
+        import tempfile
+        from pathlib import Path
+        from types import SimpleNamespace
+        from fixture.harness.trace_observation import observation
+        with tempfile.TemporaryDirectory() as d:
+            root=Path(d);app=root/'public/fixture/app';app.mkdir(parents=True)
+            (app/'service.py').write_text('def step():\n    return\n')
+            rows=['broken','[]','{"pid":9,"line":2,"event":"return"}',
+                  '{"pid":1,"line":true,"event":"line"}','{"pid":1,"line":99,"event":"line"}',
+                  '{"pid":1,"line":2,"event":"return"}']
+            (root/'order-service.log').write_text(''.join('IF_TRACE_V1 '+r+'\n' for r in rows))
+            result=observation(SimpleNamespace(root=root,bundle=root/'public',started_ids=[{'service':'order','pid':1}]))
+            self.assertEqual([{'event':'return','line':2,'source':'    return'}],result['processes'][0]['events'])
+            self.assertIn('spoofed',result['trust'])

@@ -115,7 +115,11 @@ not restate success versus failure. Trace the relevant function from entry to th
 claimed failed side effect, including earlier returns and prerequisite state.
 For each source-based mechanism, explain why that path is reachable under the
 failing condition and what state is reconstructed after restart. If not known,
-state the missing evidence rather than inferring it from a final status alone.'''
+state the missing evidence rather than inferring it from a final status alone.
+When execution_trace is available, compare process generations and inspect the
+source at executed return lines. These bounded candidate-process diagnostics can
+be spoofed or disabled; they are not protected evidence. Missing lines alone do
+not prove a path is impossible. Do not conflate initial and restarted processes.'''
     if is_comp:
         system+='\nCANCELLED_DECLINED means compensation has completed; COMPENSATING is a pending state.'
     messages=[{'role':'system','content':system},{'role':'user','content':json.dumps(prompt)}]

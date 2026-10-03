@@ -31,7 +31,7 @@ def main():
         if args.mode=='compensation_probe': conditions+=['release_replay','release_replay_inventory_restart']
         for condition in conditions:
             with tempfile.TemporaryDirectory(prefix='if-comp-') as temp:
-                Path(temp).chmod(0o755);w=World(Path(temp)/'world')
+                Path(temp).chmod(0o755);w=World(Path(temp)/'world',trace=True)
                 try:
                     w.start()
                     if condition=='order_restart':
@@ -49,6 +49,8 @@ def main():
                         second=http(PORTS['inventory'],'POST','/reservations/rsv:probe/release',{'operation_key':'rel:probe'})
                         observation={'condition':condition,'responses':[first,second],
                                      'stock':http(PORTS['inventory'],'GET','/stock')[1]}
+                    from fixture.harness.trace_observation import observation as trace_observation
+                    observation['execution_trace']=trace_observation(w)
                     observations.append(observation)
                 finally: w.close()
         result={'mode':args.mode,'complete':True,'observations':observations,

@@ -27,7 +27,8 @@ def read_rows(path,query):
 
 
 class World(T1World):
-    def __init__(self,root,control='reference',fault=False,pause=False,stock=None):
+    def __init__(self,root,control='reference',fault=False,pause=False,stock=None,trace=False):
+        self.trace=trace
         self.root,self.control,self.fault,self.pause=root,control,fault,pause
         root.mkdir(parents=True)
         root.chmod(0o755)
@@ -63,6 +64,8 @@ class World(T1World):
                 if source.is_symlink() or source.stat().st_size>64000: raise ValueError('candidate source bound')
                 (app/name).write_bytes(source.read_bytes())
         (self.bundle/'CONTRACT.md').write_bytes((ROOT/'contracts'/'public'/'CONTRACT.md').read_bytes())
+        if trace:
+            (self.bundle/'_if_trace.py').write_bytes((ROOT/'fixture/harness/trace_runtime.py').read_bytes())
         self.bundle_hashes={str(p.relative_to(self.bundle)):hashlib.sha256(p.read_bytes()).hexdigest()
                             for p in self.bundle.rglob('*') if p.is_file()}
         for p in self.bundle.rglob('*'):
@@ -82,7 +85,7 @@ class World(T1World):
         file=path.open('a')
         self.files.append(file)
         proc=subprocess.Popen([sys.executable,str(ROOT/'fixture/harness/launch.py'),str(UIDS[service]),
-            str(self.bundle),'-m','fixture.app.service','--service',service,'--socket',str(self.sock(service)),
+            str(self.bundle),'-m',('_if_trace' if self.trace and service=='order' else 'fixture.app.service'),'--service',service,'--socket',str(self.sock(service)),
             '--port',str(PORTS[service])],stdout=file,stderr=file,
             env={'PATH':'/usr/local/bin:/usr/bin:/bin','PYTHONDONTWRITEBYTECODE':'1'})
         self.processes.append(proc)

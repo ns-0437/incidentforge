@@ -44,3 +44,24 @@ class CompensationTests(ContractTests):
         self.assertEqual(1,len(releases))
         w.protocol_checks.append({'name':'release replay survives restart without second release mutation','passed':True})
         self.verdict(w,'if002-release-replay')
+
+    def test_development_trace_distinguishes_restart_return(self):
+        from fixture.harness.trace_observation import observation
+        for control in ('lost_compensation','reference'):
+            w=self.world(control=control,trace=True)
+            result=decline_restart(w)
+            trace=observation(w)
+            self.assertEqual(2,len(trace['processes']))
+            events=trace['processes'][1]['events']
+            self.assertTrue(events)
+            self.assertLessEqual(len(events),128)
+            self.assertFalse(trace['log_truncated'])
+            if control=='lost_compensation':
+                self.assertEqual('COMPENSATING',result['order']['status'])
+                self.assertTrue(any(e['event']=='return' and e['source'].strip()=='return' for e in events))
+                self.assertTrue(any('pending_compensations' in e['source'] for e in events))
+                self.assertFalse(any('/release' in e['source'] for e in events))
+            else:
+                self.assertEqual('CANCELLED_DECLINED',result['order']['status'])
+                self.assertTrue(any('/release' in e['source'] for e in events))
+            w.close()
