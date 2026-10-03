@@ -1,0 +1,305 @@
+{
+  "version": 1,
+  "updated": "2026-10-03",
+  "mode": "recorded",
+  "incidents": [
+    {
+      "incident": "IF-001",
+      "run_id": "b2-20261003T052430Z-fc5821",
+      "title": "The charge that happened twice",
+      "backend": "local-docker",
+      "decision": "accept_for_review",
+      "calls": 7,
+      "estimated_usd": 0.006421,
+      "verified_events": 57,
+      "candidate_revision": "b0af7dd6a4ed1612ef0e1b61410887d576828bf3e20b0d5611c64598d87618bf",
+      "observations": [
+        {
+          "condition": "same_key_sequential",
+          "committed_charge_count": 1,
+          "http_statuses": [
+            201,
+            200
+          ]
+        },
+        {
+          "condition": "same_key_restart",
+          "committed_charge_count": 1,
+          "http_statuses": [
+            201,
+            200
+          ]
+        },
+        {
+          "condition": "same_key_concurrent",
+          "committed_charge_count": 1,
+          "http_statuses": [
+            201,
+            200
+          ]
+        },
+        {
+          "condition": "different_keys",
+          "committed_charge_count": 2,
+          "http_statuses": [
+            201,
+            201
+          ]
+        }
+      ],
+      "hypotheses": [
+        {
+          "mechanism": "key_regeneration_strategy",
+          "confidence_basis": "code_analysis_of_payment_step"
+        },
+        {
+          "mechanism": "preserve_original_key_semantics",
+          "confidence_basis": "contract_requirement_one_committed_charge"
+        }
+      ],
+      "patch_lines": [
+        "-            o['payment_key']=str(uuid.uuid4())",
+        "+            if 'payment_key' not in o or not o['payment_key']:",
+        "+                o['payment_key']=str(uuid.uuid4())"
+      ],
+      "properties": {
+        "P1": [
+          "pass",
+          "pass",
+          "pass",
+          "pass",
+          "pass",
+          "pass"
+        ],
+        "P2": [
+          "pass",
+          "pass",
+          "pass",
+          "pass",
+          "not_applicable",
+          "pass"
+        ],
+        "P3": [
+          "pass",
+          "pass",
+          "pass",
+          "pass",
+          "pass",
+          "pass"
+        ],
+        "P4": [
+          "pass",
+          "pass",
+          "pass",
+          "pass",
+          "pass",
+          "pass"
+        ],
+        "P5": [
+          "pass",
+          "pass",
+          "pass",
+          "pass",
+          "pass",
+          "pass"
+        ],
+        "P6": [
+          "pass",
+          "not_applicable",
+          "not_applicable",
+          "not_applicable",
+          "pass",
+          "not_applicable"
+        ],
+        "P7": [
+          "pass",
+          "pass",
+          "pass",
+          "pass",
+          "pass",
+          "pass"
+        ]
+      },
+      "protected_cases": 6,
+      "judge_note": "Repair passed declared development checks. Causal prose is not independently validated.",
+      "scope": "Recorded development run, not a T8 final comparison."
+    },
+    {
+      "incident": "IF-002",
+      "run_id": "b2-if-002-20261003T103551Z-6109b9",
+      "title": "The reservation that never cleared",
+      "backend": "nebius-sandbox",
+      "decision": "accept_for_review",
+      "calls": 6,
+      "estimated_usd": 0.005221,
+      "verified_events": 45,
+      "candidate_revision": "f3ac32e6aeb5e23e1f90634c29b39fdb4cdb02222254fb2f66a30e261bfebfad",
+      "observations": [
+        {
+          "condition": "no_restart",
+          "order_status": "CANCELLED_DECLINED"
+        },
+        {
+          "condition": "order_restart",
+          "order_status": "COMPENSATING"
+        },
+        {
+          "condition": "no_restart",
+          "order_status": "CANCELLED_DECLINED"
+        },
+        {
+          "condition": "order_restart",
+          "order_status": "COMPENSATING"
+        },
+        {
+          "condition": "release_replay",
+          "available_stock": {
+            "A": 10,
+            "B": 10
+          }
+        },
+        {
+          "condition": "release_replay_inventory_restart",
+          "available_stock": {
+            "A": 10,
+            "B": 10
+          }
+        }
+      ],
+      "hypotheses": [
+        {
+          "mechanism": "compensation completes without needing a service restart; restart only clears pending compensations but does not affect final order status",
+          "confidence_basis": "order_status_pending_compensations"
+        },
+        {
+          "mechanism": "compensation only finalizes after an Inventory restart that removes stale reservation or charge entries; without restart the order stays in COMPENSATING",
+          "confidence_basis": "order_status_pending_compensations"
+        }
+      ],
+      "patch_lines": [
+        "-        if phase=='COMPENSATING' and o['order_id'] not in self.pending_compensations:",
+        "-            return",
+        "+        pass"
+      ],
+      "properties": {
+        "P1": [
+          "pass",
+          "pass",
+          "pass",
+          "pass",
+          "pass",
+          "pass",
+          "pass",
+          "pass"
+        ],
+        "P2": [
+          "pass",
+          "pass",
+          "pass",
+          "pass",
+          "not_applicable",
+          "pass",
+          "pass",
+          "pass"
+        ],
+        "P3": [
+          "pass",
+          "pass",
+          "pass",
+          "pass",
+          "pass",
+          "pass",
+          "pass",
+          "pass"
+        ],
+        "P4": [
+          "pass",
+          "pass",
+          "pass",
+          "pass",
+          "pass",
+          "pass",
+          "pass",
+          "pass"
+        ],
+        "P5": [
+          "pass",
+          "pass",
+          "pass",
+          "pass",
+          "pass",
+          "pass",
+          "pass",
+          "pass"
+        ],
+        "P6": [
+          "pass",
+          "not_applicable",
+          "not_applicable",
+          "not_applicable",
+          "pass",
+          "not_applicable",
+          "not_applicable",
+          "pass"
+        ],
+        "P7": [
+          "pass",
+          "pass",
+          "pass",
+          "pass",
+          "pass",
+          "pass",
+          "pass",
+          "pass"
+        ]
+      },
+      "protected_cases": 8,
+      "judge_note": "Repair passed declared development checks. Causal prose is not independently validated.",
+      "scope": "Recorded development run, not a T8 final comparison."
+    }
+  ],
+  "campaign": {
+    "status": "incomplete",
+    "planned_runs": 12,
+    "launched_runs": 4,
+    "unlaunched_runs": 8,
+    "ranking_supported": false,
+    "stop_reason": "Inference wall-time timeout left usage unknown; persistent guard prevented further dispatch."
+  },
+  "attempts": [
+    {
+      "slot": 1,
+      "incident": "IF-001",
+      "variant": "B0",
+      "final_decision": "unresolved",
+      "reason": "RuntimeError: format/action correction limit"
+    },
+    {
+      "slot": 2,
+      "incident": "IF-001",
+      "variant": "B1",
+      "final_decision": "unresolved",
+      "reason": "RuntimeError: format/action correction limit"
+    },
+    {
+      "slot": 3,
+      "incident": "IF-001",
+      "variant": "B2",
+      "final_decision": "unresolved",
+      "reason": "RuntimeError: format/action correction limit"
+    },
+    {
+      "slot": 4,
+      "incident": "IF-002",
+      "variant": "B1",
+      "final_decision": "unresolved",
+      "reason": "TimeoutError: Inference wall-time cap; usage unknown, no retry"
+    }
+  ],
+  "limitations": [
+    "Development runs are separate from the frozen comparison.",
+    "Two synthetic defect implementations; finite checks are not a correctness proof.",
+    "GitHub Pages serves recorded evidence. Live execution requires the local controller and credentials.",
+    "IF-002 restarts Inventory and Order to discard queued pre-crash requests."
+  ]
+}

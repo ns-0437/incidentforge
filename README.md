@@ -9,13 +9,15 @@
 [![Sandbox](https://img.shields.io/badge/Execution-Nebius%20Sandbox-ff9d5c)](docs/ARCHITECTURE.md)
 [![Nemotron](https://img.shields.io/badge/Model-NVIDIA%20Nemotron-76b900)](src/incidentforge/llm.py)
 
-[Quick start](#try-it) · [Architecture](#architecture) · [Experiments](#two-incidents-three-protocols) · [Results](#measured-results) · [Trust](#trust-boundaries)
+[Interactive judge demo](https://ns-0437.github.io/incidentforge-demo/) · [Quick start](#try-it) · [Architecture](#architecture) · [Experiments](#two-incidents-three-protocols) · [Results](#measured-results) · [Trust](#trust-boundaries)
 
 </div>
 
 ---
 
 ## Why this exists
+
+Explore the [recorded investigation desk](https://ns-0437.github.io/incidentforge-demo/): two synthetic incidents, measured observations, proposed patches, verification results, and an interactive architecture diagram. The static demo spends no inference credits. Its successful development runs are explicitly separate from the incomplete T8 comparison. [Publishing guide](docs/JUDGE_FRONTEND.md).
 
 A payment response disappears **after the charge commits**. A retry uses a fresh
 identity. The order looks healthy—and the customer is charged twice.
