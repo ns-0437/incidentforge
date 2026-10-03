@@ -1,0 +1,8 @@
+{
+  "portable_tests": 65,
+  "linux_tests": 17,
+  "linux_failures": 0,
+  "linux_report_sha256": "0d71180700d5fdc83e8ee410ea9e9929c671adbe203c8073309a35569408abb1",
+  "ci_revision": "af5bcd3b2dfb07119d5f1e8b71cb6c0da118dc64",
+  "scope": "Trace observation mechanics and uninstrumented protected controls; not model repair effectiveness."
+}

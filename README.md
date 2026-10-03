@@ -163,14 +163,16 @@ Post-T8 [reliability work](docs/POST_T8_RELIABILITY.md) adds state-specific acti
 guidance, native JSON facts, a quote-free factual conclusion, net-change and
 authored-test execution gates, persistent property-only feedback, assertion target
 checks, a developer-field catalog, explicit completion readiness, idempotent test
-specification saves, and a bounded 120-second inference wait. **62 local tests
+specification saves, and a bounded 120-second inference wait. **65 local tests
 pass.** Two follow-up B2 pilots completed: IF-001 produced an accepted frozen
 repair that passed all four previously used final schedules; IF-002 produced a
 rejected compensation repair. Neither authored developer tests. These are
 separate development results, not a new benchmark or evidence of reliable repair
 across incidents. A subsequent instruction-only IF-002 pilot also failed repair
 validation, while successfully exercising the authored-test execution and honest
-completion path. T8 results remain unchanged.
+completion path. Bounded [development traces](docs/DEVELOPMENT_TRACES.md) now
+show executed source lines by process generation; subsequent pilots still failed
+to repair IF-002. T8 results remain unchanged.
 
 ## Try it
 

@@ -245,3 +245,29 @@ Nine model calls cost **$0.010978**. Cumulative exposure is **$0.207556 / $0.40*
 No automatic retry was launched. The next useful intervention is stronger measured
 execution-path evidence, not another identical prompt attempt or weakened acceptance
 criteria. Historical accepted repairs and T8 outcomes remain unchanged.
+
+
+## Development execution traces: implemented, repair improvement not established
+
+[Development traces](DEVELOPMENT_TRACES.md) provide bounded source line/return
+observations by Order process generation. They are candidate-process diagnostics,
+not protected evidence. Tracing is disabled for protected and final evaluation.
+65 portable tests and CI pass; 17 Linux checks pass, including a trace comparison
+where the faulty restart returns early while the reference reaches release.
+
+The first declared trace pilot at `4ad1e92` stopped after two model calls because
+both investigation responses named nonexistent source symbols. It made no edits
+and cost **$0.003072**. The trace itself was available; its repair value was not tested.
+The next revision `af5bcd3` reports the exact invalid identifiers and valid choices
+without relaxing grounding. Its one declared follow-up passed investigation, but
+again suppressed a downstream release error and failed protected P4 after freeze.
+It used nine calls and cost **$0.013089**. Both attempts are retained as v9/v10.
+
+The model's v10 claim that further repair exceeded its edit budget is unverified
+and contradicted by the controller count of one applied edit. Do not promote
+that prose into a factual explanation of the stopping decision.
+
+Cumulative exposure is **$0.223717 / $0.40**; **$0.176283** remains. No calls are
+pending. No further identical pilot was started. Measured traces are implemented,
+but these attempts do not establish reliable compensation repair or a benchmark
+improvement. The original T8 comparison remains unchanged.
