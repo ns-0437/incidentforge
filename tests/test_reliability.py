@@ -269,3 +269,36 @@ class SymbolFeedbackTests(unittest.TestCase):
                           conditions={'one'},source='def step(order):\n    return order\n')
         self.assertIn("Invalid: ['invented']",str(caught.exception))
         self.assertIn('Choose only from: order, step',str(caught.exception))
+
+class TraceFocusTests(unittest.TestCase):
+    def sample(self):
+        import hashlib
+        source=b"def step(order):\n    phase=order['status']\n    if phase=='PENDING':\n        return\n    finish()\n"
+        observations=[{'condition':'restart','execution_trace':{
+            'source_sha256':hashlib.sha256(source).hexdigest(),'processes':[
+            {'generation':0,'events':[{'event':'return','line':5}]},
+            {'generation':1,'events':[{'event':'return','line':4,'source':'FORGED SOURCE'},
+                                    {'event':'return','line':4},{'event':'line','line':5}]}]}}]
+        return source,observations
+    def test_focus_separates_generations_and_uses_actual_source(self):
+        from incidentforge.trace_focus import focus
+        source,obs=self.sample();value=focus(obs,source)
+        processes=value['conditions'][0]['processes']
+        self.assertEqual([0,1],[p['generation'] for p in processes])
+        returns=processes[1]['observed_returns']
+        self.assertEqual(1,len(returns));self.assertEqual(4,returns[0]['line'])
+        self.assertNotIn('FORGED SOURCE',json.dumps(value))
+        self.assertIn("if phase=='PENDING':",json.dumps(value))
+        self.assertIn('Untrusted',value['trust'])
+    def test_source_change_hides_stale_trace_locations(self):
+        from incidentforge.trace_focus import focus
+        source,obs=self.sample();row=focus(obs,source+b'# edited\n')['conditions'][0]
+        self.assertFalse(row['source_matches']);self.assertEqual([],row['processes'])
+    def test_trace_focus_bounds_and_marks_incomplete_input(self):
+        from incidentforge.trace_focus import focus
+        source,obs=self.sample();trace=obs[0]['execution_trace'];trace['log_truncated']=True
+        trace['processes'][1]['event_limit_reached']=True
+        trace['processes'][1]['events'] += [{'event':'return','line':True},{'event':'return','line':9999}]
+        row=focus(obs,source)['conditions'][0]
+        self.assertTrue(row['log_truncated']);self.assertTrue(row['processes'][1]['event_limit_reached'])
+        self.assertEqual(1,len(row['processes'][1]['observed_returns']))
