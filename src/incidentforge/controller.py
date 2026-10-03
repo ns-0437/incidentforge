@@ -65,6 +65,7 @@ class Controller:
         base=self.workspace.revision()
         interpreted=self.variant=='B0';validations=0;experiments=0;measured_facts={}
         last_test_revision=None
+        protected_feedback=None;feedback_revision=None;developer_observations=[]
         initial_sources={name:self.workspace.read(name) for name in EDITABLE}
         try:
             bundle={'revision':base,'image_digest':self.backend.image,'lock_hash':digest({'python':'3.12','dependencies':[]}),
@@ -87,6 +88,7 @@ class Controller:
             self.emit('ExperimentSpec',spec)
             reproduction=self.backend.run(self.workspace.root,'developer')
             if not reproduction.get('complete'): raise ValueError('incomplete reproduction')
+            developer_observations=reproduction.get('observations',[])
             self.emit('ExperimentResult',{'spec_hash':digest(spec),'backend':self.backend.name,'reset_result':'fresh stores',
                 'observations':reproduction,'completion':'complete','completeness':'HTTP-only',
                 'violations':[],'resources':{'execution_count':self.backend.count},'interpretation_author':'controller'})
@@ -125,7 +127,9 @@ protected behavioral feedback during repair.'''
                 from .grounding import factual_conclusion
                 available=['read','search']
                 if interpreted:
-                    available+=['replace','developer_test','test','finish']
+                    if edits<3: available+=['replace','developer_test']
+                    if tests<2: available+=['test']
+                    available+=['finish']
                     if not experiments: available+=['experiment']
                     if self.variant=='B2' and not validations: available+=['validate']
                 else: available+=['interpret']
@@ -140,6 +144,14 @@ protected behavioral feedback during repair.'''
                 value['developer_test_schema']={'action':'developer_test','spec':{'assertions':[
                     {'name':'description','condition':'observed condition or fault label','path':'observed.field','equals':'expected scalar'}]},'reason':'regression purpose'}
                 value['test_operators']='Only equals is supported. No not_equal, shell, expressions or invented observation conditions.'
+                value['developer_test_conditions']=sorted({o.get('condition',o.get('fault')) for o in developer_observations
+                    if isinstance(o.get('condition',o.get('fault')),str)})
+                if protected_feedback is not None:
+                    value['protected_feedback']={**protected_feedback,'candidate_unchanged_since_feedback':self.workspace.revision()==feedback_revision}
+                    value['repair_review']=('Negative feedback is evidence against this candidate. Read the relevant public contract and trace the durable state '
+                        'before/after the failed response or restart. Revise the source if supported, then run developer tests. '
+                        'A changed candidate is unvalidated until independent verification; an unchanged rejected candidate remains rejected. '
+                        'If you cannot repair within bounds, finish with explicit limitations. Never claim the failed property is fixed.')
                 return value
             messages.append({'role':'user','content':json.dumps({'action_contract':guidance()})})
             for turn in range(10):
@@ -174,10 +186,13 @@ protected behavioral feedback during repair.'''
                         if validations>=1: raise ValueError('protected feedback limit')
                         from .investigation import feedback
                         validations+=1;result=feedback(self.backend.run(self.workspace.root,'protected'))
+                        protected_feedback=result;feedback_revision=self.workspace.revision()
                     elif kind=='developer_test':
                         if edits>=3: raise ValueError('edit limit')
                         from fixture.harness.developer_tests import validate
                         spec=validate(command['spec'] if isinstance(command['spec'],dict) else json.loads(command['spec']))
+                        from fixture.harness.developer_tests import validate_targets
+                        validate_targets(spec,developer_observations)
                         raw=encoded(spec)
                         if len(raw)>8192: raise ValueError('developer test size')
                         target=self.workspace.root/'developer-tests.json'
@@ -196,7 +211,9 @@ protected behavioral feedback during repair.'''
                     elif kind=='test':
                         if tests>=2: raise ValueError('developer test limit')
                         tests+=1;result=self.backend.run(self.workspace.root,'developer')
-                        if result.get('complete'): last_test_revision=self.workspace.revision()
+                        if result.get('complete'):
+                            last_test_revision=self.workspace.revision()
+                            developer_observations=result.get('observations',[])
                     else:
                         if self.variant=='B2' and not validations: raise ValueError('B2 requires validate feedback before finish')
                         if all(self.workspace.read(name)==text for name,text in initial_sources.items()):
@@ -238,6 +255,8 @@ protected behavioral feedback during repair.'''
         report={'schema_version':1,'run_id':self.run_id,'variant':self.variant,'decision':decision,'reason':reason,
             'incident':getattr(self.backend,'incident','IF-001'),
             'protected_feedback_requests':validations,
+            'protected_feedback':None if protected_feedback is None else {**protected_feedback,
+                'candidate_unchanged_since_feedback':self.workspace.revision()==feedback_revision},
             'model_claim_unverified':model_summary,'candidate_revision':frozen,'edits':edits,'requested_tests':tests,'backend':self.backend.name,
             'verified_work':{'changed_source_paths':sorted(name for name,text in initial_sources.items() if self.workspace.read(name)!=text),
                              'developer_test_file_present':(self.workspace.root/'developer-tests.json').is_file(),

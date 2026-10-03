@@ -13,6 +13,18 @@ def validate(spec):
         if type(a['equals']) not in (str,int,bool,type(None)): raise ValueError('expected scalar')
     return spec
 
+def validate_targets(spec,observations):
+    """Author only against fields actually exposed by the developer workload."""
+    for assertion in spec['assertions']:
+        matches=[o for o in observations if o.get('condition',o.get('fault'))==assertion['condition']]
+        if len(matches)!=1: raise ValueError('assertion condition must identify one observed developer condition')
+        value=matches[0]
+        for part in assertion['path'].split('.'):
+            if not isinstance(value,dict) or part not in value:
+                raise ValueError('assertion path must exist in the selected developer observation')
+            value=value[part]
+    return spec
+
 def execute(path,result):
     if not path.exists(): return {'authored':False,'assertions':[]}
     if path.is_symlink() or path.stat().st_size>8192: raise ValueError('developer tests bound')

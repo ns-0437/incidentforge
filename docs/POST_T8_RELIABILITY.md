@@ -36,7 +36,7 @@ intentionally refuses the newer development implementation.
 
 ## Validation
 
-54 portable tests pass, including eleven new regressions for malformed action
+57 portable tests pass, including fourteen new regressions for malformed action
 types, exact factual checks with native objects, guided correction, unchanged
 and reverted source, no-op edits, unsupported assertion operators and deadline
 refusal without dispatch and quote-free factual conclusions. Scripted tests establish controller behavior, not live
@@ -77,6 +77,28 @@ Project settled token-price estimate: **$0.112362**. Conservative exposure inclu
 T8's three unknown reservations: **$0.165447 / $0.20**. No new unknown inference
 usage or pending sandbox operation remains. No further inference was launched.
 
-Next priority is repair reasoning and using negative property feedback to revise
-the candidate. Any future live comparison needs a new freeze and adequate budget;
+## Follow-up: persistent negative feedback and grounded tests
+
+The controller now retains property-only feedback in subsequent action guidance
+and the final report. It marks whether the candidate is unchanged since that
+feedback. A revised candidate is explicitly unvalidated; changing code does not
+turn a rejected result into a pass. Guidance asks the model to revisit the public
+contract and durable state transitions before revising its proposal. Finishing
+with a known limitation is still possible, and independent verification remains
+the only acceptance authority. No additional protected feedback is available.
+
+Developer assertions must name exactly one condition and an existing field from
+the most recent developer observations. This rejects the literal placeholder
+test authored in the second pilot. Expected values may differ from observed
+values, so genuine failing regression assertions remain valid. This authoring
+check uses no protected observations, schedules or case names. Exhausted edit
+and test actions are omitted from guidance; server-side bounds still apply.
+
+Three new local regressions verify placeholder refusal, retained negative
+feedback across a revision without private case leakage, and field validation
+that still permits failing expected values. These follow-up changes have not
+been tested with another live model; no further inference credit was spent.
+
+Next priority is validating repair reasoning with a separately declared pilot.
+Any future live comparison needs a new freeze and adequate budget;
 these two sequential development revisions must not be merged into T8 results.

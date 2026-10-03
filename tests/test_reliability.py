@@ -14,7 +14,7 @@ from incidentforge.llm import Nebius,REQUEST_SECONDS
 class ReliabilityTests(unittest.TestCase):
     setUp=test_t4.T4Tests.setUp
 
-    def run_actions(self,commands,variant='B0',measured=None):
+    def run_actions(self,commands,variant='B0',measured=None,protected=None):
         root=self.root/'candidate';app=root/'fixture/app';app.mkdir(parents=True)
         for name in ('service.py','common.py','contract.py'): (app/name).write_text('x=1\n')
         (root/'CONTRACT.md').write_text('contract');(root/'INCIDENT.json').write_text('{}')
@@ -22,7 +22,9 @@ class ReliabilityTests(unittest.TestCase):
             image='test';name='test-double';count=0
             def run(self,path,mode):
                 self.count+=1
-                return {'complete':True,'decision':'accept_for_review','cases':[]}
+                if mode=='protected' and protected is not None: return protected
+                return {'complete':True,'decision':'accept_for_review','cases':[],
+                        'observations':[{'condition':'clean','order':{'status':'CONFIRMED'}}]}
         class Model:
             history=[]
             def call(self,messages):
@@ -113,5 +115,37 @@ class ReliabilityTests(unittest.TestCase):
             with self.assertRaises(TimeoutError):m.call([])
             request.assert_not_called()
         self.assertEqual(0,b.totals('r')['calls'])
+
+    def test_placeholder_assertion_cannot_be_saved(self):
+        bad={'action':'developer_test','spec':{'assertions':[{'name':'description','condition':'observed condition or fault label','path':'observed.field','equals':'expected scalar'}]},'reason':'regression purpose'}
+        report,_,_=self.run_actions(iter([bad]*3))
+        self.assertFalse(report['verified_work']['developer_test_file_present'])
+        self.assertEqual(0,report['edits'])
+
+    def test_failed_feedback_persists_without_private_case_details(self):
+        measured={'condition':{'committed_charge_count':1}}
+        def interpret(messages):return json.dumps(json.loads(messages[-1]['content'])['action_contract']['interpret_fields'])
+        def review(messages):
+            guidance=json.loads(messages[-1]['content'])['action_contract']
+            self.assertEqual(['P1'],guidance['protected_feedback']['failed_properties'])
+            self.assertTrue(guidance['protected_feedback']['candidate_unchanged_since_feedback'])
+            self.assertNotIn('secret-case',json.dumps(guidance))
+            return json.dumps({'action':'replace','path':'fixture/app/service.py','old':'x=2','new':'x=3','reason':'revise'})
+        def finish(messages):
+            guidance=json.loads(messages[-1]['content'])['action_contract']
+            self.assertFalse(guidance['protected_feedback']['candidate_unchanged_since_feedback'])
+            return '{"action":"finish","summary":"revision still needs verification"}'
+        rejected={'complete':True,'decision':'reject_behavior','cases':[{'case':'secret-case','properties':{'P1':{'status':'fail','reason':'secret'}}}]}
+        report,_,_=self.run_actions(iter([interpret,{'action':'replace','path':'fixture/app/service.py','old':'x=1','new':'x=2','reason':'initial'},
+            {'action':'validate'},review,finish]),'B2',measured,rejected)
+        self.assertEqual('reject_behavior',report['decision'])
+        self.assertFalse(report['protected_feedback']['candidate_unchanged_since_feedback'])
+
+    def test_assertion_target_checks_do_not_require_expected_value_to_pass(self):
+        from fixture.harness.developer_tests import validate_targets
+        spec={'assertions':[{'name':'recover','condition':'fault','path':'order.status','equals':'CONFIRMED'}]}
+        validate_targets(spec,[{'fault':'fault','order':{'status':'PENDING'}}])
+        spec['assertions'][0]['path']='order.invented'
+        with self.assertRaises(ValueError):validate_targets(spec,[{'fault':'fault','order':{'status':'PENDING'}}])
 
 if __name__=='__main__':unittest.main()
