@@ -39,6 +39,8 @@ check early returns and whether each prerequisite survives process restart. A te
 state is already complete; do not treat it as pending work without contract evidence.
 Distinguish your proposed causal mechanism from measured outcomes and consider which
 observation would falsify it. Do not claim an experiment established causality.'''
+SYSTEM=SYSTEM.replace('"spec":"JSON-encoded assertion specification"','"spec":{"assertions":[]}').replace(
+    'spec is a JSON-encoded object','spec is a JSON object (legacy JSON-encoded strings also work)')
 
 class Controller:
     def __init__(self,run_id,workspace,evidence,backend,model,budget,cancel_file=None,variant='B0'):
@@ -62,6 +64,8 @@ class Controller:
         decision='unresolved';reason='not started';model_summary=None;messages=[];edits=0;tests=0;bad=0;frozen=None
         base=self.workspace.revision()
         interpreted=self.variant=='B0';validations=0;experiments=0;measured_facts={}
+        last_test_revision=None
+        initial_sources={name:self.workspace.read(name) for name in EDITABLE}
         try:
             bundle={'revision':base,'image_digest':self.backend.image,'lock_hash':digest({'python':'3.12','dependencies':[]}),
                 'topology':['Order -> Inventory HTTP','Order -> proxy -> Payment HTTP'],
@@ -102,8 +106,8 @@ class Controller:
                     'Hidden verification occurs once after your candidate is frozen.',
                     'You may request one validate action for property-only protected development feedback. Final validation follows freeze.')
                 messages[0]['content']+='''\nBefore any replace/test/validate/finish, return an interpret action with nonempty
-conclusion, supported, weakened, uncertainty strings plus observed_facts as a JSON-encoded
-string containing the exact measured_facts object supplied with the investigation.
+conclusion, supported, weakened, uncertainty strings plus observed_facts as a JSON
+object containing the exact measured_facts supplied with the investigation (legacy JSON strings also work).
 conclusion MUST equal required_factual_conclusion exactly. Put hypothesis support and
 uncertainty only in the remaining commentary fields; those are unverified causal claims. Compare measured observations
 against your predictions. Then repair the cause. Additional action: {"action":"validate"}.
@@ -117,6 +121,27 @@ protected behavioral feedback during repair.'''
                     messages[0]['content']=messages[0]['content'].replace(
                         'After your repair you MUST request validate once before finish, so B2 exercises\nprotected behavioral feedback during repair.','The validate action is unavailable in B1.')
                 messages.append({'role':'user','content':json.dumps({'investigation':investigation})})
+            def guidance():
+                from .grounding import factual_conclusion
+                available=['read','search']
+                if interpreted:
+                    available+=['replace','developer_test','test','finish']
+                    if not experiments: available+=['experiment']
+                    if self.variant=='B2' and not validations: available+=['validate']
+                else: available+=['interpret']
+                value={'allowed_actions':available,'applied_edits':edits,'requested_test_runs':tests,
+                       'remaining_edits':3-edits,'remaining_test_runs':2-tests,
+                       'finish_requires':'A net source change; authored tests must run on the current revision; B2 also requires validate. State only observed edits/tests in summary.'}
+                if not interpreted:
+                    value['interpret_fields']={'action':'interpret','conclusion':factual_conclusion(measured_facts),
+                        'observed_facts':measured_facts,'supported':'Your hypothesis assessment',
+                        'weakened':'Your alternative assessment','uncertainty':'What remains unverified'}
+                    value['instruction']='Copy conclusion and observed_facts exactly; write your own three commentary fields. Do not nest the action.'
+                value['developer_test_schema']={'action':'developer_test','spec':{'assertions':[
+                    {'name':'description','condition':'observed condition or fault label','path':'observed.field','equals':'expected scalar'}]},'reason':'regression purpose'}
+                value['test_operators']='Only equals is supported. No not_equal, shell, expressions or invented observation conditions.'
+                return value
+            messages.append({'role':'user','content':json.dumps({'action_contract':guidance()})})
             for turn in range(10):
                 if self.cancel_file and self.cancel_file.exists(): raise Cancelled('cancelled before action')
                 if time.monotonic()>=deadline: raise TimeoutError('run wall-time cap')
@@ -152,7 +177,7 @@ protected behavioral feedback during repair.'''
                     elif kind=='developer_test':
                         if edits>=3: raise ValueError('edit limit')
                         from fixture.harness.developer_tests import validate
-                        spec=validate(json.loads(command['spec']))
+                        spec=validate(command['spec'] if isinstance(command['spec'],dict) else json.loads(command['spec']))
                         raw=encoded(spec)
                         if len(raw)>8192: raise ValueError('developer test size')
                         target=self.workspace.root/'developer-tests.json'
@@ -171,17 +196,22 @@ protected behavioral feedback during repair.'''
                     elif kind=='test':
                         if tests>=2: raise ValueError('developer test limit')
                         tests+=1;result=self.backend.run(self.workspace.root,'developer')
+                        if result.get('complete'): last_test_revision=self.workspace.revision()
                     else:
                         if self.variant=='B2' and not validations: raise ValueError('B2 requires validate feedback before finish')
+                        if all(self.workspace.read(name)==text for name,text in initial_sources.items()):
+                            raise ValueError('No net source change exists; cannot freeze a claimed repair. Apply an exact source edit first.')
+                        if (self.workspace.root/'developer-tests.json').exists() and last_test_revision!=self.workspace.revision():
+                            raise ValueError('Authored developer tests have not run on the current revision; request test before finish.')
                         frozen=self.workspace.revision();model_summary=command['summary'];reason='Candidate frozen; awaiting independent validation.'
                         self.evidence.event('candidate_frozen',{'revision':frozen,'model_claim_unverified':model_summary});break
                     self.evidence.event('tool_result',{'artifact':self.evidence.artifact(result)})
-                    messages.append({'role':'user','content':json.dumps({'tool_result':result})})
+                    messages.append({'role':'user','content':json.dumps({'tool_result':result,'action_contract':guidance()})})
                 except (ValueError,SyntaxError,KeyError) as exc:
                     bad+=1
                     self.evidence.event('action_rejected',{'reason':str(exc)[:300]})
                     if bad>2: raise RuntimeError('format/action correction limit')
-                    correction={'error':str(exc)[:300],'remaining_corrections':2-bad}
+                    correction={'error':str(exc)[:300],'remaining_corrections':2-bad,'action_contract':guidance()}
                     if isinstance(exc,EditMismatch): correction['current_source']=exc.context
                     self.evidence.event('correction_feedback',{'artifact':self.evidence.artifact(correction)})
                     messages.append({'role':'user','content':json.dumps(correction)})
@@ -209,6 +239,10 @@ protected behavioral feedback during repair.'''
             'incident':getattr(self.backend,'incident','IF-001'),
             'protected_feedback_requests':validations,
             'model_claim_unverified':model_summary,'candidate_revision':frozen,'edits':edits,'requested_tests':tests,'backend':self.backend.name,
+            'verified_work':{'changed_source_paths':sorted(name for name,text in initial_sources.items() if self.workspace.read(name)!=text),
+                             'developer_test_file_present':(self.workspace.root/'developer-tests.json').is_file(),
+                             'developer_tests_executed_on_current_revision':last_test_revision==self.workspace.revision(),
+                             'requested_test_runs':tests},
             'accounting':self.budget.totals(self.run_id),
             'next_step':'Review protected report and patch.' if decision=='accept_for_review' else 'Inspect the retained failure evidence before another bounded attempt.',
             'limitations':['One development pilot, not a B0/B1/B2 comparison.','Manual controls are not model repairs.']}

@@ -11,6 +11,6 @@ jobs:
         with:
           python-version: '3.12'
       - name: Controller, UI, grounding and campaign tests
-        run: python -m unittest tests.test_t4 tests.test_t5 tests.test_t6_controller tests.test_t7 tests.test_prefreeze tests.test_t8
+        run: python -m unittest tests.test_t4 tests.test_t5 tests.test_t6_controller tests.test_t7 tests.test_prefreeze tests.test_t8 tests.test_reliability
       - name: Compile Python sources
         run: python -m compileall -q src fixture evaluation probes scripts tests

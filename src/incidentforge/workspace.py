@@ -54,6 +54,7 @@ class Workspace:
         path=self.path(name,edit=True);before=self.read(name)
         if before.count(old)!=1: raise EditMismatch(name,before,old)
         after=before.replace(old,new,1)
+        if after==before: raise ValueError('replacement makes no source change')
         if len(after.encode())>64000: raise ValueError('source size bound')
         ast.parse(after)
         path.write_text(after,encoding='utf-8')

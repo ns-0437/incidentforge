@@ -21,11 +21,14 @@ def factual_conclusion(expected):
         return ('Measured compensation states: without restart '+expected['no_restart']['order_status']+
                 '; after restart '+expected['order_restart']['order_status']+
                 '. These observations alone do not establish the cause.')
-    return 'Measured condition facts: '+json.dumps(expected,sort_keys=True,separators=(',',':'))+'. Causality remains unverified.'
+    if expected and all(isinstance(v,dict) and set(v)=={'committed_charge_count'} for v in expected.values()):
+        return ('Measured committed charges: '+ '; '.join(k+'='+str(expected[k]['committed_charge_count']) for k in sorted(expected))+
+                '. Causality remains unverified.')
+    return 'Structured condition facts match the recorded measurements. Causality remains unverified.'
 
 def check_interpretation(command,expected):
     if not expected: raise ValueError('Run an experiment before interpreting measurements')
-    try: observed=json.loads(command['observed_facts'])
+    try: observed=command['observed_facts'] if isinstance(command['observed_facts'],dict) else json.loads(command['observed_facts'])
     except (ValueError,KeyError,TypeError): raise ValueError('observed_facts must be a JSON-encoded object')
     if json.dumps(observed,sort_keys=True)!=json.dumps(expected,sort_keys=True):
         raise ValueError('observed_facts disagree with measured facts; copy every condition exactly')

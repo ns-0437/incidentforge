@@ -103,7 +103,11 @@ class T4Tests(unittest.TestCase):
                 if mode=='developer': return {'complete':True}
                 return {'decision':'accept_for_review','complete':False,'cases':[]}
         class Model:
-            def call(self,messages): return '{"action":"finish","summary":"claimed fixed"}'
+            calls=0
+            def call(self,messages):
+                self.calls+=1
+                if self.calls==1: return json.dumps({'action':'replace','path':'fixture/app/service.py','old':'x=1','new':'x=2','reason':'test change'})
+                return '{"action":"finish","summary":"claimed fixed"}'
         b=Budget(self.root/'b.db',200000);e=Evidence(self.root/'e','r')
         report=Controller('r',self.root/'candidate',e,Backend(),Model(),b).run()
         self.assertEqual('invalid_evaluation',report['decision'])

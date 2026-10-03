@@ -159,6 +159,13 @@ Development and evaluator readiness are separate from that campaign:
 See [T8 results](docs/T8_RESULTS.md), [protocol](docs/T8_PROTOCOL.md),
 [pre-T8 review](docs/PRE_T8_STATUS.md), and [curated data](benchmarks/t8/summary.json).
 
+Post-T8 [reliability work](docs/POST_T8_RELIABILITY.md) adds state-specific action
+guidance, native JSON facts, a quote-free factual conclusion, net-change and
+authored-test execution gates, and a bounded 120-second inference wait. **54 local
+tests pass.** A revised live development pilot cleared the format gates with zero
+action rejections, but its repair failed protected validation. T8 results remain
+unchanged; repair-quality improvement is not yet established.
+
 ## Try it
 
 **Prerequisites:** Python 3.12+, Docker with Linux containers, and a cached

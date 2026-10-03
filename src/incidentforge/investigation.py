@@ -95,7 +95,7 @@ after durable COMPENSATING before release (Inventory also restarts to drop stale
 and direct Inventory same-key release replay with/without Inventory restart. Predict
 terminal status/held stock and replay stock counts. No charge identity experiment runs.
 Name hypotheses H1 and H2 in prediction objects, and state a distinct falsifying observation.'''
-    prompt={'source':workspace.read('fixture/app/service.py'),'contract':workspace.read('CONTRACT.md'),
+    prompt={'incident':workspace.read('INCIDENT.json'),'source':workspace.read('fixture/app/service.py'),'contract':workspace.read('CONTRACT.md'),
             'observed_reproduction':reproduction,'baseline_revision':workspace.revision()}
     prompt['source_line_index']='\n'.join('L'+str(n)+': '+line for n,line in enumerate(prompt['source'].splitlines(),1))
     system+='''\nExactly TWO hypotheses, H1 then H2.
@@ -104,8 +104,11 @@ At least one condition must distinguish the hypotheses. symbols must be actual s
 AST names in the supplied source (e.g. step, worker), not invented dotted paths.
 supporting_refs should use line IDs from source_line_index, e.g. ["L163","L165"].
 The controller resolves IDs to exact source text; never invent IDs or quote paraphrased code.
-CANCELLED_DECLINED means compensation has completed; COMPENSATING is a pending state.
+Keep both hypotheses tied to the supplied incident symptom. Probe names label test
+interventions; they are not application mechanisms or source-code causes.
 Observing only the final state does not show that a transient state was never entered.'''
+    if is_comp:
+        system+='\nCANCELLED_DECLINED means compensation has completed; COMPENSATING is a pending state.'
     messages=[{'role':'system','content':system},{'role':'user','content':json.dumps(prompt)}]
     for attempt in range(2):
         raw=controller.model.call(messages)

@@ -56,9 +56,13 @@ def action(raw):
             'interpret':{'action','conclusion','supported','weakened','uncertainty','observed_facts'},'validate':{'action'},'experiment':{'action'},
             'developer_test':{'action','spec','reason'}}
     kind=obj.get('action')
-    if kind not in fields or set(obj)!=fields[kind]: raise ValueError('unsupported action or fields')
-    if any(not isinstance(v,str) for v in obj.values()): raise ValueError('string fields required')
-    if kind=='interpret' and any(not v.strip() for v in obj.values()): raise ValueError('interpretation fields required')
+    if not isinstance(kind,str) or kind not in fields: raise ValueError('unsupported action')
+    if set(obj)!=fields[kind]: raise ValueError('required fields for '+kind+': '+', '.join(sorted(fields[kind])))
+    structured={'interpret':'observed_facts','developer_test':'spec'}.get(kind)
+    for key,value in obj.items():
+        if key==structured and isinstance(value,dict): continue
+        if not isinstance(value,str): raise ValueError(key+' must be a string'+(' or object' if key==structured else ''))
+    if kind=='interpret' and any(isinstance(v,str) and not v.strip() for v in obj.values()): raise ValueError('interpretation fields required')
     if kind=='replace' and (not obj['old'] or len(obj['new'].encode())>24000): raise ValueError('edit bound')
     if kind=='search' and (not obj['query'] or len(obj['query'])>128): raise ValueError('search bound')
     return obj

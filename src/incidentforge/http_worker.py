@@ -4,7 +4,7 @@ from pathlib import Path
 import sys
 import urllib.request
 sys.path.insert(0,str(Path(__file__).resolve().parents[1]))
-from incidentforge.llm import credential,ENDPOINT
+from incidentforge.llm import credential,ENDPOINT,REQUEST_SECONDS
 
 def main():
     try:
@@ -12,7 +12,7 @@ def main():
         if len(payload)>110000: raise ValueError('payload bound')
         request=urllib.request.Request(ENDPOINT,data=payload,method='POST',
             headers={'Authorization':'Bearer '+credential(),'Content-Type':'application/json'})
-        with urllib.request.urlopen(request,timeout=60) as response: raw=response.read(1_000_001)
+        with urllib.request.urlopen(request,timeout=REQUEST_SECONDS) as response: raw=response.read(1_000_001)
         if len(raw)>1_000_000: raise ValueError('response bound')
         sys.stdout.buffer.write(raw)
         return 0

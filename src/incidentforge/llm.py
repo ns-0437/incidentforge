@@ -13,6 +13,7 @@ from .records import encoded
 MODEL='nvidia/NVIDIA-Nemotron-3-Nano-30B-A3B'
 ENDPOINT='https://api.tokenfactory.nebius.com/v1/chat/completions'
 MAX_OUTPUT=8192
+REQUEST_SECONDS=120
 # Public catalog verified 2026-10-03. Reserve the entire advertised 262k
 # context at input price plus maximum output, not an optimistic text estimate.
 INPUT_RATE=Decimal('0.06')
@@ -41,7 +42,7 @@ def request_once(payload):
         stdin=subprocess.PIPE,stdout=subprocess.PIPE,stderr=subprocess.PIPE,
         creationflags=getattr(subprocess,'CREATE_NO_WINDOW',0))
     try:
-        raw,error=process.communicate(encoded(payload),timeout=60)
+        raw,error=process.communicate(encoded(payload),timeout=REQUEST_SECONDS)
     except subprocess.TimeoutExpired:
         process.kill();process.communicate(timeout=5)
         raise TimeoutError('Inference wall-time cap; usage unknown, no retry')
@@ -55,7 +56,7 @@ class Nebius:
         self.cancel_file=cancel_file
 
     def call(self,messages):
-        if time.monotonic()+70>getattr(self,'deadline',float('inf')):
+        if time.monotonic()+REQUEST_SECONDS+10>getattr(self,'deadline',float('inf')):
             raise TimeoutError('Insufficient controller time for bounded inference')
         if self.cancel_file and self.cancel_file.exists(): raise RuntimeError('Cancellation requested before inference dispatch')
         if len(encoded(messages))>100000: raise ValueError('prompt byte bound')

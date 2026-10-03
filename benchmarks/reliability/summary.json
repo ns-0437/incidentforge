@@ -1,0 +1,133 @@
+{
+  "stage": "post-T8 development",
+  "comparative_claim": false,
+  "attempts": [
+    {
+      "run_id": "b2-if-001-20261003T130224Z-9bc3d1",
+      "variant": "B2",
+      "incident": "IF-001",
+      "decision": "unresolved",
+      "reason": "RuntimeError: format/action correction limit",
+      "edits": 0,
+      "requested_tests": 0,
+      "verified_work": {
+        "changed_source_paths": [],
+        "developer_test_file_present": false,
+        "requested_test_runs": 0
+      },
+      "accounting": {
+        "calls": 4,
+        "estimated_usage_microusd": 4033,
+        "reserved_or_spent_microusd": 4033,
+        "unknown_or_pending": 0
+      },
+      "candidate_revision": null,
+      "verified_events": 33,
+      "source_pin_digest": "caebd70a3a91a243e461669bfa03699b2268ea237cf0f8be07c290fe21a674d4",
+      "action_rejections": [
+        "conclusion must equal required_factual_conclusion exactly; causal claims belong in the unverified hypothesis commentary",
+        "conclusion must equal required_factual_conclusion exactly; causal claims belong in the unverified hypothesis commentary",
+        "conclusion must equal required_factual_conclusion exactly; causal claims belong in the unverified hypothesis commentary"
+      ],
+      "interpretation_recorded": false,
+      "independent_development_validations": []
+    },
+    {
+      "run_id": "b2-if-001-20261003T130552Z-391087",
+      "variant": "B2",
+      "incident": "IF-001",
+      "decision": "reject_behavior",
+      "reason": "Protected development validation did not accept the candidate; inspect case evidence.",
+      "edits": 2,
+      "requested_tests": 0,
+      "verified_work": {
+        "changed_source_paths": [
+          "fixture/app/service.py"
+        ],
+        "developer_test_file_present": true,
+        "requested_test_runs": 0
+      },
+      "accounting": {
+        "calls": 6,
+        "estimated_usage_microusd": 5841,
+        "reserved_or_spent_microusd": 5841,
+        "unknown_or_pending": 0
+      },
+      "candidate_revision": "ca98d52692730674003d4d7ff7d5a7009ff8888f52415598275a5809eae91092",
+      "verified_events": 47,
+      "source_pin_digest": "3689ccb5e4569934eb484f4d594ab0f00c16ac2473d1a57ddeecddf399f55932",
+      "action_rejections": [],
+      "interpretation_recorded": true,
+      "independent_development_validations": [
+        {
+          "verified_cases": 6,
+          "archive_sha256": "e1065aeb6395d0154d990871a1fbdb24a1ec01cb94fcd0c51df216d495da4261",
+          "cases": [
+            {
+              "case": "reference-cancel-uncertain-payment",
+              "decision": "accept_for_review"
+            },
+            {
+              "case": "reference-clean",
+              "decision": "accept_for_review"
+            },
+            {
+              "case": "reference-compensation-restart",
+              "decision": "accept_for_review"
+            },
+            {
+              "case": "reference-payment-protocol",
+              "decision": "accept_for_review"
+            },
+            {
+              "case": "reference-response-loss-restart",
+              "decision": "reject_behavior"
+            },
+            {
+              "case": "reference-stock-contention",
+              "decision": "accept_for_review"
+            }
+          ]
+        },
+        {
+          "verified_cases": 6,
+          "archive_sha256": "4d520352b101797d5f3a41ce4fbfcc5774b90d505548d36e74305398468ca4db",
+          "cases": [
+            {
+              "case": "reference-cancel-uncertain-payment",
+              "decision": "accept_for_review"
+            },
+            {
+              "case": "reference-clean",
+              "decision": "accept_for_review"
+            },
+            {
+              "case": "reference-compensation-restart",
+              "decision": "accept_for_review"
+            },
+            {
+              "case": "reference-payment-protocol",
+              "decision": "accept_for_review"
+            },
+            {
+              "case": "reference-response-loss-restart",
+              "decision": "reject_behavior"
+            },
+            {
+              "case": "reference-stock-contention",
+              "decision": "accept_for_review"
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "project_settled_estimate_microusd": 112362,
+  "project_exposure_microusd": 165447,
+  "pending_calls": 0,
+  "limitations": [
+    "Different successive revisions; not independent trials of one frozen model protocol.",
+    "Protected development checks only; no withheld final evaluation.",
+    "T8 remains unchanged. Causal prose is unverified."
+  ]
+}

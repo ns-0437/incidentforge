@@ -50,7 +50,7 @@ def main():
     for folder in ('src','fixture','evaluation','probes','tests','contracts'):
         for p in sorted((ROOT/folder).rglob('*')):
             if p.is_file() and p.suffix in {'.py','.md'}: pins[p.relative_to(ROOT).as_posix()]=hashlib.sha256(p.read_bytes()).hexdigest()
-    evidence.event('run_started',{'mode':'live','protocol':'prefreeze-development-v2','backend':args.backend,
+    evidence.event('run_started',{'mode':'live','protocol':'post-t8-reliability-v3','backend':args.backend,
         'source_hashes':pins,'model_budget_microusd':200000,'balance_evidence':'user screenshot $1.00, 27 days on 2026-10-03'})
     result=Controller(run_id,candidate,evidence,backend,worker,budget,cancel,variant=args.variant).run()
     result['verified_events']=verify(evidence.root)
