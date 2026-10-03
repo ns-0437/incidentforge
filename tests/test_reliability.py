@@ -134,6 +134,7 @@ class ReliabilityTests(unittest.TestCase):
         def finish(messages):
             guidance=json.loads(messages[-1]['content'])['action_contract']
             self.assertFalse(guidance['protected_feedback']['candidate_unchanged_since_feedback'])
+            self.assertIn('Review the failed properties',guidance['completion_instruction'])
             return '{"action":"finish","summary":"revision still needs verification"}'
         rejected={'complete':True,'decision':'reject_behavior','cases':[{'case':'secret-case','properties':{'P1':{'status':'fail','reason':'secret'}}}]}
         report,_,_=self.run_actions(iter([interpret,{'action':'replace','path':'fixture/app/service.py','old':'x=1','new':'x=2','reason':'initial'},
@@ -160,5 +161,41 @@ class ReliabilityTests(unittest.TestCase):
         from fixture.harness.developer_tests import target_catalog
         result=target_catalog([{'condition':str(i),**{str(j):j for j in range(100)}} for i in range(30)])
         self.assertEqual(12,len(result));self.assertTrue(all(len(c['fields'])<=64 for c in result))
+
+    def test_post_feedback_flow_preserves_identical_test_execution(self):
+        measured={'condition':{'committed_charge_count':1}}
+        spec={'assertions':[{'name':'a','condition':'clean','path':'order.status','equals':'CONFIRMED'}]}
+        authored={'action':'developer_test','spec':spec,'reason':'regression'}
+        def interpret(messages):return json.dumps(json.loads(messages[-1]['content'])['action_contract']['interpret_fields'])
+        def run_test(messages):
+            g=json.loads(messages[-1]['content'])['action_contract']
+            self.assertEqual(0,g['remaining_protected_feedback_requests'])
+            self.assertNotIn('validate',g['allowed_actions']);self.assertNotIn('finish',g['allowed_actions'])
+            self.assertFalse(g['finish_ready'])
+            return '{"action":"test"}'
+        def repeat(messages):
+            g=json.loads(messages[-1]['content'])['action_contract']
+            self.assertTrue(g['finish_ready']);self.assertIn('finish',g['allowed_actions'])
+            return json.dumps({**authored,'spec':json.dumps(spec,sort_keys=True,indent=2)})
+        def finish(messages):
+            data=json.loads(messages[-1]['content'])
+            self.assertTrue(data['tool_result']['unchanged']);self.assertFalse(data['tool_result']['edit_consumed'])
+            self.assertTrue(data['action_contract']['tests_executed_on_current_revision'])
+            return '{"action":"finish","summary":"edited and tested; awaiting independent verification"}'
+        report,_,backend=self.run_actions(iter([interpret,{'action':'replace','path':'fixture/app/service.py','old':'x=1','new':'x=2','reason':'repair'},
+            authored,{'action':'validate'},run_test,repeat,finish]),'B2',measured)
+        self.assertEqual('accept_for_review',report['decision']);self.assertEqual(2,report['edits'])
+        self.assertEqual(4,backend.count)  # reproduction, feedback, test, final verification
+
+    def test_changed_expected_type_invalidates_test_revision(self):
+        spec={'assertions':[{'name':'a','condition':'clean','path':'order.status','equals':1}]}
+        changed={'assertions':[{'name':'a','condition':'clean','path':'order.status','equals':True}]}
+        report,_,_=self.run_actions(iter([
+            {'action':'replace','path':'fixture/app/service.py','old':'x=1','new':'x=2','reason':'repair'},
+            {'action':'developer_test','spec':spec,'reason':'test'},{'action':'test'},
+            {'action':'developer_test','spec':changed,'reason':'different assertion'},
+            *[{'action':'finish','summary':'done'}]*3]))
+        self.assertIsNone(report['candidate_revision']);self.assertEqual(3,report['edits'])
+        self.assertFalse(report['verified_work']['developer_tests_executed_on_current_revision'])
 
 if __name__=='__main__':unittest.main()

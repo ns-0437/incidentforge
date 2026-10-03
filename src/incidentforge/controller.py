@@ -123,19 +123,36 @@ protected behavioral feedback during repair.'''
                     messages[0]['content']=messages[0]['content'].replace(
                         'After your repair you MUST request validate once before finish, so B2 exercises\nprotected behavioral feedback during repair.','The validate action is unavailable in B1.')
                 messages.append({'role':'user','content':json.dumps({'investigation':investigation})})
+            def finish_blockers():
+                blockers=[]
+                if not interpreted: blockers.append('interpret experiment before repair')
+                if self.variant=='B2' and not validations: blockers.append('B2 requires validate feedback before finish')
+                if all(self.workspace.read(name)==text for name,text in initial_sources.items()):
+                    blockers.append('No net source change exists; cannot freeze a claimed repair. Apply an exact source edit first.')
+                if (self.workspace.root/'developer-tests.json').exists() and last_test_revision!=self.workspace.revision():
+                    blockers.append('Authored developer tests have not run on the current revision; request test before finish.')
+                return blockers
             def guidance():
                 from .grounding import factual_conclusion
                 available=['read','search']
                 if interpreted:
                     if edits<3: available+=['replace','developer_test']
                     if tests<2: available+=['test']
-                    available+=['finish']
+                    if not finish_blockers(): available+=['finish']
                     if not experiments: available+=['experiment']
                     if self.variant=='B2' and not validations: available+=['validate']
                 else: available+=['interpret']
                 value={'allowed_actions':available,'applied_edits':edits,'requested_test_runs':tests,
                        'remaining_edits':3-edits,'remaining_test_runs':2-tests,
+                       'remaining_protected_feedback_requests':max(0,1-validations) if self.variant=='B2' else 0,
+                       'finish_ready':not finish_blockers(),'finish_blockers':finish_blockers(),
+                       'authored_tests_present':(self.workspace.root/'developer-tests.json').exists(),
+                       'tests_executed_on_current_revision':last_test_revision==self.workspace.revision(),
                        'finish_requires':'A net source change; authored tests must run on the current revision; B2 also requires validate. State only observed edits/tests in summary.'}
+                if not finish_blockers():
+                    value['completion_instruction']='Finish now to freeze the candidate for independent verification. Do not rewrite tests or request another validate. Passing feedback alone is not final acceptance.'
+                    if protected_feedback and protected_feedback['decision']!='accept_for_review':
+                        value['completion_instruction']='Review the failed properties and revise if evidence and limits permit. Otherwise finish with explicit limitations for independent verification. Do not request another validate.'
                 if not interpreted:
                     value['interpret_fields']={'action':'interpret','conclusion':factual_conclusion(measured_facts),
                         'observed_facts':measured_facts,'supported':'Your hypothesis assessment',
@@ -191,7 +208,6 @@ protected behavioral feedback during repair.'''
                         validations+=1;result=feedback(self.backend.run(self.workspace.root,'protected'))
                         protected_feedback=result;feedback_revision=self.workspace.revision()
                     elif kind=='developer_test':
-                        if edits>=3: raise ValueError('edit limit')
                         from fixture.harness.developer_tests import validate
                         spec=validate(command['spec'] if isinstance(command['spec'],dict) else json.loads(command['spec']))
                         from fixture.harness.developer_tests import validate_targets
@@ -200,8 +216,12 @@ protected behavioral feedback during repair.'''
                         if len(raw)>8192: raise ValueError('developer test size')
                         target=self.workspace.root/'developer-tests.json'
                         if target.is_symlink(): raise ValueError('developer test symlink')
-                        target.write_bytes(raw);edits+=1
-                        result={'saved':True,'specification':self.evidence.artifact(spec)}
+                        unchanged=target.exists() and encoded(json.loads(target.read_text(encoding='utf-8')))==raw
+                        if not unchanged:
+                            if edits>=3: raise ValueError('edit limit')
+                            target.write_bytes(raw);edits+=1
+                        result={'saved':True,'unchanged':unchanged,'edit_consumed':not unchanged,
+                                'specification':self.evidence.artifact(spec)}
                     elif kind=='replace':
                         if edits>=3: raise ValueError('edit limit')
                         self.transition('PATCH')
@@ -218,11 +238,8 @@ protected behavioral feedback during repair.'''
                             last_test_revision=self.workspace.revision()
                             developer_observations=result.get('observations',[])
                     else:
-                        if self.variant=='B2' and not validations: raise ValueError('B2 requires validate feedback before finish')
-                        if all(self.workspace.read(name)==text for name,text in initial_sources.items()):
-                            raise ValueError('No net source change exists; cannot freeze a claimed repair. Apply an exact source edit first.')
-                        if (self.workspace.root/'developer-tests.json').exists() and last_test_revision!=self.workspace.revision():
-                            raise ValueError('Authored developer tests have not run on the current revision; request test before finish.')
+                        blockers=finish_blockers()
+                        if blockers: raise ValueError(blockers[0])
                         frozen=self.workspace.revision();model_summary=command['summary'];reason='Candidate frozen; awaiting independent validation.'
                         self.evidence.event('candidate_frozen',{'revision':frozen,'model_claim_unverified':model_summary});break
                     self.evidence.event('tool_result',{'artifact':self.evidence.artifact(result)})

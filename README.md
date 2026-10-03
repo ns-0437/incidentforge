@@ -162,7 +162,8 @@ See [T8 results](docs/T8_RESULTS.md), [protocol](docs/T8_PROTOCOL.md),
 Post-T8 [reliability work](docs/POST_T8_RELIABILITY.md) adds state-specific action
 guidance, native JSON facts, a quote-free factual conclusion, net-change and
 authored-test execution gates, persistent property-only feedback, assertion target
-checks, a developer-field catalog, and a bounded 120-second inference wait. **59 local
+checks, a developer-field catalog, explicit completion readiness, idempotent test
+specification saves, and a bounded 120-second inference wait. **61 local
 tests pass.** A revised live development pilot cleared the format gates with zero
 action rejections, but its repair failed protected validation. T8 results remain
 unchanged; repair-quality improvement is not yet established.

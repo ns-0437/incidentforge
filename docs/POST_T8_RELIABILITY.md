@@ -36,7 +36,7 @@ intentionally refuses the newer development implementation.
 
 ## Validation
 
-59 portable tests pass, including sixteen new regressions for malformed action
+61 portable tests pass, including eighteen new regressions for malformed action
 types, exact factual checks with native objects, guided correction, unchanged
 and reverted source, no-op edits, unsupported assertion operators and deadline
 refusal without dispatch and quote-free factual conclusions. Scripted tests establish controller behavior, not live
@@ -166,3 +166,27 @@ current test revision and remaining feedback allowance prominent, and prevent
 redundant test-specification writes from invalidating completed tests. A fresh
 live validation requires additional allocation within confirmed free credits.
 T9 materials may be prepared, but the live completion gate is not passed.
+
+## Local completion-flow revision after the field-catalog pilot
+
+The controller now reports `finish_ready`, explicit `finish_blockers`, the
+remaining protected-feedback allowance, and whether tests ran on the current
+revision. Its advertised actions omit finish until the same checks used by the
+actual finish gate pass. After positive feedback and completed tests it directs
+the worker to finish rather than rewrite tests or repeat validation. Negative
+feedback instead directs review/revision or an honest limited submission; it is
+never relabeled as success. Post-freeze independent verification still runs.
+
+Saving an identical developer-test specification is idempotent: object-key order
+and JSON whitespace do not create a change, consume an edit, rewrite the file or
+invalidate its completed test. Changed values, scalar types, names or assertion
+order remain changes. No failed test is converted into a pass; the existing gate
+records execution, while the independent evaluator determines acceptance.
+
+A scripted B2 regression covers interpretation, edit, test authoring, protected
+feedback, required test execution, repeated identical save, finish and fresh
+independent validation. A second regression proves that changing `1` to `true`
+invalidates prior execution. Existing negative-feedback checks also verify the
+completion advice does not encourage a false success claim. **61 tests pass.**
+These are deterministic local checks, not another live model result. No inference
+or Sandbox calls were made for this revision; exposure remains **$0.183098**.
