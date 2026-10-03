@@ -106,7 +106,16 @@ supporting_refs should use line IDs from source_line_index, e.g. ["L163","L165"]
 The controller resolves IDs to exact source text; never invent IDs or quote paraphrased code.
 Keep both hypotheses tied to the supplied incident symptom. Probe names label test
 interventions; they are not application mechanisms or source-code causes.
-Observing only the final state does not show that a transient state was never entered.'''
+Observing only the final state does not show that a transient state was never entered.
+Each condition starts from fresh stores: differences between conditions are NOT a
+chronological state transition of one order. Separate observed facts from predicted
+or hypothetical counterevidence; never put an unobserved result in counterevidence
+as though measured. Competing hypotheses must describe distinct executable causes,
+not restate success versus failure. Trace the relevant function from entry to the
+claimed failed side effect, including earlier returns and prerequisite state.
+For each source-based mechanism, explain why that path is reachable under the
+failing condition and what state is reconstructed after restart. If not known,
+state the missing evidence rather than inferring it from a final status alone.'''
     if is_comp:
         system+='\nCANCELLED_DECLINED means compensation has completed; COMPENSATING is a pending state.'
     messages=[{'role':'system','content':system},{'role':'user','content':json.dumps(prompt)}]

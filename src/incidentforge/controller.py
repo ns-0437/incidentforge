@@ -38,7 +38,18 @@ For restart defects, trace the pending state's actual branch from entry to side 
 check early returns and whether each prerequisite survives process restart. A terminal
 state is already complete; do not treat it as pending work without contract evidence.
 Distinguish your proposed causal mechanism from measured outcomes and consider which
-observation would falsify it. Do not claim an experiment established causality.'''
+observation would falsify it. Do not claim an experiment established causality.
+Experiment conditions use independent fresh stores. Comparing their final states
+is not evidence that one state changed into the other within a single execution.
+Before a replace action, use its reason field to explain the path from function
+entry to the changed statement, relevant guards/prerequisites, and how the change
+addresses the failing condition while preserving the successful condition.
+Check whether execution can reach the suspected error branch at all. A downstream
+exception is not the cause merely because its message resembles the symptom.
+Do not replace a failed side effect with a terminal success status: status writes
+do not perform the missing side effect. Preserve the public contract's success
+preconditions and recovery behavior. If evidence contradicts your hypothesis,
+revisit the source rather than suppressing the failed check.'''
 SYSTEM=SYSTEM.replace('"spec":"JSON-encoded assertion specification"','"spec":{"assertions":[]}').replace(
     'spec is a JSON-encoded object','spec is a JSON object (legacy JSON-encoded strings also work)')
 
