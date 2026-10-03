@@ -1,0 +1,85 @@
+{
+  "stage": "Frozen single development pilot",
+  "revision": "3680c8b8594e5edde1a3a43a7f3e037944956481",
+  "report": {
+    "schema_version": 1,
+    "run_id": "b2-if-001-20261003T142249Z-a154d9",
+    "variant": "B2",
+    "decision": "unresolved",
+    "reason": "RuntimeError: format/action correction limit",
+    "incident": "IF-001",
+    "protected_feedback_requests": 0,
+    "protected_feedback": null,
+    "model_claim_unverified": null,
+    "candidate_revision": null,
+    "edits": 1,
+    "requested_tests": 0,
+    "backend": "nebius-sandbox",
+    "verified_work": {
+      "changed_source_paths": [
+        "fixture/app/service.py"
+      ],
+      "developer_test_file_present": false,
+      "developer_tests_executed_on_current_revision": false,
+      "requested_test_runs": 0
+    },
+    "accounting": {
+      "calls": 7,
+      "estimated_usage_microusd": 6911,
+      "reserved_or_spent_microusd": 6911,
+      "unknown_or_pending": 0
+    },
+    "next_step": "Inspect the retained failure evidence before another bounded attempt.",
+    "limitations": [
+      "One development pilot, not a B0/B1/B2 comparison.",
+      "Manual controls are not model repairs."
+    ]
+  },
+  "verified_events": 46,
+  "action_rejections": [
+    "assertion path must exist in the selected developer observation",
+    "assertion path must exist in the selected developer observation",
+    "assertion path must exist in the selected developer observation"
+  ],
+  "interpretation_recorded": true,
+  "project_settled_estimate_microusd": 119273,
+  "project_exposure_microusd": 172358,
+  "pending_calls": 0,
+  "limitations": [
+    "Unresolved agent run; no frozen candidate or agent validation.",
+    "One development trial; no comparative efficacy claim.",
+    "No T8 result replaced."
+  ],
+  "post_hoc_diagnostic": {
+    "scope": "Separately initiated protected development check, not autonomous completion or final holdout",
+    "decision": "accept_for_review",
+    "verified_cases": 6,
+    "archive_sha256": "79eb11b7fdac85a2e316fb40fadf45ccbcd55eaa7b3e361ef1ee315416cf53cb",
+    "cases": [
+      {
+        "case": "reference-cancel-uncertain-payment",
+        "decision": "accept_for_review"
+      },
+      {
+        "case": "reference-clean",
+        "decision": "accept_for_review"
+      },
+      {
+        "case": "reference-compensation-restart",
+        "decision": "accept_for_review"
+      },
+      {
+        "case": "reference-payment-protocol",
+        "decision": "accept_for_review"
+      },
+      {
+        "case": "reference-response-loss-restart",
+        "decision": "accept_for_review"
+      },
+      {
+        "case": "reference-stock-contention",
+        "decision": "accept_for_review"
+      }
+    ]
+  }
+}

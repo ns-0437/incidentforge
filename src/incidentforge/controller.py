@@ -144,6 +144,9 @@ protected behavioral feedback during repair.'''
                 value['developer_test_schema']={'action':'developer_test','spec':{'assertions':[
                     {'name':'description','condition':'observed condition or fault label','path':'observed.field','equals':'expected scalar'}]},'reason':'regression purpose'}
                 value['test_operators']='Only equals is supported. No not_equal, shell, expressions or invented observation conditions.'
+                from fixture.harness.developer_tests import target_catalog
+                value['developer_test_targets']=target_catalog(developer_observations)
+                value['test_scope']='Developer assertions run on developer workload observations only. Experiment-only fields are unavailable here. Use the condition/path pairs listed in developer_test_targets; preserve scalar types.'
                 value['developer_test_conditions']=sorted({o.get('condition',o.get('fault')) for o in developer_observations
                     if isinstance(o.get('condition',o.get('fault')),str)})
                 if protected_feedback is not None:

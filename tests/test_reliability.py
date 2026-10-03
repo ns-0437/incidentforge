@@ -148,4 +148,17 @@ class ReliabilityTests(unittest.TestCase):
         spec['assertions'][0]['path']='order.invented'
         with self.assertRaises(ValueError):validate_targets(spec,[{'fault':'fault','order':{'status':'PENDING'}}])
 
+    def test_target_catalog_excludes_ambiguous_conditions_and_experiment_fields(self):
+        from fixture.harness.developer_tests import target_catalog
+        result=target_catalog([{'fault':'none','order':{'status':'PENDING'},'count':1},
+            {'condition':'duplicate','x':1},{'condition':'duplicate','x':2}])
+        self.assertEqual([{'condition':'none','fields':[{'path':'count','observed_type':'int'},
+            {'path':'fault','observed_type':'str'},{'path':'order.status','observed_type':'str'}]}],result)
+        self.assertNotIn('committed_charge_count',json.dumps(result))
+
+    def test_target_catalog_is_bounded(self):
+        from fixture.harness.developer_tests import target_catalog
+        result=target_catalog([{'condition':str(i),**{str(j):j for j in range(100)}} for i in range(30)])
+        self.assertEqual(12,len(result));self.assertTrue(all(len(c['fields'])<=64 for c in result))
+
 if __name__=='__main__':unittest.main()

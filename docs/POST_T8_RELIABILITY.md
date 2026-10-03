@@ -36,7 +36,7 @@ intentionally refuses the newer development implementation.
 
 ## Validation
 
-57 portable tests pass, including fourteen new regressions for malformed action
+59 portable tests pass, including sixteen new regressions for malformed action
 types, exact factual checks with native objects, guided correction, unchanged
 and reverted source, no-op edits, unsupported assertion operators and deadline
 refusal without dispatch and quote-free factual conclusions. Scripted tests establish controller behavior, not live
@@ -102,3 +102,34 @@ been tested with another live model; no further inference credit was spent.
 Next priority is validating repair reasoning with a separately declared pilot.
 Any future live comparison needs a new freeze and adequate budget;
 these two sequential development revisions must not be merged into T8 results.
+
+## Frozen follow-up pilot and separate diagnostic
+
+One IF-001/B2 pilot at revision `3680c8b8594e5edde1a3a43a7f3e037944956481`
+was declared with source hashes before dispatch. Run
+`b2-if-001-20261003T142249Z-a154d9` made seven calls ($0.006911 estimated),
+passed interpretation and applied one payment-key preservation edit. It then
+repeatedly authored assertions using experiment-only fields against the developer
+workload. Three rejected paths exhausted the correction limit. The run remains
+**unresolved**, with no frozen candidate, authored test file or protected feedback.
+It therefore did not exercise the negative-feedback revision behavior.
+
+A separately initiated, post-hoc protected development diagnostic of that exact
+retained patch passed **6/6 cases**, independently recomputed by the restricted
+reader. Candidate revision was checked before and after execution. This is useful
+patch evidence, not successful autonomous completion or a final withheld score.
+The source pins were verified before diagnostic execution. Results are preserved
+in [v4-pilot.json](../benchmarks/reliability/v4-pilot.json).
+
+The subsequent local fix exposes a bounded catalog of actual developer condition,
+field path and scalar-type pairs in action guidance and corrections. Experiment
+observations are explicitly excluded. Duplicate conditions are omitted because
+they cannot uniquely identify an assertion target. This preserves existing strict
+validation; it does not invent values or weaken acceptance. Two local regressions
+check scope, ambiguous conditions and output bounds. This latest fix has not had
+a live pilot.
+
+Current conservative project exposure: **$0.172358 / $0.20**, leaving **$0.027642**.
+No new unknown usage or pending operations. T8 and earlier pilot records remain
+unchanged. The end-to-end live-validation gate is still unmet, so T9 cannot yet
+claim a reliably completing autonomous repair workflow.

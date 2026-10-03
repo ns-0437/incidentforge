@@ -25,6 +25,30 @@ def validate_targets(spec,observations):
             value=value[part]
     return spec
 
+def target_catalog(observations):
+    """Bounded catalog of public developer fields, not experiment or evaluator data."""
+    conditions={}
+    for observation in observations:
+        condition=observation.get('condition',observation.get('fault'))
+        if not isinstance(condition,str): continue
+        conditions.setdefault(condition,[]).append(observation)
+    catalog=[]
+    for condition, matches in sorted(conditions.items()):
+        if len(matches)!=1: continue
+        fields=[]
+        def visit(value,path,depth):
+            if len(fields)>=64 or depth>6: return
+            if isinstance(value,dict):
+                for key,child in sorted(value.items()):
+                    if isinstance(key,str) and key.replace('_','').isalnum():
+                        visit(child,path+[key],depth+1)
+            elif path and type(value) in (str,int,bool,type(None)):
+                fields.append({'path':'.'.join(path),'observed_type':type(value).__name__})
+        visit(matches[0],[],0)
+        catalog.append({'condition':condition,'fields':fields})
+        if len(catalog)>=12: break
+    return catalog
+
 def execute(path,result):
     if not path.exists(): return {'authored':False,'assertions':[]}
     if path.is_symlink() or path.stat().st_size>8192: raise ValueError('developer tests bound')
