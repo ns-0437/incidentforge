@@ -2,3 +2,4 @@
 *.png binary
 *.jpg binary
 docs/ORIGINAL_BRIEF.md -text
+benchmarks/t8/freeze.json -text
