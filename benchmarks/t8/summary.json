@@ -1,10 +1,10 @@
 {
-  "status": "incomplete",
+  "status": "completed_with_unknown_usage",
   "planned_runs": 12,
-  "launched_runs": 4,
-  "unlaunched_runs": 8,
-  "accepted_final_repairs": 0,
-  "final_candidates_evaluated": 0,
+  "launched_runs": 12,
+  "unlaunched_runs": 0,
+  "accepted_final_repairs": 2,
+  "final_candidates_evaluated": 4,
   "ranking_supported": false,
   "attempts": [
     {
@@ -24,8 +24,43 @@
       },
       "edits": 1,
       "frozen_candidate": false,
+      "candidate_revision": null,
       "verified_events": 35,
-      "case_outcomes": []
+      "case_outcomes": [],
+      "final_case_errors": [],
+      "independently_verified": false,
+      "action_rejections": {
+        "assertion fields": 3
+      },
+      "resource_receipts": [
+        {
+          "terminal": true,
+          "sha256": "08361085ecbc12c2b5dbb3f23885d3aa7d10434778c8acc75519197acfdf6a85",
+          "duration_seconds": 4.173,
+          "provider_resources": {
+            "block_input": 0,
+            "block_output": 0,
+            "cost": 0.01788255,
+            "elapsed_time": 1.772603,
+            "involuntary_switches": 192,
+            "max_rss": 31304,
+            "monotonic_time": 3.53944512,
+            "page_faults": 185,
+            "page_faults_io": 67328,
+            "shared_memory": 0,
+            "signals": 0,
+            "swaps": 0,
+            "system_cpu_time": 0.242032,
+            "unshared_memory": 0,
+            "user_cpu_time": 1.530571,
+            "voluntary_switches": 17612
+          },
+          "provider_cost_unit": "unspecified; not USD inference spend"
+        }
+      ],
+      "reported_prompt_tokens": 49601,
+      "reported_completion_tokens": 8333,
+      "remote_operations": 1
     },
     {
       "slot": 2,
@@ -44,8 +79,68 @@
       },
       "edits": 0,
       "frozen_candidate": false,
+      "candidate_revision": null,
       "verified_events": 34,
-      "case_outcomes": []
+      "case_outcomes": [],
+      "final_case_errors": [],
+      "independently_verified": false,
+      "action_rejections": {
+        "conclusion must equal required_factual_conclusion exactly; causal claims belong in the unverified hypothesis commentary": 2,
+        "string fields required": 1
+      },
+      "resource_receipts": [
+        {
+          "terminal": true,
+          "sha256": "6aa01ed29592c0682a4327cf4f7b5690cbc258c7b93c7f52604325ac4c4f217d",
+          "duration_seconds": 4.118,
+          "provider_resources": {
+            "block_input": 0,
+            "block_output": 0,
+            "cost": 0.01790006,
+            "elapsed_time": 1.774346,
+            "involuntary_switches": 347,
+            "max_rss": 31320,
+            "monotonic_time": 3.531400694,
+            "page_faults": 185,
+            "page_faults_io": 67293,
+            "shared_memory": 0,
+            "signals": 0,
+            "swaps": 0,
+            "system_cpu_time": 0.247269,
+            "unshared_memory": 0,
+            "user_cpu_time": 1.527077,
+            "voluntary_switches": 17608
+          },
+          "provider_cost_unit": "unspecified; not USD inference spend"
+        },
+        {
+          "terminal": true,
+          "sha256": "c4029f0e31536230ebc94012aea45853633bcf1355c514eb6678f2f972d70922",
+          "duration_seconds": 6.178,
+          "provider_resources": {
+            "block_input": 0,
+            "block_output": 0,
+            "cost": 0.03140632,
+            "elapsed_time": 3.1250359999999997,
+            "involuntary_switches": 380,
+            "max_rss": 31192,
+            "monotonic_time": 5.691466066,
+            "page_faults": 185,
+            "page_faults_io": 130036,
+            "shared_memory": 0,
+            "signals": 0,
+            "swaps": 0,
+            "system_cpu_time": 0.377938,
+            "unshared_memory": 0,
+            "user_cpu_time": 2.747098,
+            "voluntary_switches": 26942
+          },
+          "provider_cost_unit": "unspecified; not USD inference spend"
+        }
+      ],
+      "reported_prompt_tokens": 48092,
+      "reported_completion_tokens": 6068,
+      "remote_operations": 2
     },
     {
       "slot": 3,
@@ -64,8 +159,68 @@
       },
       "edits": 0,
       "frozen_candidate": false,
+      "candidate_revision": null,
       "verified_events": 32,
-      "case_outcomes": []
+      "case_outcomes": [],
+      "final_case_errors": [],
+      "independently_verified": false,
+      "action_rejections": {
+        "string fields required": 1,
+        "conclusion must equal required_factual_conclusion exactly; causal claims belong in the unverified hypothesis commentary": 2
+      },
+      "resource_receipts": [
+        {
+          "terminal": true,
+          "sha256": "8e1c60a2a5ceecc30df5664a289d2e8a523f48962d149c855b8ae147fd0ac536",
+          "duration_seconds": 4.216,
+          "provider_resources": {
+            "block_input": 0,
+            "block_output": 0,
+            "cost": 0.01785735,
+            "elapsed_time": 1.770083,
+            "involuntary_switches": 200,
+            "max_rss": 31304,
+            "monotonic_time": 3.582717761,
+            "page_faults": 185,
+            "page_faults_io": 67308,
+            "shared_memory": 0,
+            "signals": 0,
+            "swaps": 0,
+            "system_cpu_time": 0.229883,
+            "unshared_memory": 0,
+            "user_cpu_time": 1.5402,
+            "voluntary_switches": 17604
+          },
+          "provider_cost_unit": "unspecified; not USD inference spend"
+        },
+        {
+          "terminal": true,
+          "sha256": "a1a2c86cbcf0b91c3a0c04efcd1604b952bf16cd43a86cafc7ab0722d8c0679f",
+          "duration_seconds": 6.693,
+          "provider_resources": {
+            "block_input": 0,
+            "block_output": 0,
+            "cost": 0.03260813,
+            "elapsed_time": 3.245287,
+            "involuntary_switches": 296,
+            "max_rss": 31052,
+            "monotonic_time": 5.829855423,
+            "page_faults": 185,
+            "page_faults_io": 130028,
+            "shared_memory": 0,
+            "signals": 0,
+            "swaps": 0,
+            "system_cpu_time": 0.43797,
+            "unshared_memory": 0,
+            "user_cpu_time": 2.807317,
+            "voluntary_switches": 26854
+          },
+          "provider_cost_unit": "unspecified; not USD inference spend"
+        }
+      ],
+      "reported_prompt_tokens": 36106,
+      "reported_completion_tokens": 7395,
+      "remote_operations": 2
     },
     {
       "slot": 4,
@@ -84,24 +239,1156 @@
       },
       "edits": 0,
       "frozen_candidate": false,
+      "candidate_revision": null,
       "verified_events": 29,
-      "case_outcomes": []
+      "case_outcomes": [],
+      "final_case_errors": [],
+      "independently_verified": false,
+      "action_rejections": {},
+      "resource_receipts": [
+        {
+          "terminal": true,
+          "sha256": "e4df8635638ff697737d4d8fc208c9a065f73c1d639905fd1f9b9a6d2bc362f3",
+          "duration_seconds": 5.837,
+          "provider_resources": {
+            "block_input": 0,
+            "block_output": 0,
+            "cost": 0.023440080000000002,
+            "elapsed_time": 2.328358,
+            "involuntary_switches": 263,
+            "max_rss": 31300,
+            "monotonic_time": 5.508791466,
+            "page_faults": 185,
+            "page_faults_io": 75019,
+            "shared_memory": 0,
+            "signals": 0,
+            "swaps": 0,
+            "system_cpu_time": 0.467993,
+            "unshared_memory": 0,
+            "user_cpu_time": 1.860365,
+            "voluntary_switches": 27502
+          },
+          "provider_cost_unit": "unspecified; not USD inference spend"
+        },
+        {
+          "terminal": true,
+          "sha256": "dda6fda33c4b8ae656fdd24bffc83801460d7ab017dcc121378f6f3cdf4fccd2",
+          "duration_seconds": 8.525,
+          "provider_resources": {
+            "block_input": 0,
+            "block_output": 0,
+            "cost": 0.03739258,
+            "elapsed_time": 3.723656,
+            "involuntary_switches": 601,
+            "max_rss": 31204,
+            "monotonic_time": 7.945673733,
+            "page_faults": 185,
+            "page_faults_io": 133436,
+            "shared_memory": 0,
+            "signals": 0,
+            "swaps": 0,
+            "system_cpu_time": 0.534521,
+            "unshared_memory": 0,
+            "user_cpu_time": 3.189135,
+            "voluntary_switches": 40734
+          },
+          "provider_cost_unit": "unspecified; not USD inference spend"
+        }
+      ],
+      "reported_prompt_tokens": 26500,
+      "reported_completion_tokens": 7330,
+      "remote_operations": 2
+    },
+    {
+      "slot": 5,
+      "incident": "IF-002",
+      "variant": "B2",
+      "repetition": 1,
+      "run_id": "t8-final-20261003-05",
+      "final_decision": "accept_for_review",
+      "elapsed_seconds": 179.64100000000326,
+      "reason": "All declared protected development checks passed.",
+      "accounting": {
+        "calls": 5,
+        "estimated_usage_microusd": 4337,
+        "reserved_or_spent_microusd": 4337,
+        "unknown_or_pending": 0
+      },
+      "edits": 1,
+      "frozen_candidate": true,
+      "candidate_revision": "f6d95293777f6d6a1c06c08ef9ae6e7cda8b5627c3399083ec0a27e4c076c55d",
+      "verified_events": 43,
+      "case_outcomes": [
+        {
+          "case": "canonical_mixed_payload",
+          "decision": "accept_for_review",
+          "properties": {
+            "P1": "pass",
+            "P2": "pass",
+            "P3": "pass",
+            "P4": "pass",
+            "P5": "pass",
+            "P6": "pass",
+            "P7": "pass"
+          }
+        },
+        {
+          "case": "contended_inventory",
+          "decision": "accept_for_review",
+          "properties": {
+            "P1": "pass",
+            "P2": "pass",
+            "P3": "pass",
+            "P4": "pass",
+            "P5": "pass",
+            "P6": "pass",
+            "P7": "pass"
+          }
+        },
+        {
+          "case": "decline_then_new_order",
+          "decision": "accept_for_review",
+          "properties": {
+            "P1": "pass",
+            "P2": "pass",
+            "P3": "pass",
+            "P4": "pass",
+            "P5": "pass",
+            "P6": "not_applicable",
+            "P7": "pass"
+          }
+        },
+        {
+          "case": "two_declines_with_restart",
+          "decision": "accept_for_review",
+          "properties": {
+            "P1": "pass",
+            "P2": "pass",
+            "P3": "pass",
+            "P4": "pass",
+            "P5": "pass",
+            "P6": "not_applicable",
+            "P7": "pass"
+          }
+        }
+      ],
+      "final_case_errors": [],
+      "independently_verified": true,
+      "action_rejections": {},
+      "resource_receipts": [
+        {
+          "terminal": true,
+          "sha256": "ce78b0e3acc793a747e534ccfdb227a16ce882a611d93856a190decf9f9e041a",
+          "duration_seconds": 5.849,
+          "provider_resources": {
+            "block_input": 0,
+            "block_output": 0,
+            "cost": 0.02364347,
+            "elapsed_time": 2.348633,
+            "involuntary_switches": 454,
+            "max_rss": 31428,
+            "monotonic_time": 5.500576475,
+            "page_faults": 185,
+            "page_faults_io": 75028,
+            "shared_memory": 0,
+            "signals": 0,
+            "swaps": 0,
+            "system_cpu_time": 0.350704,
+            "unshared_memory": 0,
+            "user_cpu_time": 1.997929,
+            "voluntary_switches": 27640
+          },
+          "provider_cost_unit": "unspecified; not USD inference spend"
+        },
+        {
+          "terminal": true,
+          "sha256": "c7ea5e989a7c3e5b828f0254a668644b515543d6d7f281d7e6f71f622a439277",
+          "duration_seconds": 8.322,
+          "provider_resources": {
+            "block_input": 0,
+            "block_output": 0,
+            "cost": 0.03710935,
+            "elapsed_time": 3.6953329999999998,
+            "involuntary_switches": 685,
+            "max_rss": 31204,
+            "monotonic_time": 8.00480116,
+            "page_faults": 185,
+            "page_faults_io": 133421,
+            "shared_memory": 0,
+            "signals": 0,
+            "swaps": 0,
+            "system_cpu_time": 0.502296,
+            "unshared_memory": 0,
+            "user_cpu_time": 3.193037,
+            "voluntary_switches": 40767
+          },
+          "provider_cost_unit": "unspecified; not USD inference spend"
+        },
+        {
+          "terminal": true,
+          "sha256": "206f2e0db69ab602832af0c99c7ed7fc0303d13dbb77eb871d378306b49f939f",
+          "duration_seconds": 17.638,
+          "provider_resources": {
+            "block_input": 0,
+            "block_output": 0,
+            "cost": 0.08598317999999999,
+            "elapsed_time": 8.582464,
+            "involuntary_switches": 2125,
+            "max_rss": 31708,
+            "monotonic_time": 16.870336501,
+            "page_faults": 186,
+            "page_faults_io": 321251,
+            "shared_memory": 0,
+            "signals": 0,
+            "swaps": 0,
+            "system_cpu_time": 1.292203,
+            "unshared_memory": 0,
+            "user_cpu_time": 7.290261,
+            "voluntary_switches": 93454
+          },
+          "provider_cost_unit": "unspecified; not USD inference spend"
+        },
+        {
+          "terminal": true,
+          "sha256": "c4bb3dcd614e659b265bd8b5764fcfed4993f216a7ee6330bd464ef9aac76d89",
+          "duration_seconds": 16.772,
+          "provider_resources": {
+            "block_input": 0,
+            "block_output": 0,
+            "cost": 0.08865494000000002,
+            "elapsed_time": 8.849638,
+            "involuntary_switches": 1615,
+            "max_rss": 31712,
+            "monotonic_time": 16.442045892,
+            "page_faults": 186,
+            "page_faults_io": 321247,
+            "shared_memory": 0,
+            "signals": 0,
+            "swaps": 0,
+            "system_cpu_time": 1.313958,
+            "unshared_memory": 0,
+            "user_cpu_time": 7.53568,
+            "voluntary_switches": 93317
+          },
+          "provider_cost_unit": "unspecified; not USD inference spend"
+        },
+        {
+          "terminal": true,
+          "sha256": "85900a66f1fc8a2eb9ff6a019383f9744720a5012d085bc241aae4974ad4c4a0",
+          "duration_seconds": 8.423,
+          "provider_resources": {
+            "block_input": 0,
+            "block_output": 0,
+            "cost": 0.048539940000000004,
+            "elapsed_time": 4.838273999999999,
+            "involuntary_switches": 920,
+            "max_rss": 31440,
+            "monotonic_time": 8.096414546,
+            "page_faults": 185,
+            "page_faults_io": 177150,
+            "shared_memory": 0,
+            "signals": 0,
+            "swaps": 0,
+            "system_cpu_time": 0.708924,
+            "unshared_memory": 0,
+            "user_cpu_time": 4.12935,
+            "voluntary_switches": 53863
+          },
+          "provider_cost_unit": "unspecified; not USD inference spend"
+        }
+      ],
+      "reported_prompt_tokens": 42255,
+      "reported_completion_tokens": 7501,
+      "remote_operations": 5
+    },
+    {
+      "slot": 6,
+      "incident": "IF-002",
+      "variant": "B0",
+      "repetition": 1,
+      "run_id": "t8-final-20261003-06",
+      "final_decision": "unresolved",
+      "elapsed_seconds": 70.90600000000268,
+      "reason": "TimeoutError: Inference wall-time cap; usage unknown, no retry",
+      "accounting": {
+        "calls": 1,
+        "estimated_usage_microusd": 0,
+        "reserved_or_spent_microusd": 17695,
+        "unknown_or_pending": 1
+      },
+      "edits": 0,
+      "frozen_candidate": false,
+      "candidate_revision": null,
+      "verified_events": 12,
+      "case_outcomes": [],
+      "final_case_errors": [],
+      "independently_verified": false,
+      "action_rejections": {},
+      "resource_receipts": [
+        {
+          "terminal": true,
+          "sha256": "1233882718accc1863c021ba39d5f9bac32342b32a01eca4e7478de5e70ed7df",
+          "duration_seconds": 6.416,
+          "provider_resources": {
+            "block_input": 0,
+            "block_output": 0,
+            "cost": 0.02292718,
+            "elapsed_time": 2.277068,
+            "involuntary_switches": 395,
+            "max_rss": 31300,
+            "monotonic_time": 6.055777888,
+            "page_faults": 185,
+            "page_faults_io": 75077,
+            "shared_memory": 0,
+            "signals": 0,
+            "swaps": 0,
+            "system_cpu_time": 0.326994,
+            "unshared_memory": 0,
+            "user_cpu_time": 1.950074,
+            "voluntary_switches": 27534
+          },
+          "provider_cost_unit": "unspecified; not USD inference spend"
+        }
+      ],
+      "reported_prompt_tokens": 0,
+      "reported_completion_tokens": 0,
+      "remote_operations": 1
+    },
+    {
+      "slot": 7,
+      "incident": "IF-001",
+      "variant": "B1",
+      "repetition": 2,
+      "run_id": "t8-final-20261003-07",
+      "final_decision": "unresolved",
+      "elapsed_seconds": 103.39100000000326,
+      "reason": "TimeoutError: Inference wall-time cap; usage unknown, no retry",
+      "accounting": {
+        "calls": 2,
+        "estimated_usage_microusd": 1371,
+        "reserved_or_spent_microusd": 19066,
+        "unknown_or_pending": 1
+      },
+      "edits": 0,
+      "frozen_candidate": false,
+      "candidate_revision": null,
+      "verified_events": 20,
+      "case_outcomes": [],
+      "final_case_errors": [],
+      "independently_verified": false,
+      "action_rejections": {},
+      "resource_receipts": [
+        {
+          "terminal": true,
+          "sha256": "198ee582a073d536e365ff70d5f25d0b4c3c738c9f2591308f09f33bb78f98ab",
+          "duration_seconds": 4.313,
+          "provider_resources": {
+            "block_input": 0,
+            "block_output": 0,
+            "cost": 0.01808225,
+            "elapsed_time": 1.792637,
+            "involuntary_switches": 223,
+            "max_rss": 31176,
+            "monotonic_time": 3.803128411,
+            "page_faults": 185,
+            "page_faults_io": 67307,
+            "shared_memory": 0,
+            "signals": 0,
+            "swaps": 0,
+            "system_cpu_time": 0.240721,
+            "unshared_memory": 0,
+            "user_cpu_time": 1.551916,
+            "voluntary_switches": 17625
+          },
+          "provider_cost_unit": "unspecified; not USD inference spend"
+        },
+        {
+          "terminal": true,
+          "sha256": "1e79761dae167ab70fdb699df633ae6c5ef3a636352398180e5b3bf03f38e70d",
+          "duration_seconds": 6.748,
+          "provider_resources": {
+            "block_input": 0,
+            "block_output": 0,
+            "cost": 0.0316996,
+            "elapsed_time": 3.154362,
+            "involuntary_switches": 288,
+            "max_rss": 31196,
+            "monotonic_time": 5.780132031,
+            "page_faults": 185,
+            "page_faults_io": 130036,
+            "shared_memory": 0,
+            "signals": 0,
+            "swaps": 0,
+            "system_cpu_time": 0.348273,
+            "unshared_memory": 0,
+            "user_cpu_time": 2.806089,
+            "voluntary_switches": 26939
+          },
+          "provider_cost_unit": "unspecified; not USD inference spend"
+        }
+      ],
+      "reported_prompt_tokens": 11319,
+      "reported_completion_tokens": 2879,
+      "remote_operations": 2
+    },
+    {
+      "slot": 8,
+      "incident": "IF-001",
+      "variant": "B2",
+      "repetition": 2,
+      "run_id": "t8-final-20261003-08",
+      "final_decision": "unresolved",
+      "elapsed_seconds": 112.59399999999732,
+      "reason": "RuntimeError: format/action correction limit",
+      "accounting": {
+        "calls": 4,
+        "estimated_usage_microusd": 5272,
+        "reserved_or_spent_microusd": 5272,
+        "unknown_or_pending": 0
+      },
+      "edits": 0,
+      "frozen_candidate": false,
+      "candidate_revision": null,
+      "verified_events": 33,
+      "case_outcomes": [],
+      "final_case_errors": [],
+      "independently_verified": false,
+      "action_rejections": {
+        "conclusion must equal required_factual_conclusion exactly; causal claims belong in the unverified hypothesis commentary": 3
+      },
+      "resource_receipts": [
+        {
+          "terminal": true,
+          "sha256": "b3dceb142cf5fb0efe8fabbd574abbd3137e0314a9fed06e6623726d65acd965",
+          "duration_seconds": 3.9,
+          "provider_resources": {
+            "block_input": 0,
+            "block_output": 0,
+            "cost": 0.01792834,
+            "elapsed_time": 1.777182,
+            "involuntary_switches": 280,
+            "max_rss": 31304,
+            "monotonic_time": 3.544718254,
+            "page_faults": 185,
+            "page_faults_io": 67351,
+            "shared_memory": 0,
+            "signals": 0,
+            "swaps": 0,
+            "system_cpu_time": 0.250489,
+            "unshared_memory": 0,
+            "user_cpu_time": 1.526693,
+            "voluntary_switches": 17534
+          },
+          "provider_cost_unit": "unspecified; not USD inference spend"
+        },
+        {
+          "terminal": true,
+          "sha256": "e12dee678a28bd9c4d489b22c1826b6fa77fb43588946bc1eabeb05c73027a03",
+          "duration_seconds": 6.206,
+          "provider_resources": {
+            "block_input": 0,
+            "block_output": 0,
+            "cost": 0.03153375,
+            "elapsed_time": 3.137777,
+            "involuntary_switches": 342,
+            "max_rss": 31196,
+            "monotonic_time": 5.698093889,
+            "page_faults": 185,
+            "page_faults_io": 130036,
+            "shared_memory": 0,
+            "signals": 0,
+            "swaps": 0,
+            "system_cpu_time": 0.379737,
+            "unshared_memory": 0,
+            "user_cpu_time": 2.75804,
+            "voluntary_switches": 26945
+          },
+          "provider_cost_unit": "unspecified; not USD inference spend"
+        }
+      ],
+      "reported_prompt_tokens": 36617,
+      "reported_completion_tokens": 12805,
+      "remote_operations": 2
+    },
+    {
+      "slot": 9,
+      "incident": "IF-001",
+      "variant": "B0",
+      "repetition": 2,
+      "run_id": "t8-final-20261003-09",
+      "final_decision": "accept_for_review",
+      "elapsed_seconds": 97.57799999999406,
+      "reason": "All declared protected development checks passed.",
+      "accounting": {
+        "calls": 3,
+        "estimated_usage_microusd": 2376,
+        "reserved_or_spent_microusd": 2376,
+        "unknown_or_pending": 0
+      },
+      "edits": 1,
+      "frozen_candidate": true,
+      "candidate_revision": "87b849a9fb3ba082c6fb23ecf8c644af987b3be95fe07dcd7c4225be690e0ca0",
+      "verified_events": 30,
+      "case_outcomes": [
+        {
+          "case": "canonical_mixed_payload",
+          "decision": "accept_for_review",
+          "properties": {
+            "P1": "pass",
+            "P2": "pass",
+            "P3": "pass",
+            "P4": "pass",
+            "P5": "pass",
+            "P6": "pass",
+            "P7": "pass"
+          }
+        },
+        {
+          "case": "contended_inventory",
+          "decision": "accept_for_review",
+          "properties": {
+            "P1": "pass",
+            "P2": "pass",
+            "P3": "pass",
+            "P4": "pass",
+            "P5": "pass",
+            "P6": "pass",
+            "P7": "pass"
+          }
+        },
+        {
+          "case": "dual_restart_response_loss",
+          "decision": "accept_for_review",
+          "properties": {
+            "P1": "pass",
+            "P2": "pass",
+            "P3": "pass",
+            "P4": "pass",
+            "P5": "pass",
+            "P6": "not_applicable",
+            "P7": "pass"
+          }
+        },
+        {
+          "case": "cancel_after_dual_restart",
+          "decision": "accept_for_review",
+          "properties": {
+            "P1": "pass",
+            "P2": "pass",
+            "P3": "pass",
+            "P4": "pass",
+            "P5": "pass",
+            "P6": "not_applicable",
+            "P7": "pass"
+          }
+        }
+      ],
+      "final_case_errors": [],
+      "independently_verified": true,
+      "action_rejections": {},
+      "resource_receipts": [
+        {
+          "terminal": true,
+          "sha256": "11c9c969b872de8dc8fa55d8aa926b655a3ce100a6dbee9af2a71c9a9eb10bc9",
+          "duration_seconds": 4.141,
+          "provider_resources": {
+            "block_input": 0,
+            "block_output": 0,
+            "cost": 0.01784743,
+            "elapsed_time": 1.769155,
+            "involuntary_switches": 248,
+            "max_rss": 31176,
+            "monotonic_time": 3.542687037,
+            "page_faults": 185,
+            "page_faults_io": 67292,
+            "shared_memory": 0,
+            "signals": 0,
+            "swaps": 0,
+            "system_cpu_time": 0.268875,
+            "unshared_memory": 0,
+            "user_cpu_time": 1.50028,
+            "voluntary_switches": 17611
+          },
+          "provider_cost_unit": "unspecified; not USD inference spend"
+        },
+        {
+          "terminal": true,
+          "sha256": "9588516af843d14e7b9ef1d2261f6b1e324f04c69f03c7184017cd4f1f33edfc",
+          "duration_seconds": 4.097,
+          "provider_resources": {
+            "block_input": 0,
+            "block_output": 0,
+            "cost": 0.017793,
+            "elapsed_time": 1.763576,
+            "involuntary_switches": 156,
+            "max_rss": 31448,
+            "monotonic_time": 3.537000691,
+            "page_faults": 185,
+            "page_faults_io": 63311,
+            "shared_memory": 0,
+            "signals": 0,
+            "swaps": 0,
+            "system_cpu_time": 0.187065,
+            "unshared_memory": 0,
+            "user_cpu_time": 1.576511,
+            "voluntary_switches": 17584
+          },
+          "provider_cost_unit": "unspecified; not USD inference spend"
+        },
+        {
+          "terminal": true,
+          "sha256": "2a9fa89a0c21396545ce83b197c3939b687ec693cff8ae5c8aa55ca9cd378688",
+          "duration_seconds": 12.326,
+          "provider_resources": {
+            "block_input": 0,
+            "block_output": 0,
+            "cost": 0.06492676000000001,
+            "elapsed_time": 6.476884,
+            "involuntary_switches": 1261,
+            "max_rss": 31584,
+            "monotonic_time": 11.892079317,
+            "page_faults": 186,
+            "page_faults_io": 236362,
+            "shared_memory": 0,
+            "signals": 0,
+            "swaps": 0,
+            "system_cpu_time": 1.028105,
+            "unshared_memory": 0,
+            "user_cpu_time": 5.448779,
+            "voluntary_switches": 70197
+          },
+          "provider_cost_unit": "unspecified; not USD inference spend"
+        },
+        {
+          "terminal": true,
+          "sha256": "906584bf445aacbd94c351cebfe7cfced5eac4d3a7c54b312f2525c2afe4b6ee",
+          "duration_seconds": 8.97,
+          "provider_resources": {
+            "block_input": 0,
+            "block_output": 0,
+            "cost": 0.046208509999999994,
+            "elapsed_time": 4.605059,
+            "involuntary_switches": 967,
+            "max_rss": 31584,
+            "monotonic_time": 8.567848609,
+            "page_faults": 185,
+            "page_faults_io": 167675,
+            "shared_memory": 0,
+            "signals": 0,
+            "swaps": 0,
+            "system_cpu_time": 0.677501,
+            "unshared_memory": 0,
+            "user_cpu_time": 3.927558,
+            "voluntary_switches": 53080
+          },
+          "provider_cost_unit": "unspecified; not USD inference spend"
+        }
+      ],
+      "reported_prompt_tokens": 20965,
+      "reported_completion_tokens": 4651,
+      "remote_operations": 4
+    },
+    {
+      "slot": 10,
+      "incident": "IF-002",
+      "variant": "B2",
+      "repetition": 2,
+      "run_id": "t8-final-20261003-10",
+      "final_decision": "reject_behavior",
+      "elapsed_seconds": 229.20299999999406,
+      "reason": "Protected development validation did not accept the candidate; inspect case evidence.",
+      "accounting": {
+        "calls": 6,
+        "estimated_usage_microusd": 7384,
+        "reserved_or_spent_microusd": 7384,
+        "unknown_or_pending": 0
+      },
+      "edits": 0,
+      "frozen_candidate": true,
+      "candidate_revision": "792cc17f4938f85482e4ce6cd27db979de4d87b648b2ed16bb2775c03c650a95",
+      "verified_events": 49,
+      "case_outcomes": [
+        {
+          "case": "canonical_mixed_payload",
+          "decision": "accept_for_review",
+          "properties": {
+            "P1": "pass",
+            "P2": "pass",
+            "P3": "pass",
+            "P4": "pass",
+            "P5": "pass",
+            "P6": "pass",
+            "P7": "pass"
+          }
+        },
+        {
+          "case": "contended_inventory",
+          "decision": "accept_for_review",
+          "properties": {
+            "P1": "pass",
+            "P2": "pass",
+            "P3": "pass",
+            "P4": "pass",
+            "P5": "pass",
+            "P6": "pass",
+            "P7": "pass"
+          }
+        },
+        {
+          "case": "decline_then_new_order",
+          "decision": "reject_behavior",
+          "properties": {
+            "P1": "pass",
+            "P2": "pass",
+            "P3": "fail",
+            "P4": "fail",
+            "P5": "pass",
+            "P6": "not_applicable",
+            "P7": "pass"
+          }
+        },
+        {
+          "case": "two_declines_with_restart",
+          "decision": "reject_behavior",
+          "properties": {
+            "P1": "pass",
+            "P2": "pass",
+            "P3": "fail",
+            "P4": "fail",
+            "P5": "pass",
+            "P6": "not_applicable",
+            "P7": "pass"
+          }
+        }
+      ],
+      "final_case_errors": [],
+      "independently_verified": true,
+      "action_rejections": {
+        "replacement must match exactly once; no edit applied": 2
+      },
+      "resource_receipts": [
+        {
+          "terminal": true,
+          "sha256": "a74d8dba78558f8bb25e4c46899f3b5c4e594b9ea96013f173489115aa6fa09f",
+          "duration_seconds": 5.772,
+          "provider_resources": {
+            "block_input": 0,
+            "block_output": 0,
+            "cost": 0.023099140000000004,
+            "elapsed_time": 2.294328,
+            "involuntary_switches": 366,
+            "max_rss": 31172,
+            "monotonic_time": 5.439162968,
+            "page_faults": 185,
+            "page_faults_io": 75029,
+            "shared_memory": 0,
+            "signals": 0,
+            "swaps": 0,
+            "system_cpu_time": 0.371172,
+            "unshared_memory": 0,
+            "user_cpu_time": 1.923156,
+            "voluntary_switches": 27663
+          },
+          "provider_cost_unit": "unspecified; not USD inference spend"
+        },
+        {
+          "terminal": true,
+          "sha256": "dad3addbb6eb2e88707a7014bf5987771920d34d45bf8a278e2d1d6c6fa95731",
+          "duration_seconds": 8.508,
+          "provider_resources": {
+            "block_input": 0,
+            "block_output": 0,
+            "cost": 0.03689167,
+            "elapsed_time": 3.673501,
+            "involuntary_switches": 510,
+            "max_rss": 31332,
+            "monotonic_time": 8.039019881,
+            "page_faults": 185,
+            "page_faults_io": 133355,
+            "shared_memory": 0,
+            "signals": 0,
+            "swaps": 0,
+            "system_cpu_time": 0.489595,
+            "unshared_memory": 0,
+            "user_cpu_time": 3.183906,
+            "voluntary_switches": 39645
+          },
+          "provider_cost_unit": "unspecified; not USD inference spend"
+        },
+        {
+          "terminal": true,
+          "sha256": "2e943078a1a4eb60c3cbf6a54a4de33e68cba05c0a73cba607d80d9f28d8acdb",
+          "duration_seconds": 22.614,
+          "provider_resources": {
+            "block_input": 0,
+            "block_output": 0,
+            "cost": 0.09403289,
+            "elapsed_time": 9.387305,
+            "involuntary_switches": 1992,
+            "max_rss": 31968,
+            "monotonic_time": 22.108996788,
+            "page_faults": 186,
+            "page_faults_io": 314275,
+            "shared_memory": 0,
+            "signals": 0,
+            "swaps": 0,
+            "system_cpu_time": 1.564098,
+            "unshared_memory": 0,
+            "user_cpu_time": 7.823207,
+            "voluntary_switches": 124457
+          },
+          "provider_cost_unit": "unspecified; not USD inference spend"
+        },
+        {
+          "terminal": true,
+          "sha256": "e169cbdb96b6b01092833fb3976a5f335596b1a86c2710f4fc3add9a4c20ea26",
+          "duration_seconds": 23.048,
+          "provider_resources": {
+            "block_input": 0,
+            "block_output": 0,
+            "cost": 0.09573787,
+            "elapsed_time": 9.557675,
+            "involuntary_switches": 1716,
+            "max_rss": 32224,
+            "monotonic_time": 22.594544112,
+            "page_faults": 186,
+            "page_faults_io": 314126,
+            "shared_memory": 0,
+            "signals": 0,
+            "swaps": 0,
+            "system_cpu_time": 1.820368,
+            "unshared_memory": 0,
+            "user_cpu_time": 7.737307,
+            "voluntary_switches": 121434
+          },
+          "provider_cost_unit": "unspecified; not USD inference spend"
+        },
+        {
+          "terminal": true,
+          "sha256": "bd0ccfbc083ce0e78340775190260bb3a2f0493e2ab3d5c1527738180cb1414f",
+          "duration_seconds": 13.608,
+          "provider_resources": {
+            "block_input": 0,
+            "block_output": 0,
+            "cost": 0.055229820000000006,
+            "elapsed_time": 5.507250000000001,
+            "involuntary_switches": 1414,
+            "max_rss": 31464,
+            "monotonic_time": 13.243137786,
+            "page_faults": 185,
+            "page_faults_io": 176227,
+            "shared_memory": 0,
+            "signals": 0,
+            "swaps": 0,
+            "system_cpu_time": 0.964833,
+            "unshared_memory": 0,
+            "user_cpu_time": 4.542417,
+            "voluntary_switches": 76926
+          },
+          "provider_cost_unit": "unspecified; not USD inference spend"
+        }
+      ],
+      "reported_prompt_tokens": 53798,
+      "reported_completion_tokens": 17305,
+      "remote_operations": 5
+    },
+    {
+      "slot": 11,
+      "incident": "IF-002",
+      "variant": "B0",
+      "repetition": 2,
+      "run_id": "t8-final-20261003-11",
+      "final_decision": "reject_behavior",
+      "elapsed_seconds": 136.4380000000092,
+      "reason": "Protected development validation did not accept the candidate; inspect case evidence.",
+      "accounting": {
+        "calls": 5,
+        "estimated_usage_microusd": 4557,
+        "reserved_or_spent_microusd": 4557,
+        "unknown_or_pending": 0
+      },
+      "edits": 2,
+      "frozen_candidate": true,
+      "candidate_revision": "d9544f534455f824d053cf33ce34516154589ebaa53dfc736b4e0c6885231272",
+      "verified_events": 36,
+      "case_outcomes": [
+        {
+          "case": "canonical_mixed_payload",
+          "decision": "accept_for_review",
+          "properties": {
+            "P1": "pass",
+            "P2": "pass",
+            "P3": "pass",
+            "P4": "pass",
+            "P5": "pass",
+            "P6": "pass",
+            "P7": "pass"
+          }
+        },
+        {
+          "case": "contended_inventory",
+          "decision": "accept_for_review",
+          "properties": {
+            "P1": "pass",
+            "P2": "pass",
+            "P3": "pass",
+            "P4": "pass",
+            "P5": "pass",
+            "P6": "pass",
+            "P7": "pass"
+          }
+        },
+        {
+          "case": "decline_then_new_order",
+          "decision": "reject_behavior",
+          "properties": {
+            "P1": "pass",
+            "P2": "pass",
+            "P3": "fail",
+            "P4": "fail",
+            "P5": "pass",
+            "P6": "not_applicable",
+            "P7": "pass"
+          }
+        },
+        {
+          "case": "two_declines_with_restart",
+          "decision": "reject_behavior",
+          "properties": {
+            "P1": "pass",
+            "P2": "pass",
+            "P3": "fail",
+            "P4": "fail",
+            "P5": "pass",
+            "P6": "not_applicable",
+            "P7": "pass"
+          }
+        }
+      ],
+      "final_case_errors": [],
+      "independently_verified": true,
+      "action_rejections": {
+        "unsupported action or fields": 1
+      },
+      "resource_receipts": [
+        {
+          "terminal": true,
+          "sha256": "cca970a8e4190fc889bd414afbac68fc6cb7eb9a92c776622547676ecc01b14b",
+          "duration_seconds": 5.736,
+          "provider_resources": {
+            "block_input": 0,
+            "block_output": 0,
+            "cost": 0.02297188,
+            "elapsed_time": 2.281602,
+            "involuntary_switches": 342,
+            "max_rss": 31172,
+            "monotonic_time": 5.392088082,
+            "page_faults": 185,
+            "page_faults_io": 75019,
+            "shared_memory": 0,
+            "signals": 0,
+            "swaps": 0,
+            "system_cpu_time": 0.373828,
+            "unshared_memory": 0,
+            "user_cpu_time": 1.907774,
+            "voluntary_switches": 27591
+          },
+          "provider_cost_unit": "unspecified; not USD inference spend"
+        },
+        {
+          "terminal": true,
+          "sha256": "dc7a9b9b736d8ac4f8a71cb3b14635a5267ad26b5f401b37490182dadd61a72c",
+          "duration_seconds": 26.668,
+          "provider_resources": {
+            "block_input": 0,
+            "block_output": 0,
+            "cost": 0.09175758,
+            "elapsed_time": 9.15971,
+            "involuntary_switches": 2233,
+            "max_rss": 32096,
+            "monotonic_time": 26.211402193,
+            "page_faults": 186,
+            "page_faults_io": 330184,
+            "shared_memory": 0,
+            "signals": 0,
+            "swaps": 0,
+            "system_cpu_time": 1.530289,
+            "unshared_memory": 0,
+            "user_cpu_time": 7.629421,
+            "voluntary_switches": 120336
+          },
+          "provider_cost_unit": "unspecified; not USD inference spend"
+        },
+        {
+          "terminal": true,
+          "sha256": "06fd90b09ab06f476cb5071ebfaa48b4a560efb17d57178c86fba745fa372955",
+          "duration_seconds": 15.184,
+          "provider_resources": {
+            "block_input": 0,
+            "block_output": 0,
+            "cost": 0.05582907,
+            "elapsed_time": 5.567251,
+            "involuntary_switches": 1489,
+            "max_rss": 31312,
+            "monotonic_time": 14.746081703,
+            "page_faults": 185,
+            "page_faults_io": 188758,
+            "shared_memory": 0,
+            "signals": 0,
+            "swaps": 0,
+            "system_cpu_time": 0.987632,
+            "unshared_memory": 0,
+            "user_cpu_time": 4.579619,
+            "voluntary_switches": 77103
+          },
+          "provider_cost_unit": "unspecified; not USD inference spend"
+        }
+      ],
+      "reported_prompt_tokens": 32325,
+      "reported_completion_tokens": 10899,
+      "remote_operations": 3
+    },
+    {
+      "slot": 12,
+      "incident": "IF-002",
+      "variant": "B1",
+      "repetition": 2,
+      "run_id": "t8-final-20261003-12",
+      "final_decision": "unresolved",
+      "elapsed_seconds": 195.73500000000058,
+      "reason": "RuntimeError: format/action correction limit",
+      "accounting": {
+        "calls": 6,
+        "estimated_usage_microusd": 8987,
+        "reserved_or_spent_microusd": 8987,
+        "unknown_or_pending": 0
+      },
+      "edits": 0,
+      "frozen_candidate": false,
+      "candidate_revision": null,
+      "verified_events": 37,
+      "case_outcomes": [],
+      "final_case_errors": [],
+      "independently_verified": false,
+      "action_rejections": {
+        "Expecting value: line 1 column 1 (char 0)": 1,
+        "unsupported action or fields": 1,
+        "interpret experiment before repair": 1
+      },
+      "resource_receipts": [
+        {
+          "terminal": true,
+          "sha256": "b9479d7d2ca32c6efac041be82428f73599af5ddda002a1811fbc6ed880721c8",
+          "duration_seconds": 6.298,
+          "provider_resources": {
+            "block_input": 0,
+            "block_output": 0,
+            "cost": 0.02359991,
+            "elapsed_time": 2.344405,
+            "involuntary_switches": 407,
+            "max_rss": 31172,
+            "monotonic_time": 5.536027205,
+            "page_faults": 185,
+            "page_faults_io": 75006,
+            "shared_memory": 0,
+            "signals": 0,
+            "swaps": 0,
+            "system_cpu_time": 0.336947,
+            "unshared_memory": 0,
+            "user_cpu_time": 2.007458,
+            "voluntary_switches": 27431
+          },
+          "provider_cost_unit": "unspecified; not USD inference spend"
+        },
+        {
+          "terminal": true,
+          "sha256": "a70c30fa305bfb274d554c836a95df2163bb64f91447c3b1d4d698e04ff08fbc",
+          "duration_seconds": 8.31,
+          "provider_resources": {
+            "block_input": 0,
+            "block_output": 0,
+            "cost": 0.03823042,
+            "elapsed_time": 3.8073680000000003,
+            "involuntary_switches": 599,
+            "max_rss": 31348,
+            "monotonic_time": 8.020735537,
+            "page_faults": 185,
+            "page_faults_io": 133415,
+            "shared_memory": 0,
+            "signals": 0,
+            "swaps": 0,
+            "system_cpu_time": 0.526349,
+            "unshared_memory": 0,
+            "user_cpu_time": 3.281019,
+            "voluntary_switches": 40497
+          },
+          "provider_cost_unit": "unspecified; not USD inference spend"
+        }
+      ],
+      "reported_prompt_tokens": 56879,
+      "reported_completion_tokens": 23217,
+      "remote_operations": 2
     }
   ],
-  "campaign_estimated_settled_microusd": 16615,
-  "project_estimated_settled_microusd": 68204,
-  "project_reserved_or_spent_microusd": 85899,
-  "pending_calls": 1,
-  "stop_reason": "Inference wall-time timeout left usage unknown; persistent guard prevented further dispatch.",
+  "campaign_estimated_settled_microusd": 50899,
+  "project_estimated_settled_microusd": 102488,
+  "project_reserved_or_spent_microusd": 155573,
+  "pending_calls": 0,
+  "stop_reason": "All 12 scheduled attempts completed. Unknown provider usage is retained at its full reservation; no failed attempts were replaced.",
   "freeze_sha256": "68ee6f0d191abc0789b8224001e7d1b25ee28d2d9fa4e37eaca0004c140f528f",
   "original_freeze_commit": "d47f3b0d43cf0fe77aa4ec07422f36ad4eb42f59",
   "equivalent_commit_after_author_email_correction": "4a05d43eab46ba24dc405fbcf7e7a84275fca15c",
   "identity_correction": "Only author/committer identity changed; source trees and timestamps preserved.",
   "limitations": [
-    "No matched final comparison completed.",
-    "All four attempts remain in denominator.",
-    "No final candidate was evaluated; 0/4 is not a measured schedule pass rate.",
-    "Unlaunched slots are not failures or successes.",
+    "Two independent attempts per variant/family; descriptive counts only.",
+    "Same two defects with different withheld schedules; not novel-incident generalization.",
+    "Interrupted campaign with disclosed accounting amendment.",
+    "Unknown provider usage counted at full reservation, never reported as known actual cost.",
+    "Unfrozen attempts count against valid-repair yield but are not measured schedule failures.",
     "Raw prompts, credentials, databases and account data excluded."
-  ]
+  ],
+  "unknown_usage_calls": 3,
+  "conservatively_charged_microusd": 53085,
+  "continuation": "T8_CONTINUATION.md: accounting amendment after slots 1\u20134; frozen agent and evaluator unchanged.",
+  "continuation_driver_sha256": "15f491eff96abb2c253b562799ce544d04f639d04918692885a8cd67e6bb0de6",
+  "cells": [
+    {
+      "incident": "IF-001",
+      "variant": "B0",
+      "launched": 2,
+      "accepted": 1
+    },
+    {
+      "incident": "IF-001",
+      "variant": "B1",
+      "launched": 2,
+      "accepted": 0
+    },
+    {
+      "incident": "IF-001",
+      "variant": "B2",
+      "launched": 2,
+      "accepted": 0
+    },
+    {
+      "incident": "IF-002",
+      "variant": "B0",
+      "launched": 2,
+      "accepted": 0
+    },
+    {
+      "incident": "IF-002",
+      "variant": "B1",
+      "launched": 2,
+      "accepted": 0
+    },
+    {
+      "incident": "IF-002",
+      "variant": "B2",
+      "launched": 2,
+      "accepted": 1
+    }
+  ],
+  "infrastructure_failed_attempts": 3,
+  "infrastructure_invalidity_triggered": true
 }

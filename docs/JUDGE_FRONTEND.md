@@ -9,7 +9,7 @@ repository remains private. Its About website points to the deployed demo.
 The site is a recorded replay, not a live controller. It makes no inference calls,
 accepts no credentials, and launches no sandbox operations. IF-001 uses a recorded
 local Docker run; IF-002 uses a recorded Nebius Sandbox run. Model hypotheses are
-labeled unverified. All four launched T8 attempts and the incomplete campaign are
+labeled unverified. All twelve T8 attempts and the infrastructure limitation are
 disclosed separately from the accepted development repairs.
 
 ## Update procedure

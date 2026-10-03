@@ -50,7 +50,8 @@ for incident,run_id,title in [
       'scope':'Recorded development run, not a T8 final comparison.'})
 campaign=json.loads((ROOT/'benchmarks/t8/summary.json').read_text())
 data={'version':1,'updated':'2026-10-03','mode':'recorded','incidents':items,
-      'campaign':{k:campaign[k] for k in ('status','planned_runs','launched_runs','unlaunched_runs','ranking_supported','stop_reason')},
+      'campaign':{k:campaign[k] for k in ('status','planned_runs','launched_runs','unlaunched_runs','ranking_supported','stop_reason','accepted_final_repairs','final_candidates_evaluated')},
+      'cells':campaign.get('cells',[]),
       'attempts':[{k:r[k] for k in ('slot','incident','variant','final_decision','reason')} for r in campaign['attempts']],
       'limitations':['Development runs are separate from the frozen comparison.',
         'Two synthetic defect implementations; finite checks are not a correctness proof.',

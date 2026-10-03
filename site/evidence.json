@@ -259,13 +259,53 @@
     }
   ],
   "campaign": {
-    "status": "incomplete",
+    "status": "completed_with_unknown_usage",
     "planned_runs": 12,
-    "launched_runs": 4,
-    "unlaunched_runs": 8,
+    "launched_runs": 12,
+    "unlaunched_runs": 0,
     "ranking_supported": false,
-    "stop_reason": "Inference wall-time timeout left usage unknown; persistent guard prevented further dispatch."
+    "stop_reason": "All 12 scheduled attempts completed. Unknown provider usage is retained at its full reservation; no failed attempts were replaced.",
+    "accepted_final_repairs": 2,
+    "final_candidates_evaluated": 4
   },
+  "cells": [
+    {
+      "incident": "IF-001",
+      "variant": "B0",
+      "launched": 2,
+      "accepted": 1
+    },
+    {
+      "incident": "IF-001",
+      "variant": "B1",
+      "launched": 2,
+      "accepted": 0
+    },
+    {
+      "incident": "IF-001",
+      "variant": "B2",
+      "launched": 2,
+      "accepted": 0
+    },
+    {
+      "incident": "IF-002",
+      "variant": "B0",
+      "launched": 2,
+      "accepted": 0
+    },
+    {
+      "incident": "IF-002",
+      "variant": "B1",
+      "launched": 2,
+      "accepted": 0
+    },
+    {
+      "incident": "IF-002",
+      "variant": "B2",
+      "launched": 2,
+      "accepted": 1
+    }
+  ],
   "attempts": [
     {
       "slot": 1,
@@ -294,6 +334,62 @@
       "variant": "B1",
       "final_decision": "unresolved",
       "reason": "TimeoutError: Inference wall-time cap; usage unknown, no retry"
+    },
+    {
+      "slot": 5,
+      "incident": "IF-002",
+      "variant": "B2",
+      "final_decision": "accept_for_review",
+      "reason": "All declared protected development checks passed."
+    },
+    {
+      "slot": 6,
+      "incident": "IF-002",
+      "variant": "B0",
+      "final_decision": "unresolved",
+      "reason": "TimeoutError: Inference wall-time cap; usage unknown, no retry"
+    },
+    {
+      "slot": 7,
+      "incident": "IF-001",
+      "variant": "B1",
+      "final_decision": "unresolved",
+      "reason": "TimeoutError: Inference wall-time cap; usage unknown, no retry"
+    },
+    {
+      "slot": 8,
+      "incident": "IF-001",
+      "variant": "B2",
+      "final_decision": "unresolved",
+      "reason": "RuntimeError: format/action correction limit"
+    },
+    {
+      "slot": 9,
+      "incident": "IF-001",
+      "variant": "B0",
+      "final_decision": "accept_for_review",
+      "reason": "All declared protected development checks passed."
+    },
+    {
+      "slot": 10,
+      "incident": "IF-002",
+      "variant": "B2",
+      "final_decision": "reject_behavior",
+      "reason": "Protected development validation did not accept the candidate; inspect case evidence."
+    },
+    {
+      "slot": 11,
+      "incident": "IF-002",
+      "variant": "B0",
+      "final_decision": "reject_behavior",
+      "reason": "Protected development validation did not accept the candidate; inspect case evidence."
+    },
+    {
+      "slot": 12,
+      "incident": "IF-002",
+      "variant": "B1",
+      "final_decision": "unresolved",
+      "reason": "RuntimeError: format/action correction limit"
     }
   ],
   "limitations": [

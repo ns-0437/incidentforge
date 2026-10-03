@@ -1,5 +1,10 @@
 # T8 frozen comparison protocol
 
+Closeout: all twelve slots were recorded. See [results](T8_RESULTS.md) and the
+[disclosed accounting continuation](T8_CONTINUATION.md). Three infrastructure
+failures triggered the ranking-invalidity rule below. This original protocol
+description is retained; the amendment did not change agent or evaluator inputs.
+
 Two independent attempts for each B0/B1/B2 × IF-001/IF-002 cell: twelve slots.
 Variant order rotates across family/repetition blocks. All launched attempts,
 including malformed actions, exhausted budgets, infrastructure errors and unknown

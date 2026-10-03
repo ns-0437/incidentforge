@@ -1,6 +1,6 @@
 # IncidentForge: execution backlog
 
-Current checkpoint (October 3, 2026): T0–T7 delivered as development stages. Pre-T8 work adds remote candidate/controller execution, stricter evidence checks, editable developer assertions and recovery calibration. See PRE_T8_STATUS.md for verified results and remaining freeze work. The original scope is retained. No final comparison has run; no paid overage is authorized.
+Current checkpoint (October 3, 2026): T0–T7 delivered; T8 execution and reporting complete. Twelve attempts yielded two accepted final repairs, two rejected frozen candidates and eight unresolved outcomes. Three inference timeouts invalidate variant ranking. See T8_RESULTS.md and T8_CONTINUATION.md. The original scope is retained; no paid overage is authorized. Reliability improvements require a separately frozen future campaign; T9 packaging must disclose current limitations.
 
 Historical T2 checkpoint: 32 tests, 17 case reports, all five required harmful fixes rejected; separate T0/T1 regression: 34 tests, zero skips. T3 subsequently verified remote compatibility. Solo, 6–7 hours/day: roughly 162–189 hours across October 3–29, with October 30 reserved as contingency. Estimates are ranges, not guarantees.
 

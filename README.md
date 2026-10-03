@@ -17,7 +17,7 @@
 
 ## Why this exists
 
-Explore the [recorded investigation desk](https://ns-0437.github.io/incidentforge-demo/): two synthetic incidents, measured observations, proposed patches, verification results, and an interactive architecture diagram. The static demo spends no inference credits. Its successful development runs are explicitly separate from the incomplete T8 comparison. [Publishing guide](docs/JUDGE_FRONTEND.md).
+Explore the [recorded investigation desk](https://ns-0437.github.io/incidentforge-demo/): two synthetic incidents, measured observations, proposed patches, verification results, and an interactive architecture diagram. The static demo spends no inference credits. Its development runs are separate from the completed T8 campaign and its disclosed failures. [Publishing guide](docs/JUDGE_FRONTEND.md).
 
 A payment response disappears **after the charge commits**. A retry uses a fresh
 identity. The order looks healthy—and the customer is charged twice.
@@ -138,10 +138,15 @@ Failed attempts remain in the denominator.
 
 ## Measured results
 
-**T8 is incomplete: 4 of 12 planned runs launched.** An inference timeout left
-usage unknown, so the persisted budget guard stopped further dispatch.
-All four launched attempts were unresolved before candidate freeze. No final
-agent-patch verdict was produced, and **no variant ranking is supported**.
+**T8 completed all 12 attempts: 2 accepted final repairs, 2 rejected frozen
+candidates, and 8 unresolved attempts.** Four candidates received independent
+final evaluation. B0 repaired IF-001 once; B2 repaired IF-002 once. Three
+inference timeouts triggered the predeclared infrastructure-invalidity threshold,
+so **no variant ranking is supported**. All failed attempts remain in the results.
+
+Project exposure is **$0.155573 / $0.20**, including the full reservations for
+three calls with unknown usage. The disclosed [continuation amendment](docs/T8_CONTINUATION.md)
+preserved the frozen source and all twelve original slots.
 
 Development and evaluator readiness are separate from that campaign:
 
@@ -261,7 +266,7 @@ docs/                Original brief, design, protocol and stage reviews
 <summary><b>Limitations and next steps</b></summary>
 
 - Two synthetic defect implementations; final tests vary schedules, not defect classes.
-- T8 lacks a complete matched sample. No superiority or statistical-significance claim.
+- T8 recorded all twelve attempts, but three infrastructure failures invalidate ranking. No superiority or statistical-significance claim.
 - Causal reasoning remains a model claim even when a repair passes.
 - IF-002 restarts Inventory as well as Order to discard old queued requests.
 - Local operator console, not a production multi-user platform.
