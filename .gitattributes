@@ -1,0 +1,4 @@
+* text=auto eol=lf
+*.png binary
+*.jpg binary
+docs/ORIGINAL_BRIEF.md -text

@@ -19,7 +19,7 @@ from incidentforge.remote_backend import ContreeBackend
 from incidentforge.workspace import Workspace
 
 def pins():
-    return {p.relative_to(ROOT).as_posix():hashlib.sha256(p.read_bytes()).hexdigest()
+    return {p.relative_to(ROOT).as_posix():hashlib.sha256(p.read_bytes().replace(b'\r\n',b'\n')).hexdigest()
       for folder in ('src','fixture','evaluation','probes','tests','contracts')
       for p in sorted((ROOT/folder).rglob('*')) if p.is_file() and p.suffix in {'.py','.md'}}
 
@@ -41,7 +41,8 @@ def main():
         campaign.mkdir(parents=True,exist_ok=False)
         commit=subprocess.check_output(['git','rev-parse','HEAD'],cwd=ROOT,text=True).strip()
         manifest={'campaign':args.campaign,'frozen_at':datetime.now(timezone.utc).isoformat(),'git_commit':commit,
-          'source_hashes':pins(),'driver_sha256':hashlib.sha256(Path(__file__).read_bytes()).hexdigest(),
+          'source_hashes':pins(),'source_hash_encoding':'UTF-8 bytes with CRLF normalized to LF',
+          'driver_sha256':hashlib.sha256(Path(__file__).read_bytes().replace(b'\r\n',b'\n')).hexdigest(),
           'schedule':schedule(),'model':MODEL,'temperature':.2,'max_output_tokens':8192,
           'per_run':{'model_calls':10,'edits':3,'developer_tests':2,'agent_executions':6,'final_executions':1,'agent_seconds':900},
           'project_cap_microusd':200000,'recovery_seconds':{'IF-001':3,'IF-002':2},
@@ -51,7 +52,7 @@ def main():
                          'Final schedules checked against authored controls before freeze, not used for model tuning.']}
         manifest_path.write_text(json.dumps(manifest,indent=2));print(str(manifest_path));return
     manifest=json.loads(manifest_path.read_text())
-    if manifest['source_hashes']!=pins() or manifest['driver_sha256']!=hashlib.sha256(Path(__file__).read_bytes()).hexdigest():
+    if manifest['source_hashes']!=pins() or manifest['driver_sha256']!=hashlib.sha256(Path(__file__).read_bytes().replace(b'\r\n',b'\n')).hexdigest():
         raise RuntimeError('Frozen source changed; do not continue campaign')
     budget=Budget(ROOT/'runs/t4-budget.sqlite',200000)
     ledger=campaign/'launches.jsonl'
