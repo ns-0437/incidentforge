@@ -1,0 +1,107 @@
+{
+  "status": "incomplete",
+  "planned_runs": 12,
+  "launched_runs": 4,
+  "unlaunched_runs": 8,
+  "accepted_final_repairs": 0,
+  "final_candidates_evaluated": 0,
+  "ranking_supported": false,
+  "attempts": [
+    {
+      "slot": 1,
+      "incident": "IF-001",
+      "variant": "B0",
+      "repetition": 1,
+      "run_id": "t8-final-20261003-01",
+      "final_decision": "unresolved",
+      "elapsed_seconds": 72.73500000000058,
+      "reason": "RuntimeError: format/action correction limit",
+      "accounting": {
+        "calls": 5,
+        "estimated_usage_microusd": 4977,
+        "reserved_or_spent_microusd": 4977,
+        "unknown_or_pending": 0
+      },
+      "edits": 1,
+      "frozen_candidate": false,
+      "verified_events": 35,
+      "case_outcomes": []
+    },
+    {
+      "slot": 2,
+      "incident": "IF-001",
+      "variant": "B1",
+      "repetition": 1,
+      "run_id": "t8-final-20261003-02",
+      "final_decision": "unresolved",
+      "elapsed_seconds": 67.06299999999464,
+      "reason": "RuntimeError: format/action correction limit",
+      "accounting": {
+        "calls": 5,
+        "estimated_usage_microusd": 4344,
+        "reserved_or_spent_microusd": 4344,
+        "unknown_or_pending": 0
+      },
+      "edits": 0,
+      "frozen_candidate": false,
+      "verified_events": 34,
+      "case_outcomes": []
+    },
+    {
+      "slot": 3,
+      "incident": "IF-001",
+      "variant": "B2",
+      "repetition": 1,
+      "run_id": "t8-final-20261003-03",
+      "final_decision": "unresolved",
+      "elapsed_seconds": 75.81200000000536,
+      "reason": "RuntimeError: format/action correction limit",
+      "accounting": {
+        "calls": 4,
+        "estimated_usage_microusd": 3943,
+        "reserved_or_spent_microusd": 3943,
+        "unknown_or_pending": 0
+      },
+      "edits": 0,
+      "frozen_candidate": false,
+      "verified_events": 32,
+      "case_outcomes": []
+    },
+    {
+      "slot": 4,
+      "incident": "IF-002",
+      "variant": "B1",
+      "repetition": 1,
+      "run_id": "t8-final-20261003-04",
+      "final_decision": "unresolved",
+      "elapsed_seconds": 180.42200000000594,
+      "reason": "TimeoutError: Inference wall-time cap; usage unknown, no retry",
+      "accounting": {
+        "calls": 4,
+        "estimated_usage_microusd": 3351,
+        "reserved_or_spent_microusd": 21046,
+        "unknown_or_pending": 1
+      },
+      "edits": 0,
+      "frozen_candidate": false,
+      "verified_events": 29,
+      "case_outcomes": []
+    }
+  ],
+  "campaign_estimated_settled_microusd": 16615,
+  "project_estimated_settled_microusd": 68204,
+  "project_reserved_or_spent_microusd": 85899,
+  "pending_calls": 1,
+  "stop_reason": "Inference wall-time timeout left usage unknown; persistent guard prevented further dispatch.",
+  "freeze_sha256": "68ee6f0d191abc0789b8224001e7d1b25ee28d2d9fa4e37eaca0004c140f528f",
+  "original_freeze_commit": "d47f3b0d43cf0fe77aa4ec07422f36ad4eb42f59",
+  "equivalent_commit_after_author_email_correction": "4a05d43eab46ba24dc405fbcf7e7a84275fca15c",
+  "identity_correction": "Only author/committer identity changed; source trees and timestamps preserved.",
+  "limitations": [
+    "No matched final comparison completed.",
+    "All four attempts remain in denominator.",
+    "No final candidate was evaluated; 0/4 is not a measured schedule pass rate.",
+    "Unlaunched slots are not failures or successes.",
+    "Raw prompts, credentials, databases and account data excluded."
+  ]
+}

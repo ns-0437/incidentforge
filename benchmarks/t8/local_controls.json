@@ -1,0 +1,55 @@
+{
+  "results": [
+    {
+      "incident": "IF-001",
+      "control": "reference",
+      "decision": "accept_for_review",
+      "cases": 4,
+      "errors": 0
+    },
+    {
+      "incident": "IF-001",
+      "control": "fresh_key",
+      "decision": "reject_behavior",
+      "cases": 4,
+      "errors": 0
+    },
+    {
+      "incident": "IF-001",
+      "control": "always_success",
+      "decision": "reject_behavior",
+      "cases": 2,
+      "errors": 2
+    },
+    {
+      "incident": "IF-002",
+      "control": "reference",
+      "decision": "accept_for_review",
+      "cases": 4,
+      "errors": 0
+    },
+    {
+      "incident": "IF-002",
+      "control": "lost_compensation",
+      "decision": "reject_behavior",
+      "cases": 4,
+      "errors": 0
+    },
+    {
+      "incident": "IF-002",
+      "control": "terminal_without_release",
+      "decision": "reject_behavior",
+      "cases": 4,
+      "errors": 0
+    },
+    {
+      "incident": "IF-002",
+      "control": "double_release",
+      "decision": "reject_behavior",
+      "cases": 4,
+      "errors": 0
+    }
+  ],
+  "events": 21,
+  "model_calls": 0
+}
