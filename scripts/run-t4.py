@@ -25,7 +25,7 @@ def main():
     parser.add_argument('--incident',choices=['IF-001','IF-002'],default='IF-001')
     parser.add_argument('--run-id',help='Controller-generated ID for local UI launches')
     args=parser.parse_args()
-    if not args.live: parser.error('Use --live only with the confirmed $0.20 pilot allocation.')
+    if not args.live: parser.error('Use --live only with the explicitly funded project allocation.')
     run_id=args.variant.lower()+'-'+args.incident.lower()+'-'+datetime.now(timezone.utc).strftime('%Y%m%dT%H%M%SZ')+'-'+uuid.uuid4().hex[:6]
     if args.run_id:
         if not re.fullmatch(r'ui-[a-f0-9]{32}',args.run_id): parser.error('invalid UI run ID')
@@ -41,7 +41,7 @@ def main():
         'symptom':('A customer reports duplicate charging after a transient payment response failure.' if args.incident=='IF-001'
                    else 'A declined order leaves stock reserved after service restart; cancellation never completes.'),
         'services':['Order','Inventory','Payment'],'visible_tests':'declared development observations'}))
-    budget=Budget(ROOT/'runs/t4-budget.sqlite',200000)
+    budget=Budget.existing(ROOT/'runs/t4-budget.sqlite')
     cancel=evidence.root/'CANCEL'
     from incidentforge.remote_backend import ContreeBackend
     backend=(ContreeBackend if args.backend=='contree' else DockerBackend)(ROOT,evidence,cancel,incident=args.incident)
@@ -51,7 +51,7 @@ def main():
         for p in sorted((ROOT/folder).rglob('*')):
             if p.is_file() and p.suffix in {'.py','.md'}: pins[p.relative_to(ROOT).as_posix()]=hashlib.sha256(p.read_bytes()).hexdigest()
     evidence.event('run_started',{'mode':'live','protocol':'post-t8-reliability-v3','backend':args.backend,
-        'source_hashes':pins,'model_budget_microusd':200000,'balance_evidence':'user screenshot $1.00, 27 days on 2026-10-03'})
+        'source_hashes':pins,'model_budget_microusd':budget.project_cap_microusd,'balance_evidence':'user screenshot $1.00, 27 days on 2026-10-03'})
     result=Controller(run_id,candidate,evidence,backend,worker,budget,cancel,variant=args.variant).run()
     result['verified_events']=verify(evidence.root)
     print(json.dumps(result,indent=2))

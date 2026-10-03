@@ -190,3 +190,13 @@ invalidates prior execution. Existing negative-feedback checks also verify the
 completion advice does not encourage a false success claim. **61 tests pass.**
 These are deterministic local checks, not another live model result. No inference
 or Sandbox calls were made for this revision; exposure remains **$0.183098**.
+
+
+## Explicit allocation amendment
+
+The owner approved a cumulative maximum of **$0.40** from existing free credits,
+with no further increase. The persisted ledger retains all settled and unknown
+calls; exposure before this amendment is **$0.183098**. See
+[the audit record](../benchmarks/reliability/allocation-amendment.json).
+Historical T8 caps and results are unchanged. Access is confirmed by the owner
+through submission only; December judging access remains unresolved.

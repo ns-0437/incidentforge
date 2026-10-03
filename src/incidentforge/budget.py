@@ -8,6 +8,7 @@ class BudgetExceeded(RuntimeError): pass
 class Budget:
     def __init__(self,path,project_cap_microusd):
         self.path=path
+        self.project_cap_microusd=project_cap_microusd
         with closing(sqlite3.connect(path)) as db:
             db.execute('CREATE TABLE IF NOT EXISTS settings(cap INTEGER NOT NULL)')
             row=db.execute('SELECT cap FROM settings').fetchone()
@@ -15,6 +16,16 @@ class Budget:
             elif row[0]!=project_cap_microusd: raise ValueError('project cap cannot change implicitly')
             db.execute('CREATE TABLE IF NOT EXISTS calls(id TEXT PRIMARY KEY,run TEXT,cap INTEGER,actual INTEGER,status TEXT)')
             db.commit()
+
+    @classmethod
+    def existing(cls,path,default_cap=200000):
+        """Read the explicit persisted allocation; never increase it at launch."""
+        if not path.exists(): return cls(path,default_cap)
+        with closing(sqlite3.connect(path.resolve().as_uri()+'?mode=ro',uri=True)) as db:
+            row=db.execute('SELECT cap FROM settings').fetchone()
+        if row is None or type(row[0]) is not int or not 0<row[0]<=400000:
+            raise ValueError('project allocation outside approved hard ceiling')
+        return cls(path,row[0])
 
     def reserve(self,run_id,amount,run_cap,max_calls):
         if type(amount) is not int or amount<=0: raise ValueError('positive integer reservation required')

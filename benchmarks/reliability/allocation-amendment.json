@@ -1,0 +1,10 @@
+{
+  "date": "2026-10-03T16:03:42.777930+00:00",
+  "old_cap_microusd": 200000,
+  "new_cap_microusd": 400000,
+  "exposure_before_microusd": 183098,
+  "call_records_unchanged": true,
+  "calls_sha256": "689e5c6eb5a8113082b890d3abbaee557c7e61c38fcf1e7f259b29b6f937587c",
+  "authorization": "User explicitly approved cumulative $0.40 maximum from free credits; no increase beyond this.",
+  "judge_access": "User confirms access through submission only; December 15 not confirmed."
+}

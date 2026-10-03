@@ -199,3 +199,22 @@ class ReliabilityTests(unittest.TestCase):
         self.assertFalse(report['verified_work']['developer_tests_executed_on_current_revision'])
 
 if __name__=='__main__':unittest.main()
+
+class AllocationTests(unittest.TestCase):
+    def test_existing_allocation_keeps_ledger_and_hard_ceiling(self):
+        import tempfile,sqlite3
+        from pathlib import Path
+        from incidentforge.budget import BudgetExceeded
+        with tempfile.TemporaryDirectory() as d:
+            path=Path(d)/'budget.sqlite'
+            b=Budget.existing(path)
+            token=b.reserve('old',100,200000,10);b.settle(token,80)
+            with sqlite3.connect(path) as db: db.execute('UPDATE settings SET cap=400000')
+            db.close()
+            b=Budget.existing(path)
+            self.assertEqual(b.totals('old')['reserved_or_spent_microusd'],80)
+            token=b.reserve('new',399920,400000,10);b.settle(token,399920)
+            with self.assertRaises(BudgetExceeded): b.reserve('next',1,400000,10)
+            with sqlite3.connect(path) as db: db.execute('UPDATE settings SET cap=400001')
+            db.close()
+            with self.assertRaises(ValueError): Budget.existing(path)
