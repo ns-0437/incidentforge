@@ -16,7 +16,7 @@ December 15. Recheck the live entry form before final submission.
 - [x] 62 local controller/regression tests and latest implementation CI pass.
 - [x] Judge guide, submission copy and timed recording script prepared.
 - [x] Fresh-checkout Linux/setup rehearsal recorded: 61 portable tests, 16 Linux checks, four HTTP routes; see [record](../benchmarks/release/rehearsal.json).
-- [x] Two live completion attempts retained: IF-001 accepted, IF-002 rejected. Authored-test completion remains locally tested only.
+- [x] Two live completion attempts retained: IF-001 accepted, IF-002 rejected. A third rejected IF-002 pilot exercised authored-test completion live.
 
 ## Owner/access gates
 - [x] Owner approved $0.40 cumulative maximum from existing free credits; no further increase.

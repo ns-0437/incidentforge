@@ -168,7 +168,9 @@ pass.** Two follow-up B2 pilots completed: IF-001 produced an accepted frozen
 repair that passed all four previously used final schedules; IF-002 produced a
 rejected compensation repair. Neither authored developer tests. These are
 separate development results, not a new benchmark or evidence of reliable repair
-across incidents. T8 results remain unchanged.
+across incidents. A subsequent instruction-only IF-002 pilot also failed repair
+validation, while successfully exercising the authored-test execution and honest
+completion path. T8 results remain unchanged.
 
 ## Try it
 

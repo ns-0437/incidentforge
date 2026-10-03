@@ -224,3 +224,24 @@ or establish a comparative success rate. Curated records are `v6-pilot.json` and
 Cumulative exposure is **$0.196578 / $0.40**, including **$0.053085** in conservative
 unknown-call reservations. No calls remain pending. The remaining allocation is
 **$0.203422**. The unallocated portion of the original trial is reserved, not committed.
+
+
+## Reachability-instruction follow-up: rejected repair, live test path exercised
+
+Revision `dc9155e` adds general instructions to separate independent conditions,
+trace source reachability before editing and preserve side-effect success checks.
+The evaluator, fixture and budgets are unchanged. All **62 local tests** and CI pass.
+
+One declared IF-002 B2 attempt (`b2-if-002-20261003T161722Z-d4051d`) still edited a
+downstream reconciliation error into `pass`; it failed protected compensation
+property P4. Prompting alone did not establish repair-quality improvement. The
+model did author a developer assertion, execute it on the current revision, observe
+its failure, and finish with explicit limitations. Fresh post-freeze protected
+validation rejected the candidate. This exercises the authored-test completion
+path live, but does not demonstrate successful compensation repair.
+
+Nine model calls cost **$0.010978**. Cumulative exposure is **$0.207556 / $0.40**;
+**$0.192444** remains, with no pending calls. See [retained result](../benchmarks/reliability/v8-pilot.json).
+No automatic retry was launched. The next useful intervention is stronger measured
+execution-path evidence, not another identical prompt attempt or weakened acceptance
+criteria. Historical accepted repairs and T8 outcomes remain unchanged.
