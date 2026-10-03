@@ -133,3 +133,36 @@ Current conservative project exposure: **$0.172358 / $0.20**, leaving **$0.02764
 No new unknown usage or pending operations. T8 and earlier pilot records remain
 unchanged. The end-to-end live-validation gate is still unmet, so T9 cannot yet
 claim a reliably completing autonomous repair workflow.
+
+## Field-catalog live pilot
+
+A single IF-001/B2 pilot was declared at frozen revision
+`bfe82c57bc4fd85a53d8a62cc84cbb7520c9fffb`. Run
+`b2-if-001-20261003T142937Z-37e8ac` used ten calls ($0.010740 estimated).
+It passed interpretation, recovered from an exact-edit mismatch, applied the
+payment-key repair and authored a test using a real developer field. Protected
+development feedback accepted the candidate with six independently verified cases.
+
+The controller refused premature finish because the authored test had not run.
+The agent then executed a developer test, rewrote its assertion specification,
+and incorrectly requested a second protected feedback call. That exhausted the
+correction limit. **The run remains unresolved**, without candidate freeze or
+post-freeze validation. Passing intermediate feedback is not completed autonomous
+repair. The rewritten test specification was not executed on the final revision.
+Negative-feedback revision behavior was not exercised because feedback passed.
+
+The [curated outcome](../benchmarks/reliability/v5-pilot.json) retains all rejection
+reasons, verified-work counters, accounting and the independent verification receipt.
+The original source hashes were checked again after execution. No extra diagnostic
+or model retry was launched; T8 remains unchanged.
+
+Project settled estimate is **$0.123102**; conservative exposure is **$0.183098**.
+The remaining **$0.016902** cannot fund the **$0.017695** conservative reservation
+for even one further inference call. There are no pending calls or remote operations.
+The cap was not increased and prior unknown reservations were not refunded.
+
+Next work must be local: test an explicit post-feedback completion path, make
+current test revision and remaining feedback allowance prominent, and prevent
+redundant test-specification writes from invalidating completed tests. A fresh
+live validation requires additional allocation within confirmed free credits.
+T9 materials may be prepared, but the live completion gate is not passed.

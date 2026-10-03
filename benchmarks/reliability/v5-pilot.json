@@ -1,0 +1,94 @@
+{
+  "stage": "Frozen single development pilot",
+  "revision": "bfe82c57bc4fd85a53d8a62cc84cbb7520c9fffb",
+  "report": {
+    "schema_version": 1,
+    "run_id": "b2-if-001-20261003T142937Z-37e8ac",
+    "variant": "B2",
+    "decision": "unresolved",
+    "reason": "RuntimeError: format/action correction limit",
+    "incident": "IF-001",
+    "protected_feedback_requests": 1,
+    "protected_feedback": {
+      "decision": "accept_for_review",
+      "complete": true,
+      "failed_properties": [],
+      "scope": "Protected development feedback only; not final holdout.",
+      "candidate_unchanged_since_feedback": false
+    },
+    "model_claim_unverified": null,
+    "candidate_revision": null,
+    "edits": 3,
+    "requested_tests": 1,
+    "backend": "nebius-sandbox",
+    "verified_work": {
+      "changed_source_paths": [
+        "fixture/app/service.py"
+      ],
+      "developer_test_file_present": true,
+      "developer_tests_executed_on_current_revision": false,
+      "requested_test_runs": 1
+    },
+    "accounting": {
+      "calls": 10,
+      "estimated_usage_microusd": 10740,
+      "reserved_or_spent_microusd": 10740,
+      "unknown_or_pending": 0
+    },
+    "next_step": "Inspect the retained failure evidence before another bounded attempt.",
+    "limitations": [
+      "One development pilot, not a B0/B1/B2 comparison.",
+      "Manual controls are not model repairs."
+    ]
+  },
+  "verified_events": 65,
+  "action_rejections": [
+    "replacement must match exactly once; no edit applied",
+    "Authored developer tests have not run on the current revision; request test before finish.",
+    "protected feedback limit"
+  ],
+  "interpretation_recorded": true,
+  "protected_development_verifications": [
+    {
+      "verified_cases": 6,
+      "tests_without_case_export": 0,
+      "archive_sha256": "3e8157af3d60d27ef3e83ebfa98a18c86fed0c8956a5cee6d235f93e4a2da29f",
+      "cases": [
+        {
+          "case": "reference-cancel-uncertain-payment",
+          "decision": "accept_for_review"
+        },
+        {
+          "case": "reference-clean",
+          "decision": "accept_for_review"
+        },
+        {
+          "case": "reference-compensation-restart",
+          "decision": "accept_for_review"
+        },
+        {
+          "case": "reference-payment-protocol",
+          "decision": "accept_for_review"
+        },
+        {
+          "case": "reference-response-loss-restart",
+          "decision": "accept_for_review"
+        },
+        {
+          "case": "reference-stock-contention",
+          "decision": "accept_for_review"
+        }
+      ]
+    }
+  ],
+  "project_settled_estimate_microusd": 130013,
+  "project_exposure_microusd": 183098,
+  "remaining_microusd": 16902,
+  "pending_calls": 0,
+  "limitations": [
+    "Protected feedback passed, but no final candidate freeze or post-freeze validation occurred.",
+    "Test specification changed after its execution; current-revision test guard remains unsatisfied.",
+    "One development attempt, not a final withheld score or success-rate estimate.",
+    "No T8 outcome replaced."
+  ]
+}
