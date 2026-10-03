@@ -271,3 +271,20 @@ Cumulative exposure is **$0.223717 / $0.40**; **$0.176283** remains. No calls ar
 pending. No further identical pilot was started. Measured traces are implemented,
 but these attempts do not establish reliable compensation repair or a benchmark
 improvement. The original T8 comparison remains unchanged.
+
+
+## Compact trace focus and live timeout
+
+Two implementation commits separate the source-bound summary (`d7a397d`) from
+its agent-guidance integration (`446ba21`). The summary highlights observed returns
+and nearby source while suppressing locations whose source hash no longer matches.
+All **68 portable tests** and implementation CI pass. Protected evaluation is unchanged.
+
+The declared IF-002 B2 attempt `b2-if-002-20261003T182559Z-12a807` timed out at
+120 seconds on its first inference call, before any edits. No retry was made.
+The full **$0.017695** reservation remains pending with unknown actual usage.
+This is an infrastructure failure, not evidence for or against repair quality.
+
+Cumulative exposure is **$0.241412 / $0.40**. The nominal remainder is **$0.158588**,
+but dispatch is blocked pending explicit accounting reconciliation. All prior
+usage remains in the same ledger. See [v11 evidence](../benchmarks/reliability/v11-pilot.json).

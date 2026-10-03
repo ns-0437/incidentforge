@@ -13,7 +13,7 @@ December 15. Recheck the live entry form before final submission.
 - [x] Real Token Factory inference and Sandbox execution evidenced.
 - [x] Frozen twelve-slot T8 results, failures and accounting retained.
 - [x] Public recorded frontend deployed; main repository remains private.
-- [x] 65 local controller/regression tests and latest implementation CI pass.
+- [x] 68 local controller/regression tests and latest implementation CI pass.
 - [x] Judge guide, submission copy and timed recording script prepared.
 - [x] Fresh-checkout Linux/setup rehearsal recorded: 61 portable tests, 16 Linux checks, four HTTP routes; see [record](../benchmarks/release/rehearsal.json).
 - [x] Two live completion attempts retained: IF-001 accepted, IF-002 rejected. A third rejected IF-002 pilot exercised authored-test completion live.
@@ -36,3 +36,6 @@ Supporting materials: [third-party inventory](THIRD_PARTY_NOTICES.md) and
 [draft access request](JUDGE_ACCESS_REQUEST.md). Neither replaces owner review or
 provider confirmation. The historical submission plan proposed Apache; the
 actual project license is MIT.
+
+Latest live pilot timed out before response; its full reservation remains pending.
+No additional live dispatch until that accounting state is reconciled.

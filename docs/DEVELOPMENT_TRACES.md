@@ -28,3 +28,19 @@ protected checks. Do not use a traced development run as a new benchmark score.
 
 The original T8 evidence remains frozen. Any follow-up model result is reported
 separately in POST_T8_RELIABILITY.md, including failed attempts.
+
+
+## Compact return-site focus
+
+The host now presents up to eight observed return sites per process, each with
+nearby source context. Context is taken from the actual candidate source, not
+from text claimed by the trace. A SHA-256 match is required before displaying
+locations. Source edits suppress stale locations until a matching observation is
+available. Generations stay separate, and truncation flags remain visible.
+This summary appears in investigation and action guidance; it does not turn
+candidate-process diagnostics into protected measurements or a causal verdict.
+
+Three additional tests cover generation separation, forged snippet avoidance,
+stale-source suppression and bounded incomplete data. The full portable suite is
+now 68 passing tests; CI passed at `446ba21`. The one live pilot timed out before
+model response, so repair improvement from this presentation is unestablished.
