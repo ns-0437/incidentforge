@@ -27,7 +27,7 @@ class EditSyntaxError(SyntaxError):
         start=max(0,number-4);end=min(len(lines),number+3)
         self.context={'path':name,'line':number,'offset':error.offset,
             'proposed_first_line':start+1,'proposed_source_excerpt':''.join(lines[start:end]),
-            'applied':False,'instruction':'Proposed source failed Python parsing; current file is unchanged. Preserve indentation of the enclosing block. Read current source before retrying; a comment alone is not a statement.'}
+            'applied':False,'instruction':'Proposed source failed Python compilation; current file is unchanged. Preserve indentation of the enclosing block. Read current source before retrying; a comment alone is not a statement.'}
 
 class Workspace:
     def __init__(self,root): self.root=root

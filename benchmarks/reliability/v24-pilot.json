@@ -1,0 +1,55 @@
+{
+  "stage": "post-T8 development v24",
+  "revision": "f14495e",
+  "comparative_claim": false,
+  "source_pin_digest": "d4e283af3f97671e603684be4c6fd43abd11f63b52d77b9ce5efe58ad2c8ef6d",
+  "report": {
+    "schema_version": 1,
+    "run_id": "b2-if-002-20261004T091613Z-02e089",
+    "variant": "B2",
+    "decision": "unresolved",
+    "reason": "RuntimeError: format/action correction limit",
+    "incident": "IF-002",
+    "protected_feedback_requests": 0,
+    "protected_feedback": null,
+    "model_claim_unverified": null,
+    "candidate_revision": null,
+    "edits": 0,
+    "requested_tests": 0,
+    "backend": "nebius-sandbox",
+    "verified_work": {
+      "changed_source_paths": [],
+      "developer_test_file_present": false,
+      "developer_tests_executed_on_current_revision": false,
+      "developer_tests_passed_on_current_revision": false,
+      "requested_test_runs": 0
+    },
+    "accounting": {
+      "calls": 5,
+      "estimated_usage_microusd": 8727,
+      "reserved_or_spent_microusd": 8727,
+      "unknown_or_pending": 0
+    },
+    "next_step": "Inspect the retained failure evidence before another bounded attempt.",
+    "limitations": [
+      "One development pilot, not a B0/B1/B2 comparison.",
+      "Manual controls are not model repairs."
+    ]
+  },
+  "verified_events": 42,
+  "action_rejections": [
+    "replacement must match exactly once; no edit applied",
+    "replacement must match exactly once; no edit applied",
+    "replacement must match exactly once; no edit applied"
+  ],
+  "declared_acceptance_met": false,
+  "project_exposure_microusd": 325425,
+  "project_settled_estimate_microusd": 254645,
+  "remaining_microusd": 74575,
+  "pending_calls": 0,
+  "limitations": [
+    "Three nonmatching source edits; no patch, authored assertions, protected feedback or frozen candidate.",
+    "Public observation control tests passed separately; this pilot does not demonstrate model use of those assertions.",
+    "Existing T8 comparison unchanged. No identical retry."
+  ]
+}

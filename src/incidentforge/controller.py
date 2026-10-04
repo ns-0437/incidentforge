@@ -94,7 +94,7 @@ class Controller:
         decision='unresolved';reason='not started';model_summary=None;messages=[];edits=0;tests=0;bad=0;frozen=None
         base=self.workspace.revision()
         interpreted=self.variant=='B0';validations=0;experiments=0;measured_facts={}
-        last_test_revision=None;last_tests_passed=False
+        last_test_revision=None;last_tests_passed=False;required_read_path=None
         protected_feedback=None;feedback_revision=None;developer_observations=[]
         initial_sources={name:self.workspace.read(name) for name in EDITABLE}
         try:
@@ -155,6 +155,7 @@ protected behavioral feedback during repair.'''
                 messages.append({'role':'user','content':json.dumps({'investigation':investigation})})
             def finish_blockers():
                 blockers=[]
+                if required_read_path: blockers.append('Read '+required_read_path+' after the rejected edit before another action')
                 if not interpreted: blockers.append('interpret experiment before repair')
                 if self.variant=='B2' and not validations: blockers.append('B2 requires validate feedback before finish')
                 if all(self.workspace.read(name)==text for name,text in initial_sources.items()):
@@ -176,10 +177,12 @@ protected behavioral feedback during repair.'''
                     if not experiments: available+=['experiment']
                     if self.variant=='B2' and not validations: available+=['validate']
                 else: available+=['interpret']
+                if required_read_path: available=['read']
                 value={'allowed_actions':available,'applied_edits':edits,'requested_test_runs':tests,
                        'remaining_edits':3-edits,'remaining_test_runs':2-tests,
                        'remaining_protected_feedback_requests':max(0,1-validations) if self.variant=='B2' else 0,
                        'finish_ready':not finish_blockers(),'finish_blockers':finish_blockers(),
+                       'required_read_path':required_read_path,
                        'authored_tests_present':(self.workspace.root/'developer-tests.json').exists(),
                        'tests_executed_on_current_revision':last_test_revision==self.workspace.revision(),
                        'finish_requires':'A net source change; author regression tests and run them successfully on the current revision; B2 also requires validate. State only observed edits/tests in summary.'}
@@ -217,7 +220,7 @@ protected behavioral feedback during repair.'''
                 messages=latest_action_contract(messages)
                 from .action_schema import action_format
                 contract=guidance()
-                raw=self.model.call(messages,response_format=action_format(contract['allowed_actions'],contract['developer_test_targets'],measured_facts))
+                raw=self.model.call(messages,response_format=action_format(contract['allowed_actions'],contract['developer_test_targets'],measured_facts,required_read_path=required_read_path))
                 messages.append({'role':'assistant','content':raw})
                 try:
                     command=action(raw)
@@ -226,7 +229,11 @@ protected behavioral feedback during repair.'''
                     if self.variant=='B0' and kind=='validate': raise ValueError('protected feedback is B2-only')
                     if self.variant=='B1' and kind=='validate': raise ValueError('protected feedback is B2-only')
                     if not interpreted and kind in ('replace','developer_test','test','validate','finish'): raise ValueError('interpret experiment before repair')
-                    if kind=='read': result={'path':command['path'],'content':self.workspace.read(command['path'])}
+                    if required_read_path and (kind!='read' or command.get('path')!=required_read_path):
+                        raise ValueError('Read '+required_read_path+' after the rejected edit before another action')
+                    if kind=='read':
+                        result={'path':command['path'],'content':self.workspace.read(command['path'])}
+                        required_read_path=None
                     elif kind=='search': result=self.workspace.search(command['query'])
                     elif kind=='experiment':
                         if experiments>=1: raise ValueError('distinguishing experiment limit')
@@ -296,6 +303,7 @@ protected behavioral feedback during repair.'''
                     self.evidence.event('tool_result',{'artifact':self.evidence.artifact(result)})
                     messages.append({'role':'user','content':json.dumps({'tool_result':result,'action_contract':guidance()})})
                 except (ValueError,SyntaxError,KeyError) as exc:
+                    if isinstance(exc,(EditMismatch,EditSyntaxError)): required_read_path=exc.context['path']
                     bad+=1
                     self.evidence.event('action_rejected',{'reason':str(exc)[:300]})
                     if bad>2: raise RuntimeError('format/action correction limit')

@@ -284,12 +284,24 @@ class ReliabilityTests(unittest.TestCase):
             self.assertIn('    pass',rejected['proposed_source_excerpt'])
             self.assertEqual(0,correction['action_contract']['applied_edits'])
             self.assertEqual('x=1\n',(self.root/'candidate/fixture/app/service.py').read_text())
-            return json.dumps({'action':'replace','path':'fixture/app/service.py','old':'x=1','new':'x=2','reason':'valid correction'})
+            self.assertEqual(['read'],correction['action_contract']['allowed_actions'])
+            return json.dumps({'action':'read','path':'fixture/app/service.py'})
         report,_,_=self.run_actions(iter([
             {'action':'replace','path':'fixture/app/service.py','old':'x=1','new':'# removed block\n    pass','reason':'invalid indentation'},
-            check,{'action':'developer_test','spec':{'assertions':[{'name':'regression','condition':'clean','path':'order.status','equals':'CONFIRMED'}]},'reason':'cover outcome'},{'action':'test'},{'action':'finish','summary':'corrected syntax'}]))
+            check,{'action':'replace','path':'fixture/app/service.py','old':'x=1','new':'x=2','reason':'valid correction'},
+            {'action':'developer_test','spec':{'assertions':[{'name':'regression','condition':'clean','path':'order.status','equals':'CONFIRMED'}]},'reason':'cover outcome'},{'action':'test'},{'action':'finish','summary':'corrected syntax'}]))
         self.assertEqual(2,report['edits'])
         self.assertEqual('accept_for_review',report['decision'])
+
+    def test_rejected_edit_requires_read_of_affected_file(self):
+        report,model,_=self.run_actions(iter([
+            {'action':'replace','path':'fixture/app/service.py','old':'not present','new':'x=2','reason':'bad match'},
+            {'action':'read','path':'fixture/app/common.py'},
+            {'action':'replace','path':'fixture/app/service.py','old':'x=1','new':'x=2','reason':'skip required read'}]))
+        self.assertEqual(0,report['edits'])
+        self.assertEqual('unresolved',report['decision'])
+        self.assertIn('Read fixture/app/service.py after the rejected edit',json.dumps(model.history))
+        self.assertEqual('x=1\n',(self.root/'candidate/fixture/app/service.py').read_text())
 
     def test_native_objects_keep_exact_factual_gate(self):
         expected={'restart':{'order_status':'COMPENSATING','compensation_complete':False}}

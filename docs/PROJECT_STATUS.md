@@ -43,12 +43,12 @@ budget; repeatedly tuning against old schedules cannot support that claim.
 
 ## Budget and access
 
-Cumulative accounted exposure: **$0.316698 / $0.40**. Remaining allocation:
-**$0.083302**. Includes retained development attempts through v23; no inference remains pending.
+Cumulative accounted exposure: **$0.325425 / $0.40**. Remaining allocation:
+**$0.074575**. Includes retained development attempts through v24; no inference remains pending.
 The other trial credits are unallocated. The GitHub Pages site is a recorded replay,
 not a hosted inference service. The main source repository stays private until release.
 
-Validation for the backend selector: **113 portable tests passed** and JavaScript
+Validation for the backend selector: **114 portable tests passed** and JavaScript
 syntax validation passed. Tests verify HTTP allowlisting, recorded selection,
 child-process arguments and failure before launch when Docker is unavailable.
 October 4 browser review confirmed Sandbox selection, recorded patch and validation
@@ -62,3 +62,7 @@ Current detailed acceptance matrix: [COMPLETION_GATES.md](COMPLETION_GATES.md).
 IF-001 completed the required authored-test gate in v22, with weak test coverage
 explicitly disclosed. IF-002 remains inconsistent; v23 exposed an edit-compilation
 gap that is now fixed offline. No new reliability percentage is claimed.
+
+Public regression observations passed 19 Linux checks, including faulty/reference
+assertion discrimination. v24 still stopped before repair after repeated edit
+mismatches. Mandatory source re-reading after rejected edits is now enforced offline.

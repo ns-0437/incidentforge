@@ -561,3 +561,22 @@ Use the existing $0.40 cumulative ledger, ten-call bound and unknown-operation g
 Do not reset accounting or perform an automatic retry. Starting exposure: $0.316698;
 remaining allocation: $0.083302. No causal or population reliability claim follows
 from a single successful attempt.
+
+### v24 result and correction handling
+
+v24 stopped unresolved after five calls ($0.008727) and three nonmatching exact
+edits. No patch or authored tests were applied; no protected validation ran. The
+predeclared acceptance condition was not met. The failure is retained in
+benchmarks/reliability/v24-pilot.json. Total exposure is $0.325425; $0.074575 remains,
+with no pending inference. No identical retry was made.
+
+After an edit mismatch or compilation rejection, the controller now requires a
+fresh read of the affected file before another action. The provider schema exposes
+only that read, and local enforcement rejects other actions or reading another
+file. Existing call/edit/correction bounds remain. This prevents blindly replaying
+the same edit without re-reading; it does not guarantee a correct diagnosis or repair.
+The change is tested offline, not yet evaluated in a new live pilot.
+
+Final verification for the correction guard: 114 portable tests passed; Python
+compilation, JavaScript syntax and Git whitespace checks passed. Original brief
+SHA256 remains unchanged. The separate 19-check Linux suite remains green.

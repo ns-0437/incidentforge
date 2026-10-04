@@ -33,7 +33,7 @@ two rejected frozen candidates and eight unresolved attempts. Three inference
 timeouts crossed our predeclared infrastructure threshold, so we make no variant
 ranking claim. Later development reduced JSON-escaping friction, added explicit
 completion guidance, and prevented unrun or placeholder tests from masquerading
-as completed work. The current implementation passes 113 portable tests. Later development includes
+as completed work. The current implementation passes 114 portable tests. Later development includes
 an accepted IF-002 Sandbox repair after schema-constrained investigation, as well
 as retained failed attempts. That compensation pilot omitted authored tests. The current completion gate
 requires passing authored regression assertions. A later payment-family run

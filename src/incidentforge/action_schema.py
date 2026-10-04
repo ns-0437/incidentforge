@@ -2,7 +2,7 @@
 from .workspace import EDITABLE,READABLE
 
 
-def action_format(allowed,targets,measured_facts):
+def action_format(allowed,targets,measured_facts,required_read_path=None):
     def obj(properties):
         return {'type':'object','properties':properties,'required':list(properties),'additionalProperties':False}
     def measured(value):
@@ -10,7 +10,7 @@ def action_format(allowed,targets,measured_facts):
         return {'enum':[value]}
     text={'type':'string'}
     fields={
-        'read':{'path':{'type':'string','enum':sorted(READABLE)}},
+        'read':{'path':{'type':'string','enum':[required_read_path] if required_read_path else sorted(READABLE)}},
         'search':{'query':text},
         'replace':{'path':{'type':'string','enum':sorted(EDITABLE)},'old':text,'new':text,'reason':text},
         'test':{},'validate':{},'experiment':{},'finish':{'summary':text},
