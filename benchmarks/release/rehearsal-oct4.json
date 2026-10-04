@@ -1,0 +1,27 @@
+{
+  "date": "2026-10-04",
+  "source_commit": "f6fc999a098359ec99c96beccb59852960b68583",
+  "checkout": "fresh git clone --no-local; ignored runs and credentials not copied",
+  "portable_tests": 97,
+  "linux_checks": {
+    "tests": 17,
+    "failures": 0,
+    "errors": 0,
+    "skips": 0
+  },
+  "linux_report_sha256": "3cfe52df7c6a8548da534a5dddb5d984f410a5d0e9fea052d919d751c231209c",
+  "image_id": "sha256:dddfd7e07f9d15aeeca61529320492139d21cac7f0070c00609243e51e4e0016",
+  "ui_routes_200": [
+    "/",
+    "/app.js",
+    "/style.css",
+    "/api/state"
+  ],
+  "fresh_history_empty": true,
+  "inference_calls": 0,
+  "limitations": [
+    "Local fresh checkout, not public judge access.",
+    "Authored controls do not establish model repair reliability.",
+    "HTTP startup check is not browser end-to-end launch testing."
+  ]
+}

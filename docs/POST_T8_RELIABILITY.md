@@ -435,3 +435,18 @@ marks it unapplied, and retains the actual source. It does not auto-repair model
 code. A scripted regression verifies rejection, unchanged source, correction
 feedback and a later valid edit. All 97 portable tests pass; no additional live
 run was made. See [v15 record](../benchmarks/reliability/v15-pilot.json).
+
+## v16 and release rehearsal — October 4
+
+The syntax-feedback pilot stopped at investigation schema validation: a bugs
+envelope followed by an error object. Two calls cost $0.002115, zero edits; the
+syntax correction path was not exercised. All 16 events and artifacts verified.
+Exposure is $0.275748 / $0.40; $0.124252 remains, no pending calls. Further live
+retries are paused. A targeted offline change names required and received root
+fields and asks for a replacement plan rather than an error report. 98 portable
+tests pass. See [v16](../benchmarks/reliability/v16-pilot.json).
+
+A fresh clone of f6fc999 passed 97 portable tests, 17 Linux checks with zero
+skips and four HTTP startup routes, with empty history and no credentials copied.
+See [rehearsal](../benchmarks/release/rehearsal-oct4.json). This is setup evidence,
+not autonomous efficacy or completed judge access.

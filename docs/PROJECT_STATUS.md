@@ -43,12 +43,12 @@ budget; repeatedly tuning against old schedules cannot support that claim.
 
 ## Budget and access
 
-Cumulative accounted exposure: **$0.273633 / $0.40**. Remaining allocation:
-**$0.126367**. No new inference was used for this status review or UI change.
+Cumulative accounted exposure: **$0.275748 / $0.40**. Remaining allocation:
+**$0.124252**. No new inference was used for this status review or UI change.
 The other trial credits are unallocated. The GitHub Pages site is a recorded replay,
 not a hosted inference service. The main source repository stays private until release.
 
-Validation for the backend selector: **97 portable tests passed** and JavaScript
+Validation for the backend selector: **98 portable tests passed** and JavaScript
 syntax validation passed. Tests verify HTTP allowlisting, recorded selection,
 child-process arguments and failure before launch when Docker is unavailable.
 October 4 browser review confirmed Sandbox selection, recorded patch and validation

@@ -24,7 +24,7 @@ Python implements the controller, HTTP services, persistence broker, evidence
 chain and local UI. NVIDIA Nemotron Nano is called through Nebius Token Factory
 at runtime. Nebius Sandboxes execute isolated candidate workloads; an independent
 restricted Docker reader recomputes protected results from exported evidence.
-The public GitHub Pages frontend explores recorded synthetic evidence without
+The static frontend explores recorded synthetic evidence without
 exposing keys or triggering paid operations.
 
 ## Challenges and measured results
@@ -33,7 +33,7 @@ two rejected frozen candidates and eight unresolved attempts. Three inference
 timeouts crossed our predeclared infrastructure threshold, so we make no variant
 ranking claim. Later development reduced JSON-escaping friction, added explicit
 completion guidance, and prevented unrun or placeholder tests from masquerading
-as completed work. Those changes pass 62 local checks. Two follow-up B2 attempts completed: an
+as completed work. The current implementation passes 98 portable tests. Two follow-up B2 attempts completed: an
 accepted IF-001 repair and a rejected IF-002 repair. These are development results,
 not a new benchmark.
 
@@ -74,3 +74,9 @@ YouTube video and final Devpost entry are separate release actions.
 
 Owner clarification, October 4: confirmation covers continued access to the owner
 account only. Separate judge credentials/access have **not** been confirmed.
+
+Release check October 4: the recorded demo URL returns HTTP 404. The requested
+link remains unchanged, but deployment is not currently available. Restore
+working hosting before submission. The private source returning signed-out 404
+is expected until the owner authorizes publication. Nebius access/credit email
+has been sent by the owner; reply pending.
