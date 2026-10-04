@@ -302,3 +302,53 @@ class TraceFocusTests(unittest.TestCase):
         row=focus(obs,source)['conditions'][0]
         self.assertTrue(row['log_truncated']);self.assertTrue(row['processes'][1]['event_limit_reached'])
         self.assertEqual(1,len(row['processes'][1]['observed_returns']))
+
+class ReconciliationTests(unittest.TestCase):
+    setUp=test_t4.T4Tests.setUp
+    def sample(self,terminal=True):
+        from incidentforge.evidence import Evidence
+        path=self.root/'runs';path.mkdir(exist_ok=True)
+        b=Budget(path/'t4-budget.sqlite',400000);token=b.reserve('timeout',17695,200000,10)
+        e=Evidence(path/'timeout','timeout')
+        e.event('model_reserved',{'reservation':token,'maximum_microusd':17695})
+        reason='TimeoutError: Inference wall-time cap; usage unknown, no retry'
+        if terminal:
+            e.event('stopped',{'reason':reason})
+            e.event('report',{'run_id':'timeout','decision':'unresolved','reason':reason})
+        return b,token,e
+    def test_preview_then_atomic_reconciliation_preserves_unknown_cost(self):
+        from incidentforge.reconciliation import reconcile
+        from contextlib import closing
+        import sqlite3
+        b,token,e=self.sample();before=b.path.read_bytes()
+        preview=reconcile(self.root,'timeout')
+        self.assertFalse(preview['applied']);self.assertEqual(before,b.path.read_bytes())
+        with self.assertRaises(ValueError): reconcile(self.root,'timeout',apply=True)
+        receipt=reconcile(self.root,'timeout',apply=True,authority='test authorization')
+        self.assertEqual(17695,receipt['exposure_microusd'])
+        with closing(sqlite3.connect(b.path)) as db:
+            self.assertEqual((None,'conservative_unknown'),db.execute('SELECT actual,status FROM calls WHERE id=?',(token,)).fetchone())
+            self.assertEqual(1,db.execute('SELECT COUNT(*) FROM timeout_reconciliations').fetchone()[0])
+            self.assertEqual(400000,db.execute('SELECT cap FROM settings').fetchone()[0])
+        with self.assertRaises(ValueError): reconcile(self.root,'timeout',apply=True,authority='duplicate')
+        self.assertEqual(17695,b.totals('timeout')['reserved_or_spent_microusd'])
+        from incidentforge.ui import budget_status
+        status=budget_status(self.root)
+        self.assertEqual(.017695,status['reserved_usd'])
+        self.assertEqual(.017695,status['unknown_usd'])
+        self.assertEqual(0,status['estimated_usd'])
+        self.assertEqual(0,status['pending'])
+        self.assertEqual(1,status['unknown_calls'])
+    def test_nonterminal_and_tampered_evidence_cannot_clear_pending(self):
+        from incidentforge.reconciliation import reconcile
+        b,token,e=self.sample(terminal=False)
+        with self.assertRaises(ValueError): reconcile(self.root,'timeout',apply=True,authority='test')
+        self.assertEqual(1,b.totals('timeout')['unknown_or_pending'])
+        (e.root/'events.jsonl').write_text('{}\n')
+        with self.assertRaises((ValueError,KeyError)): reconcile(self.root,'timeout',apply=True,authority='test')
+        self.assertEqual(1,b.totals('timeout')['unknown_or_pending'])
+    def test_settled_call_cannot_be_reclassified_unknown(self):
+        from incidentforge.reconciliation import reconcile
+        b,token,e=self.sample();b.settle(token,100)
+        with self.assertRaises(ValueError): reconcile(self.root,'timeout',apply=True,authority='test')
+        self.assertEqual(100,b.totals('timeout')['reserved_or_spent_microusd'])
