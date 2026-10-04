@@ -359,3 +359,19 @@ selected experiment. Three regression tests cover both rejection paths and valid
 line IDs/verbatim excerpts. All 84 portable tests pass. These are validation
 corrections, not evidence of a higher autonomous repair success rate. No new
 inference spending or replacement of frozen results occurred.
+
+## Exact experiment coverage — October 4
+
+The investigation-to-repair handoff now requires a literal completed result and
+each declared condition exactly once, with a supported measurement. Previously
+four rows could contain duplicate condition names and overwrite facts during
+summarization. Invalid results are rejected before publishing a complete
+ExperimentResult or returning measurements to repair.
+
+Four regression tests cover valid reordered results, duplicate/missing/unexpected
+conditions, malformed or unmeasured results, and rejection at the investigator
+handoff. All 88 portable tests pass. A read-only compatibility check accepted
+all 23 retained results explicitly labeled declared four-condition experiments;
+36 other experiment records, including reproduction, were outside this check.
+Historical evidence and frozen benchmark outcomes were not modified. No live
+inference was used; cumulative exposure remains $0.254663 of the $0.40 cap.

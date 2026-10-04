@@ -167,15 +167,14 @@ not prove a path is impossible. Do not conflate initial and restarted processes.
         spec['controlled_variables']=['candidate revision','declined customer','initial stock','fresh stores','stable release key']
     controller.emit('ExperimentSpec',spec)
     observed=controller.backend.run(workspace.root,intervention)
-    if not observed.get('complete') or len(observed.get('observations',[]))!=4:
-        raise ValueError('incomplete distinguishing experiment')
+    from .grounding import experiment_facts,factual_conclusion
+    measured=experiment_facts(observed,conditions)
     controller.emit('ExperimentResult',{'spec_hash':digest(spec),'backend':controller.backend.name,
         'reset_result':'fresh stores per condition','observations':observed,'completion':'complete',
         'completeness':'declared four-condition experiment','violations':[],
         'resources':{'execution_count':controller.backend.count},'interpretation_author':'controller; model interprets next'})
-    from .grounding import facts,factual_conclusion
-    return {'hypotheses':plan['hypotheses'],'precommitted_experiment':spec,'measured_result':observed,'measured_facts':facts(observed),
-            'required_factual_conclusion':factual_conclusion(facts(observed)),
+    return {'hypotheses':plan['hypotheses'],'precommitted_experiment':spec,'measured_result':observed,'measured_facts':measured,
+            'required_factual_conclusion':factual_conclusion(measured),
             'required_next_step':'Interpret which explanations are supported/weakened before patching; retain uncertainty.'}
 
 def feedback(result):

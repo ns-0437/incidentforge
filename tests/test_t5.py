@@ -50,6 +50,61 @@ class SourceEvidenceTests(unittest.TestCase):
         self.assertEqual(['L1: def step():'],result['hypotheses'][0]['supporting_refs'])
         self.assertEqual(['    return'],result['hypotheses'][1]['supporting_refs'])
 
+class ExperimentCompletenessTests(unittest.TestCase):
+    conditions=['same_key_sequential','same_key_restart','same_key_concurrent','different_keys']
+
+    def result(self):
+        return {'complete':True,'observations':[
+            {'condition':name,'committed_charge_count':count}
+            for name,count in zip(self.conditions,[1,1,1,2])]}
+
+    def test_unique_complete_measurements_accept_any_order(self):
+        from incidentforge.grounding import experiment_facts
+        result=self.result();result['observations'].reverse()
+        measured=experiment_facts(result,self.conditions)
+        self.assertEqual(set(self.conditions),set(measured))
+        self.assertEqual(2,measured['different_keys']['committed_charge_count'])
+
+    def test_duplicate_missing_and_unexpected_conditions_fail_closed(self):
+        from incidentforge.grounding import experiment_facts
+        for mode in ('duplicate','missing','unexpected'):
+            result=self.result()
+            if mode=='duplicate': result['observations'][-1]=dict(result['observations'][0])
+            elif mode=='missing': result['observations'].pop()
+            else: result['observations'][-1]['condition']='invented'
+            with self.subTest(mode=mode),self.assertRaisesRegex(ValueError,'exactly once'):
+                experiment_facts(result,self.conditions)
+
+    def test_incomplete_malformed_and_unmeasured_results_rejected(self):
+        from incidentforge.grounding import experiment_facts
+        for complete in (False,1,'true',None):
+            result=self.result();result['complete']=complete
+            with self.subTest(complete=complete),self.assertRaises(ValueError):
+                experiment_facts(result,self.conditions)
+        for observations in ({},[None],[{'condition':[]}],
+                             [{'condition':name} for name in self.conditions]):
+            with self.subTest(observations=observations),self.assertRaises(ValueError):
+                experiment_facts({'complete':True,'observations':observations},self.conditions)
+
+    def test_investigator_does_not_publish_duplicate_experiment_as_complete(self):
+        import tempfile
+        from pathlib import Path
+        from types import SimpleNamespace
+        from incidentforge.investigation import investigate
+        plan=SourceEvidenceTests().plan()
+        plan['experiment']['predictions']={name:{'H1':'one','H2':'two'} for name in self.conditions}
+        bad=self.result();bad['observations'][-1]=dict(bad['observations'][0])
+        emitted=[]
+        with tempfile.TemporaryDirectory() as tmp:
+            file=Path(tmp)/'service.py';file.write_text('def step():\n    return\n')
+            workspace=SimpleNamespace(root=Path(tmp),read=lambda name:file.read_text() if name=='fixture/app/service.py' else '{}',
+                                      path=lambda name:file,revision=lambda:'baseline')
+            controller=SimpleNamespace(workspace=workspace,model=SimpleNamespace(call=lambda messages:json.dumps(plan)),
+                backend=SimpleNamespace(run=lambda root,mode:bad,count=1,name='test'),
+                emit=lambda kind,data:emitted.append(kind))
+            with self.assertRaisesRegex(ValueError,'exactly once'): investigate(controller,{'observations':[]})
+        self.assertEqual(['Hypothesis','Hypothesis','ExperimentSpec'],emitted)
+
 class GateTests(unittest.TestCase):
     setUp=test_t4.T4Tests.setUp
     def test_b2_refuses_patch_before_interpretation(self):

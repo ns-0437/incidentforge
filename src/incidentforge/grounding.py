@@ -16,6 +16,25 @@ def facts(result):
             output[condition]={'available_stock':{sku:cell['available'] for sku,cell in observation['stock'].items()}}
     return output
 
+def experiment_facts(result,conditions):
+    """Require every declared condition exactly once before summarizing results."""
+    if not isinstance(result,dict) or result.get('complete') is not True:
+        raise ValueError('distinguishing experiment did not complete')
+    observations=result.get('observations')
+    if not isinstance(observations,list):
+        raise ValueError('experiment observations must be a list')
+    names=[]
+    for observation in observations:
+        if not isinstance(observation,dict) or not isinstance(observation.get('condition'),str):
+            raise ValueError('experiment observation requires a condition name')
+        names.append(observation['condition'])
+    if len(names)!=len(set(names)) or set(names)!=set(conditions):
+        raise ValueError('experiment must observe every declared condition exactly once')
+    measured=facts(result)
+    if set(measured)!=set(conditions):
+        raise ValueError('experiment condition is missing a supported measurement')
+    return measured
+
 def factual_conclusion(expected):
     if 'no_restart' in expected and 'order_restart' in expected:
         return ('Measured compensation states: without restart '+expected['no_restart']['order_status']+
