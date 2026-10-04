@@ -4,10 +4,13 @@ permissions:
   contents: read
 jobs:
   portable:
-    runs-on: ubuntu-latest
+    # Pinned, not ubuntu-latest: that label migrates to Ubuntu 26 from
+    # October 19, 2026, inside the submission and judging windows. Judges must
+    # be able to see a passing run through December 15, so the image is fixed.
+    runs-on: ubuntu-24.04
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-python@v5
+      - uses: actions/checkout@v6
+      - uses: actions/setup-python@v6
         with:
           python-version: '3.12'
       - name: Controller, UI, grounding and campaign tests
