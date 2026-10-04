@@ -9,7 +9,7 @@
 [![Sandbox](https://img.shields.io/badge/Execution-Nebius%20Sandbox-ff9d5c)](docs/ARCHITECTURE.md)
 [![Nemotron](https://img.shields.io/badge/Model-NVIDIA%20Nemotron-76b900)](src/incidentforge/llm.py)
 
-[Interactive judge demo](https://ns-0437.github.io/incidentforge-demo/) · [Quick start](#try-it) · [Architecture](#architecture) · [Experiments](#two-incidents-three-protocols) · [Results](#measured-results) · [Trust](#trust-boundaries)
+[Quick start](#try-it) · [Architecture](#architecture) · [Experiments](#two-incidents-three-protocols) · [Results](#measured-results) · [Trust](#trust-boundaries)
 
 </div>
 
@@ -17,7 +17,7 @@
 
 ## Why this exists
 
-Explore the [recorded investigation desk](https://ns-0437.github.io/incidentforge-demo/): two synthetic incidents, measured observations, proposed patches, verification results, and an interactive architecture diagram. The static demo spends no inference credits. Its development runs are separate from the completed T8 campaign and its disclosed failures. [Publishing guide](docs/JUDGE_FRONTEND.md).
+Explore the recorded investigation desk locally with `python -m http.server 8766 --bind 127.0.0.1 --directory site`, then open http://127.0.0.1:8766. It retains synthetic evidence and the architecture diagram without spending inference credits. The separate public demo repository is being retired at the owner's request.
 
 A payment response disappears **after the charge commits**. A retry uses a fresh
 identity. The order looks healthy—and the customer is charged twice.
@@ -163,7 +163,7 @@ Post-T8 [reliability work](docs/POST_T8_RELIABILITY.md) adds state-specific acti
 guidance, native JSON facts, a quote-free factual conclusion, net-change and
 authored-test execution gates, persistent property-only feedback, assertion target
 checks, a developer-field catalog, explicit completion readiness, idempotent test
-specification saves, and a bounded 120-second inference wait. **79 local tests
+specification saves, and a bounded 120-second inference wait. **81 local tests
 pass.** Two follow-up B2 pilots completed: IF-001 produced an accepted frozen
 repair that passed all four previously used final schedules; IF-002 produced a
 rejected compensation repair. Neither authored developer tests. These are

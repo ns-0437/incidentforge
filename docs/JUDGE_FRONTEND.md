@@ -1,3 +1,12 @@
+# Recorded frontend — public deployment retired
+
+On October 4 the owner requested deletion of the separate demo repository and
+will perform that deletion manually. The main repository About link was cleared.
+Keep `site/` in the private main repository for local replay and recording:
+`python -m http.server 8766 --bind 127.0.0.1 --directory site`.
+Do not republish the separate repository. The following is historical deployment
+documentation, not current instructions.
+
 # Public judge frontend
 
 Live URL: https://ns-0437.github.io/incidentforge-demo/

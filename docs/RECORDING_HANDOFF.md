@@ -1,6 +1,7 @@
 # Recording handoff
 
-Open https://ns-0437.github.io/incidentforge-demo/ and follow [VIDEO_SCRIPT.md](VIDEO_SCRIPT.md).
+Run `python -m http.server 8766 --bind 127.0.0.1 --directory site` from the repository.
+Open http://127.0.0.1:8766 and follow [VIDEO_SCRIPT.md](VIDEO_SCRIPT.md).
 Target 2:45; keep the final video strictly under three minutes.
 
 1. Rehearse overview, IF-001 Observe/Investigate/Repair/Verify, IF-002,
@@ -9,7 +10,7 @@ Target 2:45; keep the final video strictly under three minutes.
    execution labels visible; close account settings and unrelated windows.
 3. Show failures and state frozen totals: 2 accepted, 2 rejected, 8 unresolved.
    Do not claim ranking, universal correctness, or reliable IF-002 repair.
-4. Explain Pages is a recorded evidence viewer. Only describe live judge
+4. Explain the local viewer shows recorded evidence. Only describe live judge
    execution access after its delivery path has been rehearsed.
 5. Review readable text, clear audio, duration, and absence of secrets.
 6. Upload the reviewed video as public on YouTube and check signed-out playback.

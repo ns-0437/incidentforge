@@ -2,7 +2,8 @@
 
 ## Start with the recorded evidence
 
-Open https://ns-0437.github.io/incidentforge-demo/. This is a static recorded replay,
+From the repository, run `python -m http.server 8766 --bind 127.0.0.1 --directory site`
+and open http://127.0.0.1:8766. This is a static recorded replay,
 not a hosted inference service. It cannot spend credits or launch a sandbox.
 
 Select IF-001 for duplicate payment after a lost response, or IF-002 for stranded
