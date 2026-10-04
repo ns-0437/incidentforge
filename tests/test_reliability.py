@@ -424,6 +424,35 @@ class ReliabilityTests(unittest.TestCase):
         self.assertEqual(2,backend.count)
         self.assertEqual('finish',next(commands)['action'])
 
+    def test_b2_cannot_exceed_the_single_allowed_feedback_request(self):
+        measured={'condition':{'committed_charge_count':1}}
+        def interpret(messages):
+            return json.dumps(json.loads(messages[-1]['content'])['action_contract']['interpret_fields'])
+        def refused(messages):
+            self.assertIn('protected feedback limit',json.loads(messages[-1]['content'])['error'])
+            return json.dumps({'action':'finish','summary':'second feedback refused'})
+        commands=iter([interpret,
+            {'action':'replace','path':'fixture/app/service.py','old':'x=1','new':'x=2','reason':'repair'},
+            {'action':'validate'},{'action':'validate'},refused,
+            {'action':'finish','summary':'done'}])
+        report,model,backend=self.run_actions(commands,'B2',measured,
+            {'complete':True,'decision':'accept_for_review','cases':[]})
+        self.assertEqual(1,report['protected_feedback_requests'])
+        self.assertIsNone(report['candidate_revision'])
+
+    def test_source_change_after_passing_tests_invalidates_their_applicability(self):
+        authored={'action':'developer_test','spec':{'assertions':[{'name':'a','condition':'clean',
+            'path':'order.status','equals':'CONFIRMED'}]},'reason':'regression'}
+        commands=iter([
+            {'action':'replace','path':'fixture/app/service.py','old':'x=1','new':'x=2','reason':'repair'},
+            authored,{'action':'test'},
+            {'action':'replace','path':'fixture/app/service.py','old':'x=2','new':'x=3','reason':'second edit'},
+            {'action':'finish','summary':'tests passed earlier'},
+            {'action':'finish','summary':'still stale'}])
+        report,_,_=self.run_actions(commands)
+        self.assertIsNone(report['candidate_revision'])
+        self.assertFalse(report['verified_work']['developer_tests_executed_on_current_revision'])
+
     def test_failed_feedback_persists_without_private_case_details(self):
         measured={'condition':{'committed_charge_count':1}}
         def interpret(messages):return json.dumps(json.loads(messages[-1]['content'])['action_contract']['interpret_fields'])
