@@ -18,6 +18,30 @@ def accepted_receipt():
                 'boundary':{'scripted-isolation-check':True},
                 'properties':{f'P{i}':{'status':'pass'} for i in range(1,8)}}]}
 
+class StartupReportTests(unittest.TestCase):
+    setUp=test_t4.T4Tests.setUp
+
+    def test_backend_failure_is_visible_and_spends_nothing(self):
+        import importlib.util,shutil,contextlib,io
+        from pathlib import Path
+        project=Path(__file__).resolve().parents[1]
+        spec=importlib.util.spec_from_file_location('run_t4_startup',project/'scripts/run-t4.py')
+        runner=importlib.util.module_from_spec(spec);spec.loader.exec_module(runner)
+        for folder in ('fixture/app','contracts/public'):
+            shutil.copytree(project/folder,self.root/folder)
+        runner.ROOT=self.root
+        with patch('sys.argv',['run-t4.py','--live','--backend','contree']),patch('incidentforge.remote_backend.ContreeBackend',side_effect=RuntimeError('SECRET_ERROR')),patch.object(runner,'Nebius') as model,contextlib.redirect_stdout(io.StringIO()) as output:
+            self.assertEqual(1,runner.main())
+        model.assert_not_called()
+        report=json.loads(next((self.root/'runs').glob('*/report.json')).read_text())
+        self.assertEqual('backend_startup',report['failure_stage'])
+        self.assertEqual(0,report['accounting']['calls'])
+        self.assertNotIn('SECRET_ERROR',output.getvalue())
+        run=self.root/'runs'/report['run_id']
+        self.assertEqual(3,verify(run))
+        from incidentforge.ui import details
+        self.assertEqual('verified',details(self.root,report['run_id'])['integrity'])
+
 class SetupPreflightTests(unittest.TestCase):
     setUp=test_t4.T4Tests.setUp
 

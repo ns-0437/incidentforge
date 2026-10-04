@@ -44,15 +44,29 @@ def main():
     budget=Budget.existing(ROOT/'runs/t4-budget.sqlite')
     cancel=evidence.root/'CANCEL'
     from incidentforge.remote_backend import ContreeBackend
-    backend=(ContreeBackend if args.backend=='contree' else DockerBackend)(ROOT,evidence,cancel,incident=args.incident)
-    worker=Nebius(budget,run_id,evidence,cancel_file=cancel)
     pins={}
     for folder in ('src','fixture','evaluation','probes','tests','contracts'):
         for p in sorted((ROOT/folder).rglob('*')):
             if p.is_file() and p.suffix in {'.py','.md'}: pins[p.relative_to(ROOT).as_posix()]=hashlib.sha256(p.read_bytes()).hexdigest()
     evidence.event('run_started',{'mode':'live','protocol':'post-t8-reliability-v3','backend':args.backend,
         'source_hashes':pins,'model_budget_microusd':budget.project_cap_microusd,'balance_evidence':'user screenshot $1.00, 27 days on 2026-10-03'})
-    result=Controller(run_id,candidate,evidence,backend,worker,budget,cancel,variant=args.variant).run()
+    try:
+        backend=(ContreeBackend if args.backend=='contree' else DockerBackend)(ROOT,evidence,cancel,incident=args.incident)
+    except (RuntimeError,OSError) as exc:
+        # Startup exceptions can include local paths or provider details. Keep a
+        # stable, actionable public report; do not serialize arbitrary exceptions.
+        result={'schema_version':1,'run_id':run_id,'variant':args.variant,'incident':args.incident,
+            'decision':'unresolved','reason':'Execution backend startup failed. Run scripts/check-setup.py for local prerequisites.',
+            'failure_stage':'backend_startup','error_type':type(exc).__name__,
+            'backend':'nebius-sandbox' if args.backend=='contree' else 'local-docker',
+            'candidate_revision':None,'edits':0,'requested_tests':0,'model_claim_unverified':None,
+            'accounting':budget.totals(run_id),'limitations':['No controller or model request was started.']}
+        evidence.event('stopped',{'reason':result['reason'],'state':'PREPARING'})
+        evidence.event('report',result)
+        (evidence.root/'report.json').write_text(json.dumps(result,indent=2))
+    else:
+        worker=Nebius(budget,run_id,evidence,cancel_file=cancel)
+        result=Controller(run_id,candidate,evidence,backend,worker,budget,cancel,variant=args.variant).run()
     result['verified_events']=verify(evidence.root)
     print(json.dumps(result,indent=2))
     print('Evidence: '+str(evidence.root))
