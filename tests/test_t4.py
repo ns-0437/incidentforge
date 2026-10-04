@@ -52,6 +52,28 @@ class T4Tests(unittest.TestCase):
         (e.root/'artifacts'/ref['sha256']).write_bytes(b'changed')
         with self.assertRaises(ValueError): verify(e.root)
 
+    def test_deleting_a_referenced_artifact_is_detected(self):
+        e=Evidence(self.root/'events','r');ref=e.artifact(b'protected validation transcript')
+        e.event('validation_completed',{'artifact':ref});self.assertEqual(1,verify(e.root))
+        (e.root/'artifacts'/ref['sha256']).unlink()
+        with self.assertRaises(ValueError): verify(e.root)
+
+    def test_artifact_reference_nested_inside_artifact_content_is_resolved(self):
+        e=Evidence(self.root/'events','r');inner=e.artifact(b'the diff')
+        e.event('tool_result',{'artifact':e.artifact({'saved':True,'specification':inner})})
+        self.assertEqual(1,verify(e.root))
+        (e.root/'artifacts'/inner['sha256']).unlink()
+        with self.assertRaises(ValueError): verify(e.root)
+
+    def test_falsified_artifact_size_is_detected(self):
+        e=Evidence(self.root/'events','r');ref=e.artifact(b'abcdef')
+        e.event('tool_result',{'artifact':{'sha256':ref['sha256'],'bytes':ref['bytes']+1}})
+        with self.assertRaises(ValueError): verify(e.root)
+
+    def test_unreferenced_artifact_does_not_fail_verification(self):
+        e=Evidence(self.root/'events','r');e.artifact(b'orphan');e.event('note',{})
+        self.assertEqual(1,verify(e.root))
+
     def test_event_order_tampering_is_detected(self):
         e=Evidence(self.root/'events','r');e.event('a',{});e.event('b',{})
         path=e.root/'events.jsonl';lines=path.read_text().splitlines();path.write_text('\n'.join(reversed(lines)))
