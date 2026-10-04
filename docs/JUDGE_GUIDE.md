@@ -41,10 +41,13 @@ are not the benchmark score. Later reliability pilots remain separate.
 
 ## Run the test build
 
-Use Python 3.12 or newer and Docker Desktop with Linux containers. The source
-repository is https://github.com/ns-0437/incidentforge; it remains private during
-development and must become public before submission. Do not claim this guide
-provides judge access until that release step is complete.
+Both commands in this section need only Python 3.12 or newer. Docker is **not**
+required here; it is needed for the Linux behavioral checks further below and for
+live validation. Verified on October 4 by running both commands from a clean
+tracked-source copy with no Docker involvement. The source repository is
+https://github.com/ns-0437/incidentforge; it remains private during development and
+must become public before submission. Do not claim this guide provides judge access
+until that release step is complete.
 
 ```powershell
 python -m unittest tests.test_t4 tests.test_t5 tests.test_t6_controller tests.test_t7 tests.test_prefreeze tests.test_t8 tests.test_reliability
@@ -87,6 +90,13 @@ python scripts/run-t4.py --live --variant B2 --incident IF-001 --backend contree
 The setup check makes no inference or Sandbox requests, changes no ledger, and
 prints no credentials. Passing it checks local prerequisites only; it does not
 confirm provider credit, credential validity, or judge access.
+
+Its `inference_credential` check reports "present" when `NEBIUS_API_KEY` is set or
+`~/.config/contree/auth.ini` exists. Both live outside the checkout, so a clean
+checkout on an already-configured machine still reports a credential as present.
+A fresh machine reports it absent. Verified October 4 from a clean tracked-source
+copy. This is why a clean checkout on the developer machine cannot stand in for a
+fresh-user access rehearsal.
 
 The local UI offers Docker and Nebius Sandbox; the command above selects Sandbox. The
 persisted budget blocks dispatch that is not funded or has unknown pending usage.

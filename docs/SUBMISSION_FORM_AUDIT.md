@@ -21,13 +21,19 @@ or changed. No project visibility was altered.
 Consequently the following are **not recorded here and must not be assumed**:
 exact on-screen field labels, character or word limits, image and thumbnail
 requirements and their dimensions, which fields the UI marks required versus
-optional, and the text of any checkbox declarations. The rules reference "images"
-as submission content, which implies a gallery or thumbnail field exists, but that
-field was not observed. Owner action O-1 below closes this.
+optional, and the text of any checkbox declarations. The rules mention "images"
+among the materials a judge may review, which is not evidence that any particular
+image or gallery field exists on the form. No form field is claimed here. Owner
+action O-1 below closes this.
 
 ## Verified requirements and where each one stands
 
 Sources: hackathon overview page and Official Rules, both read 2026-10-04.
+
+**The `#` column is this document's own internal numbering of published
+requirements. It is not a form field number, a form field order, or anything
+observed in the submission UI.** References elsewhere in this file such as
+"requirement 13" use this numbering.
 
 | # | Requirement (verified wording in brief) | Prepared content | Gap |
 |---|---|---|---|
@@ -43,44 +49,61 @@ Sources: hackathon overview page and Official Rules, both read 2026-10-04.
 | 10 | Video must not include third-party trademarks or copyrighted music without permission | Added to [RECORDING_HANDOFF.md](RECORDING_HANDOFF.md) review step | None |
 | 11 | Feedback on Token Factory, AI Cloud and NVIDIA tools used | DEVPOST_DRAFT "Platform feedback", evidence-linked | None |
 | 12 | Written explanation of significant updates if the project predates the Submission Period | Project is new within the period; no prior work to disclose beyond the AI-assistance note | Owner confirms at O-3 |
-| 13 | Testing access, free of charge and without restriction, until the Judging Period ends | **Was not written anywhere** | **Closed by this document.** See copy-ready text below |
+| 13 | Testing access, free of charge and without restriction, until the Judging Period ends | **Was not written anywhere.** Draft text added below | **Open.** Text is drafted; sufficiency is unconfirmed. See the testing section |
 | 14 | All materials in English | All materials are English | None |
 | 15 | City selection if the entrant attended a Builders & Brews event | Not applicable unless the owner attended one of the 20 listed cities | Owner confirms at O-4 |
 
-## The testing requirement changes the judge-access picture
+## The testing requirement, and what is still unsettled
 
 Verified wording from the Official Rules, Testing section:
 
 > "Access must be provided to an Entrant's working Project for judging and testing
-> by providing a link to a website, functioning demo, **or a test build**. ... The
+> by providing a link to a website, functioning demo, or a test build. ... The
 > Entrant must make the Project available free of charge and without any
 > restriction, for testing, evaluation and use by the Sponsor, Administrator and
-> Judges until the Judging Period ends. **Judges are not required to test the
+> Judges until the Judging Period ends. Judges are not required to test the
 > Project and may choose to judge based solely on the text description, images, and
-> video provided in the Submission.**"
+> video provided in the Submission."
 
-Two consequences, both material:
+**The access gate is not resolved by this wording, and must not be recorded as
+resolved.** What can be offered splits into three distinct things, and only the
+first is within our control:
 
-1. A **test build** satisfies the requirement. A public repository with a working
-   quick start, a credential-free test suite and a credential-free replay is a test
-   build, and it needs no provider account for anyone.
-2. Judging does not depend on judges running anything.
+| What | Needs | Status |
+|---|---|---|
+| Credential-free replay of retained evidence, plus the authored test suite | Public release of the repository | Available once the owner authorizes release. Nothing else blocks it |
+| **Full autonomous investigation**: runtime inference and Sandbox execution against a live incident | Arranged provider access for whoever is running it | **Not available.** Depends on the pending Nebius reply, or on a judge supplying their own credentials |
+| Whether the first is **sufficient** for this hackathon's working-access requirement | A statement from the organizer | **Not confirmed.** No organizer confirmation has been sought or received |
 
-**This does not mean judge access is arranged, and nothing here should be stated as
-if it were.** The pending Nebius reply still matters for anyone who wants to
-reproduce live inference. What changes is the risk: the submission's testing
-requirement is satisfiable without that reply, so the reply is an improvement rather
-than a blocker. [COMPLETION_GATES.md](COMPLETION_GATES.md) should be read with that
-distinction in mind.
+Two cautions on reading the quoted clause:
 
-The rules also say that if an entrant's **website** is private, credentials must be
-included in testing instructions. That clause is about the entrant's own hosted
-site. It does not call for sharing a personal provider API key, and this project
-will not share one.
+- "Judges are not required to test the Project" describes what judges may choose to
+  do. It does **not** waive the entrant's obligation to provide the required access.
+  Treating it as a waiver would be a misreading.
+- The rules do not expressly require separate provider credentials for judges, and
+  they name "a test build" among the acceptable forms of access. Neither point
+  establishes that our particular test build discharges the requirement for a
+  project whose headline capability is live autonomous repair. That judgement
+  belongs to the organizer.
+
+The practical consequence is narrower than it first appears: the credential-free
+path is worth preparing and shipping regardless, because it is the floor. It is not
+a substitute for the Nebius reply, and the gate in
+[COMPLETION_GATES.md](COMPLETION_GATES.md) stays open until a supported basis exists.
+
+Separately, the rules say that if an entrant's **website** is private, credentials
+must be included in testing instructions. That clause concerns the entrant's own
+hosted site. It does not call for sharing a personal provider API key, and this
+project will not share one.
+
+**If the organizer's position is wanted before submission, asking the hackathon
+manager is the only way to get it.** The overview page carries an "Email the
+hackathon manager" link. That is an owner decision, not something to assume either
+way.
 
 ## Copy-ready text
 
-### Testing instructions (new, field 13)
+### Testing instructions (requirement 13 in the table above)
 
 > IncidentForge is supplied as a test build. Everything below is free, needs no
 > account, and needs no API key.
@@ -105,11 +128,27 @@ will not share one.
 > explains how to configure; this is optional and not required to evaluate the
 > retained evidence. No credential of ours is distributed.
 
-### Track (field 2)
+**Validated by literal execution on 2026-10-04**, from a clean tracked-source copy
+at `cbe75a8` containing no credential files, with no Docker and no provider
+environment variables, making zero inference calls. Every command above ran and
+produced the stated result: 115 tests pass, the replay serves all seven curated
+files with HTTP 200, and the operator console answers on its four routes. Record:
+[judge-instructions-cbe75a8.json](../benchmarks/release/judge-instructions-cbe75a8.json).
+
+**One limit of that validation, found while running it.** `check-setup.py` reported
+`inference_credential: present` even though the copy contained no credential,
+because discovery reads `NEBIUS_API_KEY` and `~/.config/contree/auth.ini`, which
+live outside the checkout and exist on the developer machine. **A clean copy on this
+machine is therefore not a fresh-user environment.** It validates the
+credential-free paths, which is what the text above promises, and it cannot validate
+fresh-user provider access. The outstanding fresh-user rehearsal remains outstanding,
+and no credential value was read or recorded while establishing this.
+
+### Track (requirement 2)
 
 > Coding and Agentic Engineering
 
-### Significant-updates note (field 12)
+### Significant-updates note (requirement 12)
 
 > IncidentForge was created new during the Submission Period. It reuses no prior
 > project of ours. Development was assisted by AI coding tools; the design,
@@ -127,14 +166,14 @@ in [DEVPOST_DRAFT.md](DEVPOST_DRAFT.md) and are not duplicated here.
 | **P-1** | Demo URL. The retained link `https://ns-0437.github.io/incidentforge-demo/` returned 404 on October 4 and is kept only until a replacement deploys. Planned replacement `https://ns-0437.github.io/incidentforge/` is not deployed | Repository is public and the Pages workflow has run and been verified signed out |
 | **P-2** | Video URL. Not recorded, not uploaded | Owner records, verifies duration under three minutes, uploads public, checks signed-out playback |
 | **P-3** | Repository URL is live but private, so it returns 404 when signed out | Owner authorizes public release |
-| **P-4** | Live-execution access for judges beyond the credential-free test build | Nebius reply arrives and a supported path is rehearsed. Not required for field 13 |
+| **P-4** | Live-execution access for judges beyond the credential-free replay and test suite | Nebius reply arrives and a supported path is rehearsed. Whether the credential-free build alone suffices is unconfirmed |
 
 ## Owner actions this audit cannot perform
 
 | ID | Action |
 |---|---|
 | **O-1** | Sign in to Devpost and open the "Enter a Submission" form so the remaining UI details can be recorded: field labels, character limits, image or thumbnail requirements, required-versus-optional marking, and any checkbox declarations |
-| **O-2** | Confirm hackathon registration. The rules require clicking "Join Hackathon" before a submission can be created, and the unauthenticated page could not show whether this is done |
+| **O-2** | Registration: **owner-reported as joined** (2026-10-04). A signed-out page can neither verify nor refute this, so it is recorded as owner-reported and needs no reconfirmation |
 | **O-3** | Review authorship, the AI-assistance disclosure and the IP representations in the rules, which require the submission to be the entrant's original and solely owned work |
 | **O-4** | Confirm whether any Builders & Brews city event was attended. If not, leave the city field unset |
 | **O-5** | Review and approve the testing-instructions text above before it is pasted |

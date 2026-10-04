@@ -1,0 +1,68 @@
+{
+  "date": "2026-10-04",
+  "purpose": "Literal execution of the credential-free testing instructions drafted in docs/SUBMISSION_FORM_AUDIT.md",
+  "source_commit": "cbe75a8",
+  "checkout": "git archive HEAD extracted to a scratch directory; tracked files only, no .git, no runs/, no credential files present in the copy",
+  "environment": {
+    "python": "3.12.14",
+    "docker_used": false,
+    "provider_env_vars_set": false,
+    "inference_calls": 0,
+    "sandbox_operations": 0
+  },
+  "steps_validated": [
+    {
+      "step": "authored test suite",
+      "command": "python -m unittest tests.test_t4 tests.test_t5 tests.test_t6_controller tests.test_t7 tests.test_prefreeze tests.test_t8 tests.test_reliability",
+      "result": "115 tests, OK",
+      "credentials_required": false,
+      "ledger_created": false
+    },
+    {
+      "step": "static recorded replay",
+      "command": "python -m http.server 8766 --bind 127.0.0.1 --directory site",
+      "result": "HTTP 200 for /, and for all seven curated files",
+      "files_served": [
+        "/",
+        "/.nojekyll",
+        "/app.js",
+        "/evidence.json",
+        "/evidence.sha256",
+        "/icon.svg",
+        "/index.html",
+        "/style.css"
+      ],
+      "credentials_required": false
+    },
+    {
+      "step": "local operator console",
+      "command": "python scripts/serve-ui.py --port 8765",
+      "result": "HTTP 200 for /, /app.js, /style.css, /api/state",
+      "credentials_required": false,
+      "files_created_in_checkout": "empty runs/ directory only"
+    },
+    {
+      "step": "setup diagnostic",
+      "command": "python scripts/check-setup.py --backend contree",
+      "result": "exit 0; ready_for_preflighted_launch true; no inference or Sandbox request made",
+      "note": "Reported inference_credential present although the copy contains no credential; see credential_discovery_finding"
+    }
+  ],
+  "static_evidence_sha256": "a1e18da9507e07c49d6cfda0dca897a98e3daf0fc287460f9aab2b641509e04b",
+  "static_files": 7,
+  "credential_discovery_finding": {
+    "observed": "check-setup.py reported inference_credential ready in a checkout containing no credential",
+    "cause": "credential discovery reads NEBIUS_API_KEY and ~/.config/contree/auth.ini, both outside the checkout; auth.ini exists on the developer machine",
+    "consequence": "A clean tracked-source copy on the developer machine is not a fresh-user environment. It validates the credential-free replay and test paths; it cannot validate fresh-user provider access.",
+    "credential_values_read_or_recorded": false
+  },
+  "not_covered": [
+    "Linux behavioral and isolation checks; no Docker was used in this validation.",
+    "Live model execution and Sandbox dispatch; no inference credits were spent.",
+    "Public clone from GitHub; the repository is private, so cloning was not exercised.",
+    "Hosted demo URL; Pages is not deployed.",
+    "Whether this credential-free test build satisfies the hackathon working-access requirement; the organizer has not confirmed that."
+  ],
+  "supersedes": null,
+  "relation_to_rehearsal_v25": "rehearsal-v25.json covers commit 85b4612 and includes the Docker Linux checks. src/incidentforge/preflight.py changed after that commit, so the Python paths were revalidated here. This record does not replace that rehearsal."
+}

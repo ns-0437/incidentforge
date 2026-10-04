@@ -32,13 +32,21 @@ The owner has sent the Nebius access/credit email. Owner-account availability th
 December 15 does not establish a usable judge access path. Await the actual reply,
 then implement and rehearse the supported arrangement. Do not share a personal key.
 
-Scope of that gate, from the Official Rules read October 4: the Testing requirement
-is satisfied by "a link to a website, functioning demo, or a test build" offered free
-and without restriction through the Judging Period, and judges "are not required to
-test the Project". A credential-free public repository, test suite and recorded
-viewer is a test build, so the pending reply improves live reproduction rather than
-deciding whether the submission meets the testing requirement. Prepared instructions
-and the remaining form gaps are in [SUBMISSION_FORM_AUDIT.md](SUBMISSION_FORM_AUDIT.md).
-This does not mean judge access is arranged, and it must not be described that way.
+Scope of that gate, from the Official Rules read October 4. The Testing requirement
+names "a link to a website, functioning demo, or a test build", offered free and
+without restriction through the Judging Period. Three things stay separate:
+
+- Credential-free replay and the authored test suite become available at public
+  release and need no provider account.
+- Full autonomous investigation using runtime inference and Sandbox execution
+  requires arranged provider access and is not available.
+- Whether the credential-free test build is sufficient for judging **has not been
+  confirmed by the organizer**.
+
+"Judges are not required to test the Project" describes judge discretion and does
+not waive providing the required access. Separate provider credentials for judges
+are not expressly required, which is not a basis for marking this gate resolved.
+**The gate stays open.** Prepared instructions and the remaining form gaps are in
+[SUBMISSION_FORM_AUDIT.md](SUBMISSION_FORM_AUDIT.md).
 
 The project is not submission-complete while these release gates remain open.

@@ -24,9 +24,12 @@ Target 2:45; keep the final video strictly under three minutes.
    execution access after its delivery path has been rehearsed.
 5. Review readable text, clear audio, duration, and absence of secrets. The rules
    require that the video "must not include third party trademarks, or copyrighted
-   music or other material unless the Entrant has permission to use such material",
-   so add no background music and keep third-party branding incidental to showing
-   the tools actually used. The rules also require the project to function as
+   music or other material unless the Entrant has permission to use such material".
+   The permission exception is part of the rule: music or other third-party material
+   you hold rights to is allowed, and the practical default is to use none rather
+   than to establish rights under time pressure. Showing the Nebius and NVIDIA
+   products actually used is inherent to the required demonstration; keep other
+   third-party branding out. The rules also require the project to function as
    depicted, so keep the recorded-replay labelling visible rather than implying
    live inference.
 6. Upload the reviewed video as public on YouTube and check signed-out playback.
