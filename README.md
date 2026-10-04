@@ -17,6 +17,8 @@
 
 ## Why this exists
 
+**Hosting status:** the retained demo URL currently returns 404. Main-repository Pages deployment is prepared for public release. Until then, [run the viewer locally](docs/RECORDING_HANDOFF.md).
+
 Explore the [recorded investigation desk](https://ns-0437.github.io/incidentforge-demo/): two synthetic incidents, measured observations, proposed patches, verification results, and an interactive architecture diagram. The static demo spends no inference credits. Its development runs are separate from the completed T8 campaign and its disclosed failures. [Publishing guide](docs/JUDGE_FRONTEND.md).
 
 A payment response disappears **after the charge commits**. A retry uses a fresh
@@ -41,7 +43,7 @@ proof that the model's explanation was correct, either.
 | :--- | :--- | :--- |
 | **Reproduce** | Fresh stores and a witnessed failure | HTTP observations, durable effects, reset evidence |
 | **Investigate** | Competing hypotheses and precommitted predictions | Source references, conditions, measured facts |
-| **Repair** | Bounded edits and optional developer assertions | Exact diff, rejected actions, candidate revision |
+| **Repair** | Bounded edits and required passing developer assertions | Exact diff, rejected actions, candidate revision |
 | **Challenge** | B2 receives property-only feedback | Violated properties, without private schedule text |
 | **Verify** | Frozen candidate meets withheld schedules | Independent verdicts, hashes, boundary receipts |
 | **Review** | Local dashboard presents patch and limitations | Timeline, hypothesis cards, diff, review ZIP |

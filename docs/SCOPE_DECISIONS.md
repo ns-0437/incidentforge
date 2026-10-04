@@ -1,8 +1,10 @@
 # IncidentForge: scope and decision register
 
-Current checkpoint (October 3, 2026): T3 PASSED. The user approved the reviewed source upload and supplied Nebius free-beta confirmation emails. All 32 T2 tests passed remotely, with 17 case reports and 51 verified backups. Cancellation and remote boundary checks passed. See T3_STATUS.md, which supersedes older unverified-remote statements below. Next: T4 controller/model integration; inference funding/license checks remain separate. No paid overage authorized.
-
-Updated October 3, 2026. User explicitly authorized T2. T0–T2 local gates are complete; see T2_STATUS.md for measured contract, boundary and harmful-control coverage. No out-of-pocket spending or remote workloads are authorized by this record.
+Current checkpoint (October 4, 2026): T0-T7 delivered; the frozen T8 campaign
+and failure-inclusive report are complete. T9 release preparation is in progress.
+Post-T8 development is retained separately and cannot replace frozen results.
+The user authorized real Sandbox execution, commits/pushes, and a cumulative
+inference allocation up to $0.40 from free credits. No paid overage is authorized.
 
 ## Fixed requirements
 
@@ -11,7 +13,7 @@ Original brief preserved byte-identically. Three real HTTP services and separate
 ## Corrections applied
 
 - Restored scope, replaced static-only interface and mandatory invented 72-run matrix.
-- Image listing now succeeds according to user terminal output; previous list permission blocker resolved. Execution and isolation remain unverified.
+- Image listing now succeeds according to user terminal output; previous list permission blocker resolved. Execution and isolation subsequently passed the declared remote checks in T3.
 - Proxy responses are network evidence, not actual effects. Snapshot history is sampled, not complete.
 - Protected boundary failure blocks protected claims; host grading is not sufficient by itself.
 - Local-only submission is an unapproved contingency, not a default.
@@ -29,11 +31,27 @@ Original brief preserved byte-identically. Three real HTTP services and separate
 | Gate | Evidence required |
 |---|---|
 | Execution start | PASSED: user explicitly requested the next stage; local T0 passed |
-| Local runtime | PASSED: Docker Linux engine and T0 isolation tests; remote runtime remains unverified |
-| Funded inference | Current balance/expiry, exact selected model/license/price and bounded pilot allocation |
-| Sandbox execution | Successful bounded command and actual quota/free-beta coverage |
-| Protected evaluation | PASSED locally under T2 declared conditions; must repeat on ConTree before remote claims |
-| Final campaign | Frozen system/split, measured budget and declared run counts |
+| Local runtime | PASSED: Docker Linux and declared ConTree isolation checks |
+| Funded inference | ACTIVE: exact Nano endpoint in llm.py; persisted cumulative $0.40 ceiling. Provider credit/access reply pending |
+| Sandbox execution | PASSED: real workloads and exports; free beta confirmed by provider email |
+| Protected evaluation | PASSED under declared T2/T3 conditions; independent returned-evidence checks retained per run |
+| Final campaign | COMPLETE: twelve declared T8 attempts; no variant ranking after timeout threshold exceeded |
 | Judging access | Working free-to-judge access through December 15 with funded runtime |
 
 Routine implementation details can be resolved within these requirements. Any removal of required integration, incident family, evaluation layer or product capability needs explicit user agreement. Pending decisions are not permission to run paid operations.
+
+## October 4 completion and release decisions
+
+- New candidates require a source change plus authored regression assertions that
+  pass on the current revision. Historical runs retain their original outcomes;
+  a historical accepted candidate without authored tests is disclosed as such.
+- Investigation output is constrained by a provider JSON Schema, source identifier
+  vocabulary and nonblank source-line references. Semantic and measured-fact
+  validation remain separate; schema compliance does not prove diagnosis quality.
+- Main repository remains private until owner-approved public release. Deploy its
+  site/ directory through the prepared manual Pages workflow, verify it signed out,
+  then update the retained About/README URL. Do not recreate the separate demo repo.
+- Owner account availability through December 15 is confirmed by the owner. Judge
+  access delivery is not confirmed; the owner sent the Nebius request and awaits reply.
+- Owner will record the video. Script/local recording instructions are prepared;
+  public video, final source release and Devpost submission remain open gates.

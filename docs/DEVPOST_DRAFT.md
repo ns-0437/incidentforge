@@ -33,9 +33,11 @@ two rejected frozen candidates and eight unresolved attempts. Three inference
 timeouts crossed our predeclared infrastructure threshold, so we make no variant
 ranking claim. Later development reduced JSON-escaping friction, added explicit
 completion guidance, and prevented unrun or placeholder tests from masquerading
-as completed work. The current implementation passes 99 portable tests. Two follow-up B2 attempts completed: an
-accepted IF-001 repair and a rejected IF-002 repair. These are development results,
-not a new benchmark.
+as completed work. The current implementation passes 107 portable tests. Later development includes
+an accepted IF-002 Sandbox repair after schema-constrained investigation, as well
+as retained failed attempts. That accepted pilot omitted authored tests; the current
+completion gate now requires passing authored regression assertions. These are
+development results, not a new benchmark.
 
 ## What we learned
 Correct measurements, plausible explanations, useful edits and a completed agent
