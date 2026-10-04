@@ -17,7 +17,10 @@ At the owner-approved source release:
 
 1. Review and publish the main repository.
 2. In Settings > Pages, choose GitHub Actions as the publishing source.
-3. Run `Publish judge frontend` on main and confirm deployment succeeds.
+3. Run `Publish judge frontend` on main and confirm the `deploy` **job** ran and
+   reported a `page_url`. The job is guarded on repository, private-flag and
+   branch; a guard that evaluates false skips the job, and a run whose only job
+   skipped still reports as successful. Check the job, not the run colour.
 4. Open the new URL signed out; check both incidents, tabs, architecture,
    evidence download, and the disclosed failed attempts.
 5. After successful deployment, update the About website, README, recording

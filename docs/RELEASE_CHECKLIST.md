@@ -28,7 +28,9 @@ Passing development examples do not establish repeat autonomous repair reliabili
 - [ ] Incorporate Nebius's reply into a concrete free judge-access path and rehearse it with a fresh user.
 - [ ] Record the walkthrough, verify duration, publish on YouTube and check signed-out playback.
 - [ ] Make the main repository public at owner-approved release.
-- [ ] Enable Pages Actions and run the manual workflow; verify the deployed site signed out.
+- [ ] Deploy Pages from the main repository. Expand into the ordered sub-steps in
+      [Pages deployment is unexercised](#pages-deployment-is-unexercised) below; the
+      workflow has never executed, so treat this as a first run rather than a repeat.
 - [ ] Only after successful deployment, replace the retained old About/README demo link and other submission links.
 - [ ] Check final CI, source/demo/video links, setup instructions and actual hackathon entry requirements.
 - [ ] Submit the reviewed Devpost entry and retain confirmation.
@@ -37,6 +39,41 @@ The owner confirmed continued access to their account through December 15; this
 does not establish judge access. The owner has sent the support email and will
 provide the reply. Never share the owner's personal key or require judges to buy
 credits. The static recorded viewer alone does not settle live execution access.
+
+## Pages deployment is unexercised
+
+Observed October 4, 2026 against ns-0437/incidentforge:
+
+- `gh run list --workflow pages.yml` returns nothing. The workflow has **never run**.
+- `gh api repos/ns-0437/incidentforge/pages` returns **404**. No Pages site is
+  configured, so no publishing source has been selected yet.
+- The repository is private, which is why neither of the above has happened.
+
+The deploy job is guarded by `github.repository`, `github.event.repository.private
+== false` and `github.ref == 'refs/heads/main'`. **A guard that evaluates false
+skips the job, and a run whose only job is skipped still reports as successful.**
+On release day that reads as a green run with nothing deployed, which is the one
+outcome most likely to be mistaken for success. Check the job's own status, not
+the run's colour, and confirm a `page_url` was emitted.
+
+The deployment sequence itself lives in [JUDGE_FRONTEND.md](JUDGE_FRONTEND.md) and
+is not restated here. Two additions to it, both consequences of the above:
+
+- Its step 1 and step 2 are prerequisites for the guard, not formalities. The job
+  cannot pass while the repository is private, and it has nowhere to publish until
+  the Pages source is set to GitHub Actions.
+- At its step 3, read the **job** status. A skipped job is the failure mode to
+  watch for, and it does not look like a failure.
+- At its step 4, `python scripts/check-site.py` validates the local artifact only.
+  Confirming what is actually served needs a signed-out fetch of
+  `https://ns-0437.github.io/incidentforge/` returning 200.
+
+The workflow pins `ubuntu-24.04` and uses `actions/checkout@v6`,
+`configure-pages@v5`, `upload-pages-artifact@v4` and `deploy-pages@v4`. Newer
+majors exist (`configure-pages@v6`, `upload-pages-artifact@v5`, `deploy-pages@v5`)
+and were deliberately not adopted: an untested bump to an untested workflow adds
+risk at the moment there is least time to absorb it. If the first dispatch fails
+on a deprecated action, bumping these is the first thing to try.
 
 ## Timing and constraints
 
