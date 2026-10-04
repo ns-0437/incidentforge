@@ -13,7 +13,7 @@ December 15. Recheck the live entry form before final submission.
 - [x] Real Token Factory inference and Sandbox execution evidenced.
 - [x] Frozen twelve-slot T8 results, failures and accounting retained.
 - [x] Public recorded frontend deployed; main repository remains private.
-- [x] 71 local controller/regression tests and latest implementation CI pass.
+- [x] 74 local controller/regression tests and latest implementation CI pass.
 - [x] Judge guide, submission copy and timed recording script prepared.
 - [x] Fresh-checkout Linux/setup rehearsal recorded: 61 portable tests, 16 Linux checks, four HTTP routes; see [record](../benchmarks/release/rehearsal.json).
 - [x] Two live completion attempts retained: IF-001 accepted, IF-002 rejected. A third rejected IF-002 pilot exercised authored-test completion live.

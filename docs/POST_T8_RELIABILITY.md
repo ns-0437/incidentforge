@@ -305,3 +305,27 @@ The local UI now headlines this total exposure instead of only settled estimates
 repeat rejection, nonterminal/tampered evidence and settled-call protection.
 JavaScript syntax validation also passes. This improves recovery and reporting;
 it makes no new repair-quality claim.
+
+
+## October 4: compact-focus follow-up and verifier startup guard
+
+One declared IF-002 attempt at `9c60fd7` completed investigation and applied one
+edit, but stopped when the independent reader discovered Docker Desktop's Linux
+engine was unavailable. Six model calls settled at **$0.009764**. The autonomous
+outcome remains **unresolved**; it was not resumed or relabeled.
+
+After restoring Docker, a read-only, network-disabled reader recomputed the
+already-exported archive. It rejected the candidate. Six exported cases were
+checked; two tests did not export cases. This is a later diagnostic, not an
+accepted autonomous repair. See [v12 record](../benchmarks/reliability/v12-pilot.json).
+
+The Sandbox adapter now checks Docker Linux availability and pins the reader's
+image ID during construction, before remote workload or model calls. It records
+readiness in evidence and reuses that image for later verification. Startup checks
+cannot guarantee the daemon stays available, but they prevent this specific
+late discovery of an already-missing dependency. **74 portable tests pass**, with
+negative checks for missing daemon, wrong engine OS and malformed image IDs.
+The actual restored engine passed the new check without spending inference credits.
+
+Exposure is **$0.251176 / $0.40**; **$0.148824** remains. No pending reservations
+or active Sandbox guard remain. No further model attempt was started.
