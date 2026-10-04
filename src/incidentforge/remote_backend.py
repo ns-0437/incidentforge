@@ -2,6 +2,7 @@
 import hashlib
 import json
 import os
+import re
 from pathlib import Path
 import subprocess
 import time
@@ -25,6 +26,19 @@ def read_export(out,mode):
     if observed.get('mode')!=mode or observed.get('complete') is not True: raise ValueError('incomplete execution')
     return observed
 
+def reader_preflight():
+    """Check the local verifier before remote execution or inference spending."""
+    try:
+        server=subprocess.run(['docker','info','--format','{{.OSType}}'],
+                              capture_output=True,text=True,timeout=20,check=True).stdout.strip()
+        if server!='linux': raise RuntimeError('Independent verifier requires Docker Linux containers')
+        pinned=subprocess.run(['docker','image','inspect','python:3.12-slim','--format','{{.Id}}'],
+                              capture_output=True,text=True,timeout=20,check=True).stdout.strip()
+        if not re.fullmatch(r'sha256:[0-9a-f]{64}',pinned): raise RuntimeError('Invalid verifier image identity')
+    except (OSError,subprocess.SubprocessError) as exc:
+        raise RuntimeError('Independent verifier unavailable. Start Docker Desktop with Linux containers and ensure python:3.12-slim is cached before launching inference.') from exc
+    return pinned
+
 class ContreeBackend:
     name='nebius-sandbox'
     image='4fa16c8f-62a9-35a4-a4ea-07b7e8cd44ae'
@@ -34,6 +48,8 @@ class ContreeBackend:
         self.cancel_file=cancel_file or evidence.root/'CANCEL'
         self.python=Path(os.environ.get('CONTREE_PYTHON',str(Path.home()/'AppData/Roaming/uv/tools/contree-cli/Scripts/python.exe')))
         if not self.python.is_file(): raise RuntimeError('Set CONTREE_PYTHON to installed ConTree SDK Python')
+        self.reader_image=reader_preflight()
+        self.evidence.event('verifier_preflight',{'backend':'docker','image':self.reader_image,'status':'ready','scope':'startup check only; later daemon failure remains possible'})
 
     def run(self,candidate,mode):
         if time.monotonic()+340>getattr(self,'deadline',float('inf')):
@@ -74,9 +90,7 @@ class ContreeBackend:
         # Only bounded JSON is parsed on the host. No returned code or database is executed.
         observed=read_export(out,mode)
         if mode in {'protected','final_holdout'}:
-            pinned=subprocess.run(['docker','image','inspect','python:3.12-slim','--format','{{.Id}}'],
-                                  capture_output=True,text=True,timeout=20,check=True).stdout.strip()
-            if not pinned.startswith('sha256:'): raise ValueError('reader image identity')
+            pinned=self.reader_image
             reader='incidentforge-reader-'+uuid.uuid4().hex
             args=['docker','run','--name',reader,'--rm','--read-only','--network','none','--pids-limit','32','--memory','256m',
                   '--cpus','1','--cap-drop','ALL','--security-opt','no-new-privileges=true',

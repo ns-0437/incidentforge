@@ -352,3 +352,33 @@ class ReconciliationTests(unittest.TestCase):
         b,token,e=self.sample();b.settle(token,100)
         with self.assertRaises(ValueError): reconcile(self.root,'timeout',apply=True,authority='test')
         self.assertEqual(100,b.totals('timeout')['reserved_or_spent_microusd'])
+
+class VerifierPreflightTests(unittest.TestCase):
+    def test_missing_daemon_stops_before_remote_work(self):
+        import subprocess,sys,tempfile
+        from pathlib import Path
+        from incidentforge.remote_backend import ContreeBackend
+        with tempfile.TemporaryDirectory() as temp:
+            evidence=Mock();evidence.root=Path(temp)
+            with patch.dict('os.environ',{'CONTREE_PYTHON':sys.executable}), patch(
+                    'incidentforge.remote_backend.subprocess.run',side_effect=subprocess.CalledProcessError(1,['docker'])) as run:
+                with self.assertRaisesRegex(RuntimeError,'Start Docker Desktop'):
+                    ContreeBackend(Path(temp),evidence)
+                self.assertEqual(1,run.call_count)
+                evidence.event.assert_not_called()
+    def test_linux_image_is_pinned_at_startup(self):
+        import sys,tempfile
+        from pathlib import Path
+        from incidentforge.remote_backend import ContreeBackend
+        with tempfile.TemporaryDirectory() as temp:
+            evidence=Mock();evidence.root=Path(temp);image='sha256:'+'a'*64
+            with patch.dict('os.environ',{'CONTREE_PYTHON':sys.executable}), patch(
+                    'incidentforge.remote_backend.subprocess.run',side_effect=[Mock(stdout='linux'),Mock(stdout=image)]):
+                backend=ContreeBackend(Path(temp),evidence)
+            self.assertEqual(image,backend.reader_image);self.assertEqual(0,backend.count)
+            self.assertEqual('verifier_preflight',evidence.event.call_args.args[0])
+    def test_wrong_os_or_invalid_image_fails_closed(self):
+        from incidentforge.remote_backend import reader_preflight
+        for outputs in ([Mock(stdout='windows')],[Mock(stdout='linux'),Mock(stdout='sha256:bad')]):
+            with patch('incidentforge.remote_backend.subprocess.run',side_effect=outputs):
+                with self.assertRaises(RuntimeError): reader_preflight()
