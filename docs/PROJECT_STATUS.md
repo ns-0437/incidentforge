@@ -9,7 +9,7 @@ labels alone would overstate readiness: quality and external release gates matte
 |---|---:|---:|---|
 | Core engine and platform integration | 40 | 35 | Real HTTP services, protected persistence/evaluator, Nemotron, Sandbox, controller and evidence exist. Intake/indexing remain tailored to the supported fixtures. |
 | Investigation, repair and evaluation | 25 | 18 | Frozen T8 complete with all failures retained; some accepted repairs. Reliable IF-002 repair and stronger evidence of value remain unresolved. |
-| Product interface and reproducibility | 15 | 12 | Local console, exports, local replay and clean-checkout rehearsal exist. Sandbox UI selection now implemented; full judge workflow rehearsal still needed. |
+| Product interface and reproducibility | 15 | 12 | Local console, exports, public replay and clean-checkout rehearsal exist. Sandbox UI selection now implemented; full judge workflow rehearsal still needed. |
 | Judge access and submission | 20 | 5 | MIT, guide, draft, recording script prepared. Provider availability owner-confirmed through December 15; access delivery, final recording, public release, signed-out checks and actual submission remain. |
 | Total | 100 | 70 | Approximately 30 points of work remain. |
 
@@ -45,7 +45,7 @@ budget; repeatedly tuning against old schedules cannot support that claim.
 
 Cumulative accounted exposure: **$0.254663 / $0.40**. Remaining allocation:
 **$0.145337**. No new inference was used for this status review or UI change.
-The other trial credits are unallocated. The retained local site is a recorded replay,
+The other trial credits are unallocated. The GitHub Pages site is a recorded replay,
 not a hosted inference service. The main source repository stays private until release.
 
 Validation for the backend selector: **81 portable tests passed** and JavaScript
@@ -57,8 +57,3 @@ launch/cancellation and fresh-user judge access were not rehearsed in this check
 
 Owner clarification, October 4: confirmation covers continued access to the owner
 account only. Separate judge credentials/access have **not** been confirmed.
-
-October 4: owner requested retirement of the separate public demo repository and
-will delete it manually. Main About URL cleared; local `site/` retained. Public
-demo delivery is now an open release gate. Identifier vocabulary is supplied
-before investigation; no new live efficacy result is claimed.

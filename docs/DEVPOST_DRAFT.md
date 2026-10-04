@@ -24,7 +24,7 @@ Python implements the controller, HTTP services, persistence broker, evidence
 chain and local UI. NVIDIA Nemotron Nano is called through Nebius Token Factory
 at runtime. Nebius Sandboxes execute isolated candidate workloads; an independent
 restricted Docker reader recomputes protected results from exported evidence.
-The locally served static frontend explores recorded synthetic evidence without
+The public GitHub Pages frontend explores recorded synthetic evidence without
 exposing keys or triggering paid operations.
 
 ## Challenges and measured results
@@ -50,7 +50,7 @@ completion on arbitrary repositories.
 
 ## Built with / track
 Python, Docker, SQLite, Nebius Token Factory, Nebius Sandboxes/ConTree,
-NVIDIA Nemotron, HTML/CSS/JavaScript.
+NVIDIA Nemotron, HTML/CSS/JavaScript, GitHub Pages.
 Track: Coding and Agentic Engineering.
 
 ## Platform feedback
@@ -61,7 +61,7 @@ recovery. Strict structured-output contracts needed explicit field examples and
 clear separation between developer and experiment observations.
 
 ## Links and release placeholders
-- Public demo link: pending replacement; separate demo repository retired by owner request.
+- Recorded demo: https://ns-0437.github.io/incidentforge-demo/
 - Source: https://github.com/ns-0437/incidentforge (PRIVATE until release)
 - Video: NOT RECORDED / NOT PUBLISHED
 - Free provider availability through December 15: owner-confirmed October 4.

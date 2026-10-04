@@ -12,8 +12,7 @@ December 15. Recheck the live entry form before final submission.
 - [x] Original brief retained; MIT license present.
 - [x] Real Token Factory inference and Sandbox execution evidenced.
 - [x] Frozen twelve-slot T8 results, failures and accounting retained.
-- [x] Recorded frontend retained locally; main repository remains private.
-- [ ] Replacement public demo delivery after owner-requested demo retirement.
+- [x] Public recorded frontend deployed; main repository remains private.
 - [x] 81 portable controller/regression tests passed locally; CI status must be checked at release.
 - [x] Judge guide, submission copy and timed recording script prepared.
 - [x] Fresh-checkout Linux/setup rehearsal recorded: 61 portable tests, 16 Linux checks, four HTTP routes; see [record](../benchmarks/release/rehearsal.json).
@@ -45,8 +44,3 @@ See [timeout recovery](TIMEOUT_RECOVERY.md).
 
 Owner clarification, October 4: confirmation covers continued access to the owner
 account only. Separate judge credentials/access have **not** been confirmed.
-
-October 4: owner requested retirement of the separate public demo repository and
-will delete it manually. Main About URL cleared; local `site/` retained. Public
-demo delivery is now an open release gate. Identifier vocabulary is supplied
-before investigation; no new live efficacy result is claimed.
