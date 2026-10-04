@@ -608,3 +608,12 @@ prose remains unverified. Total exposure $0.337380; remaining $0.062620; pending
 The judge viewer now uses v22/v25 and displays authored assertions with baseline
 and final outcomes. v22's weak assertion is disclosed, including the post-run origin
 of its baseline assessment. T8 totals and all twelve attempts are unchanged.
+
+## Judge publishing consistency
+
+The static publishing gate now checks property coverage and acceptance consistency,
+campaign denominators, duplicate attempt slots, acceptance totals and cell counts
+in addition to the exact file allowlist and digest. Seven corrupted-data variants
+are rejected even after recomputing the digest. The viewer labels wholly non-applicable
+checks separately from passing checks and treats empty lists as missing evidence.
+Twelve UI/publishing tests passed. No inference was used for this change.

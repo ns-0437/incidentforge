@@ -161,4 +161,25 @@ class StaticPublishTests(unittest.TestCase):
             evidence=site/'evidence.json';evidence.write_bytes(evidence.read_bytes()+b' ')
             with self.assertRaisesRegex(ValueError,'digest'):module.check(site)
 
+    def test_inconsistent_publishing_claims_fail_even_with_matching_digest(self):
+        import copy,hashlib,importlib.util,shutil
+        root=Path(__file__).resolve().parents[1]
+        spec=importlib.util.spec_from_file_location('check_site_semantics',root/'scripts/check-site.py')
+        module=importlib.util.module_from_spec(spec);spec.loader.exec_module(module)
+        original=json.loads((root/'site/evidence.json').read_text(encoding='utf-8'))
+        for mode in ('empty-property','failed-property','missing-property','denominator','accepted-count','duplicate-slot','cell'):
+            data=copy.deepcopy(original)
+            if mode=='empty-property': data['incidents'][0]['properties']['P1']=[]
+            elif mode=='failed-property': data['incidents'][0]['properties']['P1'][0]='fail'
+            elif mode=='missing-property': del data['incidents'][0]['properties']['P7']
+            elif mode=='denominator': data['campaign']['launched_runs']+=1
+            elif mode=='accepted-count': data['campaign']['accepted_final_repairs']+=1
+            elif mode=='duplicate-slot': data['attempts'][1]['slot']=data['attempts'][0]['slot']
+            else: data['cells'][0]['accepted']+=1
+            with self.subTest(mode=mode),tempfile.TemporaryDirectory() as tmp:
+                site=Path(tmp)/'site';shutil.copytree(root/'site',site)
+                raw=json.dumps(data).encode();(site/'evidence.json').write_bytes(raw)
+                (site/'evidence.sha256').write_text(hashlib.sha256(raw).hexdigest()+'  evidence.json\n')
+                with self.assertRaises(ValueError): module.check(site)
+
 if __name__=='__main__': unittest.main()
