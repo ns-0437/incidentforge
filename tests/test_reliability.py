@@ -18,6 +18,55 @@ def accepted_receipt():
                 'boundary':{'scripted-isolation-check':True},
                 'properties':{f'P{i}':{'status':'pass'} for i in range(1,8)}}]}
 
+class RemoteFailureArchiveTests(unittest.TestCase):
+    setUp=test_t4.T4Tests.setUp
+
+    def test_failed_runner_archive_is_retained_without_claiming_success(self):
+        import importlib.util,io,tarfile,hashlib,types,sys
+        from pathlib import Path
+        payload=b'diagnostic archive bytes';digest=hashlib.sha256(payload).hexdigest()
+        tar=io.BytesIO()
+        with tarfile.open(fileobj=tar,mode='w') as archive:
+            info=tarfile.TarInfo('evidence.zip');info.size=len(payload);archive.addfile(info,io.BytesIO(payload))
+        state={'status':'SUCCESS','result_image_uuid':'snapshot','metadata':{'result':{
+            'state':{'exit_code':1},'stdout':{'truncated':False,'value':json.dumps({'exit_code':1,'bytes':len(payload),'sha256':digest})}}}}
+        class Client:
+            def get_operation_status(self,*args,**kwargs): return types.SimpleNamespace(to_dict=lambda:state)
+            def inspect_image_archive(self,*args,**kwargs): return [tar.getvalue()]
+        modules={name:types.ModuleType(name) for name in ('contree_client','contree_client.sync','contree_client.runtime','contree_client.models')}
+        modules['contree_client.sync'].ContreeClient=types.SimpleNamespace(from_profile=lambda **kwargs:Client())
+        modules['contree_client.runtime'].RetryPolicy=lambda **kwargs:None
+        modules['contree_client.models'].FileSpec=object;modules['contree_client.models'].InstanceNetworking=object
+        script=Path(__file__).resolve().parents[1]/'scripts/contree-execute.py'
+        request=self.root/'request.json';guard=self.root/'guard.json'
+        request.write_text(json.dumps({'output':str(self.root),'guard':str(guard),'cancel':str(self.root/'CANCEL')}))
+        guard.write_text(json.dumps({'output':str(self.root)}));(self.root/'launch.json').write_text('{"uuid":"operation"}')
+        with patch.dict(sys.modules,modules),patch('sys.argv',[str(script),str(request),'--recover']):
+            spec=importlib.util.spec_from_file_location('failed_export',script)
+            runner=importlib.util.module_from_spec(spec);spec.loader.exec_module(runner)
+            self.assertEqual(1,runner.main())
+        self.assertEqual(payload,(self.root/'evidence.zip').read_bytes())
+        self.assertEqual(1,json.loads((self.root/'receipt.json').read_text())['runner_exit_code'])
+        self.assertTrue(json.loads((self.root/'error.json').read_text())['terminal_confirmed'])
+        self.assertFalse(guard.exists())
+
+class EditCompileTests(unittest.TestCase):
+    setUp=test_t4.T4Tests.setUp
+
+    def test_ast_parseable_but_uncompilable_edit_is_rejected_without_writing(self):
+        from incidentforge.workspace import EditSyntaxError
+        import ast
+        root=self.root/'candidate';folder=root/'fixture/app';folder.mkdir(parents=True)
+        source='def step():\n    raise RuntimeError("release")\n'
+        file=folder/'service.py';file.write_text(source)
+        proposed='def step():\n    break\n'
+        ast.parse(proposed)
+        with self.assertRaises(EditSyntaxError) as caught:
+            Workspace(root).replace('fixture/app/service.py','raise RuntimeError("release")','break')
+        self.assertIn('outside loop',str(caught.exception))
+        self.assertFalse(caught.exception.context['applied'])
+        self.assertEqual(source,file.read_text())
+
 class RegressionQualityTests(unittest.TestCase):
     def test_baseline_assessment_distinguishes_weak_and_discriminating_tests(self):
         from fixture.harness.developer_tests import assess

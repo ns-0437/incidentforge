@@ -1,0 +1,9 @@
+{
+  "revision": "91374c8",
+  "tests": 17,
+  "failures": 0,
+  "errors": 0,
+  "skips": 0,
+  "evidence": "runs/t6-linux-20261004-084137/report.json",
+  "scope": "Linux behavioral/isolation suite; not model efficacy."
+}

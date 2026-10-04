@@ -500,3 +500,31 @@ exception details. A separate payment-family rehearsal is declared as v21.
 The current controller requires authored, passing regression tests before freeze.
 The operator Patch view and review ZIP include saved specifications and execution
 receipts. Historical reports remain unchanged. 108 portable tests pass.
+
+## v21-v23: constrained actions and strict completion
+
+v21 stopped after three invalid test-authoring requests, with one source edit and
+no protected validation. v22 used provider-constrained actions and completed IF-001:
+nine calls ($0.008450), authored assertions executed on the final revision, and
+accepted independent protected validation. Its final retry-count assertion also
+passes on baseline observations, so it does not detect the original defect.
+New receipts disclose baseline assessment rather than implying all passing tests
+are effective regression detectors. See the individual v21/v22 records.
+
+v23 exercised IF-002 under the new action protocol. Five calls ($0.006815) produced
+an edit and a test, then execution failed: the model inserted break outside a loop.
+AST parsing accepted that construct; Python compilation rejects it. Edits now use
+compile-only validation before writing, without executing candidate code on host.
+No repaired result is claimed. The model's status-only compensation proposal remains
+unvalidated. See benchmarks/reliability/v23-pilot.json.
+
+Cumulative exposure is $0.316698 / $0.40, with no pending inference. Remaining
+allocation is $0.083302; unknown historical usage remains fully reserved.
+Immediate browser cancellation completed before execution with zero model calls.
+A browser review download passed CRC and manifest checks. Linux t6 passed all
+17 tests with zero failures, errors or skips after the assertion assessment change.
+
+Failed-run archives are now retained after hash and size verification while the
+helper still returns failure. Recovery of the existing v23 archive confirmed the
+compile error without rerunning its workload or making an inference call.
+The final portable suite passed 113 tests.

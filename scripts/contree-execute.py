@@ -46,9 +46,12 @@ def main():
                 raise TimeoutError('terminal state unconfirmed')
             time.sleep(1)
         execution=state.get('metadata',{}).get('result') or {}
-        if state['status']!='SUCCESS' or execution.get('state',{}).get('exit_code')!=0: raise RuntimeError('remote runner unsuccessful')
+        if state['status']!='SUCCESS': raise RuntimeError('remote operation unsuccessful')
+        exit_code=execution.get('state',{}).get('exit_code')
+        if type(exit_code) is not int: raise ValueError('missing runner exit status')
         if execution['stdout'].get('truncated'): raise ValueError('truncated completion receipt')
         metadata=json.loads(execution['stdout']['value'].strip())
+        if metadata.get('exit_code')!=exit_code: raise ValueError('runner exit status mismatch')
         if not 0<metadata['bytes']<=16_000_000: raise ValueError('archive size')
         data=bytearray()
         for block in client.inspect_image_archive(state['result_image_uuid'],'/tmp/evidence.zip',compressed=False):
@@ -60,9 +63,10 @@ def main():
             content=archive.extractfile(members[0]).read(16_000_001)
         if hashlib.sha256(content).hexdigest()!=metadata['sha256']: raise ValueError('archive hash')
         (out/'evidence.zip').write_bytes(content)
-        (out/'receipt.json').write_text(json.dumps({'operation':operation,'terminal':True,'sha256':metadata['sha256'],
+        (out/'receipt.json').write_text(json.dumps({'operation':operation,'terminal':True,'runner_exit_code':exit_code,'sha256':metadata['sha256'],
             'duration_seconds':state.get('duration'),'provider_resources':execution.get('resources'),
             'provider_cost_unit':'unspecified; not USD inference spend'}))
+        if exit_code!=0: raise RuntimeError('remote runner unsuccessful; diagnostic archive retained')
         return 0
     except Exception as exc:
         # An upload failure cannot have started execution. A spawn failure may have.

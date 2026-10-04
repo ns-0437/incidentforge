@@ -65,7 +65,7 @@ class Workspace:
         after=before.replace(old,new,1)
         if after==before: raise ValueError('replacement makes no source change')
         if len(after.encode())>64000: raise ValueError('source size bound')
-        try: ast.parse(after)
+        try: compile(after,name,'exec')
         except SyntaxError as exc: raise EditSyntaxError(name,before,after,exc) from exc
         path.write_text(after,encoding='utf-8')
         return ''.join(difflib.unified_diff(before.splitlines(True),after.splitlines(True),fromfile=name,tofile=name))

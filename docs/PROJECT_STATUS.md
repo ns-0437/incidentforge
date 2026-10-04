@@ -43,17 +43,22 @@ budget; repeatedly tuning against old schedules cannot support that claim.
 
 ## Budget and access
 
-Cumulative accounted exposure: **$0.275748 / $0.40**. Remaining allocation:
-**$0.124252**. No new inference was used for this status review or UI change.
+Cumulative accounted exposure: **$0.316698 / $0.40**. Remaining allocation:
+**$0.083302**. Includes retained development attempts through v23; no inference remains pending.
 The other trial credits are unallocated. The GitHub Pages site is a recorded replay,
 not a hosted inference service. The main source repository stays private until release.
 
-Validation for the backend selector: **99 portable tests passed** and JavaScript
+Validation for the backend selector: **113 portable tests passed** and JavaScript
 syntax validation passed. Tests verify HTTP allowlisting, recorded selection,
 child-process arguments and failure before launch when Docker is unavailable.
 October 4 browser review confirmed Sandbox selection, recorded patch and validation
 views, and review download. The archive CRC and manifest hashes passed. Live UI
-launch/cancellation and fresh-user judge access were not rehearsed in this check.
+launch and immediate cancellation were also rehearsed; fresh-user judge access remains pending.
 
 Owner clarification, October 4: confirmation covers continued access to the owner
 account only. Separate judge credentials/access have **not** been confirmed.
+
+Current detailed acceptance matrix: [COMPLETION_GATES.md](COMPLETION_GATES.md).
+IF-001 completed the required authored-test gate in v22, with weak test coverage
+explicitly disclosed. IF-002 remains inconsistent; v23 exposed an edit-compilation
+gap that is now fixed offline. No new reliability percentage is claimed.
