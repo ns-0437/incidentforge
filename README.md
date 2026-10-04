@@ -208,7 +208,7 @@ results are included, while raw runs stay local.
 <summary><b>Run checks without spending inference credits</b></summary>
 
 ```powershell
-python -m unittest tests.test_t4 tests.test_t5 tests.test_t6_controller tests.test_t7 tests.test_prefreeze tests.test_t8 tests.test_reliability
+python -m unittest discover -s tests -t .
 
 # Linux isolation and behavioral fixture checks
 .\scripts\run-t0-linux.ps1 -Stage t6

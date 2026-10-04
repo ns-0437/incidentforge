@@ -2,13 +2,13 @@
 import json
 import unittest
 from unittest.mock import patch
-from tests.test_t4 import T4Tests
+from tests import test_t4
 from incidentforge.controller import Controller
 from incidentforge.evidence import Evidence,verify
 from incidentforge.budget import Budget
 
 class VariantTests(unittest.TestCase):
-    setUp=T4Tests.setUp
+    setUp=test_t4.T4Tests.setUp
     def test_evidence_unicode_verification_uses_utf8(self):
         e=Evidence(self.root/'unicode','r');e.event('claim',{'text':'compensation → release; café'})
         self.assertEqual(1,verify(e.root))

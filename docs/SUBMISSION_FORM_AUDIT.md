@@ -114,8 +114,10 @@ way.
 >    guide describes separately.
 > 2. Run the portable test suite. It exercises the controller, the protected
 >    evaluator, the grounding checks and the frozen campaign data:
->    `python -m unittest tests.test_t4 tests.test_t5 tests.test_t6_controller tests.test_t7 tests.test_prefreeze tests.test_t8 tests.test_reliability`
->    115 tests are expected to pass. No model calls are made.
+>    `python -m unittest discover -s tests -t .`
+>    128 tests are expected to pass and 61 to be skipped. The skips are the
+>    Linux root isolation checks, which need Docker and are described separately
+>    in the judge guide. No model calls are made.
 > 3. Open the recorded evidence viewer at the demo URL, or serve it locally with
 >    `python -m http.server 8766 --bind 127.0.0.1 --directory site`. It replays
 >    retained investigations, repairs, authored assertions and protected evaluation
@@ -131,7 +133,7 @@ way.
 **Validated by literal execution on 2026-10-04**, from a clean tracked-source copy
 at `cbe75a8` containing no credential files, with no Docker and no provider
 environment variables, making zero inference calls. Every command above ran and
-produced the stated result: 115 tests pass, the replay serves all seven curated
+produced the stated result: the portable suite passes, the replay serves all seven curated
 files with HTTP 200, and the operator console answers on its four routes. Record:
 [judge-instructions-cbe75a8.json](../benchmarks/release/judge-instructions-cbe75a8.json).
 

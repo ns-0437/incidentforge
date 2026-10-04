@@ -50,9 +50,14 @@ must become public before submission. Do not claim this guide provides judge acc
 until that release step is complete.
 
 ```powershell
-python -m unittest tests.test_t4 tests.test_t5 tests.test_t6_controller tests.test_t7 tests.test_prefreeze tests.test_t8 tests.test_reliability
+python -m unittest discover -s tests -t .
 python scripts/serve-ui.py --port 8765
 ```
+
+The suite discovers every test module, so nothing can be silently omitted from a
+hand-maintained list. Expect 128 passed and 61 skipped on Windows or as a
+non-root user: the skips are the Linux root isolation checks described below,
+and they are reported as skips rather than silently dropped.
 
 Visit http://127.0.0.1:8765. A fresh checkout has empty run history; raw local runs
 are intentionally excluded from Git. The public replay supplies curated examples.
