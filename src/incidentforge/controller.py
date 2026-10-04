@@ -25,7 +25,7 @@ they do not guarantee absence of committed side effects. Preserve successful
 orders, crash recovery, declines, compensation and API idempotency. After editing,
 test, then finish. Hidden verification occurs once after your candidate is frozen.
 Do not claim hidden tests passed or invent observations.''' 
-SYSTEM+='''\nYou can author developer tests using developer_test. spec is a JSON-encoded object
+SYSTEM+='''\nYou MUST author developer regression tests using developer_test and run test after the final edit before finish. spec is a JSON-encoded object
 {"assertions":[{"name":"decline completes","condition":"no_restart","path":"order.status","equals":"CANCELLED_DECLINED"}]}.
 Up to 12 assertions, condition selects the public observation condition or fault label;
 path selects nested object fields, equals is a scalar. These are saved in developer-tests.json
@@ -91,7 +91,7 @@ class Controller:
         decision='unresolved';reason='not started';model_summary=None;messages=[];edits=0;tests=0;bad=0;frozen=None
         base=self.workspace.revision()
         interpreted=self.variant=='B0';validations=0;experiments=0;measured_facts={}
-        last_test_revision=None
+        last_test_revision=None;last_tests_passed=False
         protected_feedback=None;feedback_revision=None;developer_observations=[]
         initial_sources={name:self.workspace.read(name) for name in EDITABLE}
         try:
@@ -156,8 +156,12 @@ protected behavioral feedback during repair.'''
                 if self.variant=='B2' and not validations: blockers.append('B2 requires validate feedback before finish')
                 if all(self.workspace.read(name)==text for name,text in initial_sources.items()):
                     blockers.append('No net source change exists; cannot freeze a claimed repair. Apply an exact source edit first.')
-                if (self.workspace.root/'developer-tests.json').exists() and last_test_revision!=self.workspace.revision():
+                if not (self.workspace.root/'developer-tests.json').exists():
+                    blockers.append('Author developer regression tests with developer_test before finish.')
+                elif last_test_revision!=self.workspace.revision():
                     blockers.append('Authored developer tests have not run on the current revision; request test before finish.')
+                elif not last_tests_passed:
+                    blockers.append('Authored developer tests did not pass; repair the source or correct the assertions before finish.')
                 return blockers
             def guidance():
                 from .grounding import factual_conclusion
@@ -175,7 +179,7 @@ protected behavioral feedback during repair.'''
                        'finish_ready':not finish_blockers(),'finish_blockers':finish_blockers(),
                        'authored_tests_present':(self.workspace.root/'developer-tests.json').exists(),
                        'tests_executed_on_current_revision':last_test_revision==self.workspace.revision(),
-                       'finish_requires':'A net source change; authored tests must run on the current revision; B2 also requires validate. State only observed edits/tests in summary.'}
+                       'finish_requires':'A net source change; author regression tests and run them successfully on the current revision; B2 also requires validate. State only observed edits/tests in summary.'}
                 if not finish_blockers():
                     value['completion_instruction']='Finish now to freeze the candidate for independent verification. Do not rewrite tests or request another validate. Passing feedback alone is not final acceptance.'
                     if protected_feedback and protected_feedback['decision']!='accept_for_review':
@@ -267,8 +271,13 @@ protected behavioral feedback during repair.'''
                     elif kind=='test':
                         if tests>=2: raise ValueError('developer test limit')
                         tests+=1;result=self.backend.run(self.workspace.root,'developer')
-                        if result.get('complete'):
+                        last_test_revision=None;last_tests_passed=False
+                        if result.get('complete') is True:
                             last_test_revision=self.workspace.revision()
+                            receipt=result.get('developer_tests',{})
+                            assertions=receipt.get('assertions',[])
+                            last_tests_passed=(receipt.get('authored') is True and receipt.get('passed') is True
+                                and bool(assertions) and all(a.get('passed') is True for a in assertions))
                             developer_observations=result.get('observations',[])
                     else:
                         blockers=finish_blockers()
@@ -317,6 +326,7 @@ protected behavioral feedback during repair.'''
             'verified_work':{'changed_source_paths':sorted(name for name,text in initial_sources.items() if self.workspace.read(name)!=text),
                              'developer_test_file_present':(self.workspace.root/'developer-tests.json').is_file(),
                              'developer_tests_executed_on_current_revision':last_test_revision==self.workspace.revision(),
+                             'developer_tests_passed_on_current_revision':last_test_revision==self.workspace.revision() and last_tests_passed,
                              'requested_test_runs':tests},
             'accounting':self.budget.totals(self.run_id),
             'next_step':'Review protected report and patch.' if decision=='accept_for_review' else 'Inspect the retained failure evidence before another bounded attempt.',

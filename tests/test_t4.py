@@ -100,13 +100,19 @@ class T4Tests(unittest.TestCase):
             name='test-double';image='test';count=0
             def run(self,path,mode):
                 self.count+=1
-                if mode=='developer': return {'complete':True}
+                if mode=='developer':
+                    from fixture.harness.developer_tests import execute
+                    result={'complete':True,'observations':[{'condition':'clean','order':{'status':'CONFIRMED'}}]}
+                    result['developer_tests']=execute(path/'developer-tests.json',result)
+                    return result
                 return {'decision':'accept_for_review','complete':False,'cases':[]}
         class Model:
             calls=0
             def call(self,messages):
                 self.calls+=1
                 if self.calls==1: return json.dumps({'action':'replace','path':'fixture/app/service.py','old':'x=1','new':'x=2','reason':'test change'})
+                if self.calls==2: return json.dumps({'action':'developer_test','spec':{'assertions':[{'name':'r','condition':'clean','path':'order.status','equals':'CONFIRMED'}]},'reason':'regression'})
+                if self.calls==3: return '{"action":"test"}'
                 return '{"action":"finish","summary":"claimed fixed"}'
         b=Budget(self.root/'b.db',200000);e=Evidence(self.root/'e','r')
         report=Controller('r',self.root/'candidate',e,Backend(),Model(),b).run()

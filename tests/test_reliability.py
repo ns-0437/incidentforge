@@ -135,8 +135,12 @@ class ReliabilityTests(unittest.TestCase):
             def run(self,path,mode):
                 self.count+=1
                 if mode=='protected' and protected is not None: return protected
-                return {**accepted_receipt(),
+                result={**accepted_receipt(),
                         'observations':[{'condition':'clean','order':{'status':'CONFIRMED'}}]}
+                if mode=='developer':
+                    from fixture.harness.developer_tests import execute
+                    result['developer_tests']=execute(path/'developer-tests.json',result)
+                return result
         class Model:
             history=[]
             def call(self,messages):
@@ -152,6 +156,7 @@ class ReliabilityTests(unittest.TestCase):
     def test_contradictory_final_acceptance_remains_invalid(self):
         report,_,_=self.run_actions(iter([
             {'action':'replace','path':'fixture/app/service.py','old':'x=1','new':'x=2','reason':'repair'},
+            {'action':'developer_test','spec':{'assertions':[{'name':'regression','condition':'clean','path':'order.status','equals':'CONFIRMED'}]},'reason':'cover outcome'},{'action':'test'},
             {'action':'finish','summary':'candidate for review'}]),protected={
                 'complete':True,'decision':'accept_for_review','cases':[]})
         self.assertEqual('invalid_evaluation',report['decision'])
@@ -169,8 +174,8 @@ class ReliabilityTests(unittest.TestCase):
             return json.dumps({'action':'replace','path':'fixture/app/service.py','old':'x=1','new':'x=2','reason':'valid correction'})
         report,_,_=self.run_actions(iter([
             {'action':'replace','path':'fixture/app/service.py','old':'x=1','new':'# removed block\n    pass','reason':'invalid indentation'},
-            check,{'action':'finish','summary':'corrected syntax'}]))
-        self.assertEqual(1,report['edits'])
+            check,{'action':'developer_test','spec':{'assertions':[{'name':'regression','condition':'clean','path':'order.status','equals':'CONFIRMED'}]},'reason':'cover outcome'},{'action':'test'},{'action':'finish','summary':'corrected syntax'}]))
+        self.assertEqual(2,report['edits'])
         self.assertEqual('accept_for_review',report['decision'])
 
     def test_native_objects_keep_exact_factual_gate(self):
@@ -192,6 +197,23 @@ class ReliabilityTests(unittest.TestCase):
         with self.assertRaises(ValueError):action('{"action":[]}')
         with self.assertRaises(ValueError):action('{"action":"test","extra":true}')
 
+    def test_source_edit_without_authored_regression_cannot_freeze(self):
+        report,model,_=self.run_actions(iter([
+            {'action':'replace','path':'fixture/app/service.py','old':'x=1','new':'x=2','reason':'repair'},
+            *[{'action':'finish','summary':'skip tests'}]*3]))
+        self.assertIsNone(report['candidate_revision'])
+        self.assertEqual('unresolved',report['decision'])
+        self.assertIn('Author developer regression tests',json.dumps(model.history))
+
+    def test_failing_authored_assertions_cannot_freeze(self):
+        report,_,_=self.run_actions(iter([
+            {'action':'replace','path':'fixture/app/service.py','old':'x=1','new':'x=2','reason':'repair'},
+            {'action':'developer_test','spec':{'assertions':[{'name':'wrong','condition':'clean','path':'order.status','equals':'PENDING'}]},'reason':'test'},
+            {'action':'test'},*[{'action':'finish','summary':'ignore failed assertion'}]*3]))
+        self.assertIsNone(report['candidate_revision'])
+        self.assertTrue(report['verified_work']['developer_tests_executed_on_current_revision'])
+        self.assertFalse(report['verified_work']['developer_tests_passed_on_current_revision'])
+
     def test_no_change_finish_cannot_claim_repair(self):
         report,model,backend=self.run_actions(iter([{'action':'finish','summary':'fixed'}]*3))
         self.assertIsNone(report['candidate_revision']);self.assertEqual('unresolved',report['decision'])
@@ -212,7 +234,7 @@ class ReliabilityTests(unittest.TestCase):
         report,_,_=self.run_actions(iter([
             {'action':'test'},correct,
             {'action':'replace','path':'fixture/app/service.py','old':'x=1','new':'x=2','reason':'repair'},
-            {'action':'finish','summary':'one edit; no tests requested'}]),'B1',expected)
+            {'action':'developer_test','spec':{'assertions':[{'name':'regression','condition':'clean','path':'order.status','equals':'CONFIRMED'}]},'reason':'cover outcome'},{'action':'test'},{'action':'finish','summary':'edited and tested'}]),'B1',expected)
         self.assertEqual('accept_for_review',report['decision'])
         self.assertEqual(['fixture/app/service.py'],report['verified_work']['changed_source_paths'])
 
@@ -293,7 +315,9 @@ class ReliabilityTests(unittest.TestCase):
             return '{"action":"finish","summary":"revision still needs verification"}'
         rejected={'complete':True,'decision':'reject_behavior','cases':[{'case':'secret-case','properties':{'P1':{'status':'fail','reason':'secret'}}}]}
         report,_,_=self.run_actions(iter([interpret,{'action':'replace','path':'fixture/app/service.py','old':'x=1','new':'x=2','reason':'initial'},
-            {'action':'validate'},review,finish]),'B2',measured,rejected)
+            {'action':'validate'},review,
+            {'action':'developer_test','spec':{'assertions':[{'name':'regression','condition':'clean','path':'order.status','equals':'CONFIRMED'}]},'reason':'test'},
+            {'action':'test'},finish]),'B2',measured,rejected)
         self.assertEqual('reject_behavior',report['decision'])
         self.assertFalse(report['protected_feedback']['candidate_unchanged_since_feedback'])
 
