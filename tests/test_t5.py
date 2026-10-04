@@ -17,6 +17,12 @@ class T5Tests(unittest.TestCase):
         self.assertNotIn('secret',json.dumps(result))
         self.assertNotIn('private',json.dumps(result))
 
+    def test_feedback_requires_literal_completion(self):
+        for value in (False, None, 0, 1, 'true', 'false', {}, []):
+            with self.subTest(value=value):
+                self.assertFalse(feedback({'complete':value,'cases':[]})['complete'])
+        self.assertTrue(feedback({'complete':True,'cases':[]})['complete'])
+
     def test_interpretation_requires_nonempty_fields(self):
         with self.assertRaises(ValueError): action(json.dumps({'action':'interpret','conclusion':'',
             'supported':'a','weakened':'b','uncertainty':'c'}))

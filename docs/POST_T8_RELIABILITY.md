@@ -375,3 +375,16 @@ all 23 retained results explicitly labeled declared four-condition experiments;
 36 other experiment records, including reproduction, were outside this check.
 Historical evidence and frozen benchmark outcomes were not modified. No live
 inference was used; cumulative exposure remains $0.254663 of the $0.40 cap.
+
+## Incomplete protected feedback stops B2 — October 4
+
+B2 now stops unresolved when its protected-feedback execution is incomplete.
+The request remains counted and its sanitized feedback retained, but no further
+model action is requested and no candidate is frozen. Previously the request
+count alone satisfied the feedback gate even without completed feedback.
+Only literal boolean true counts as completion; truthy strings or numbers do
+not. A completed behavioral rejection still permits revision under the existing
+limits. Two regression tests verify completion typing and the controller stop,
+including no extra model calls, no final execution, and no private-data leakage.
+All 90 portable tests pass. No live inference was used and no historical result
+was changed. Exposure remains $0.254663 of the $0.40 allocation.

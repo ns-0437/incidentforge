@@ -122,6 +122,25 @@ class ReliabilityTests(unittest.TestCase):
         self.assertFalse(report['verified_work']['developer_test_file_present'])
         self.assertEqual(0,report['edits'])
 
+    def test_incomplete_protected_feedback_stops_without_more_calls_or_freeze(self):
+        measured={'condition':{'committed_charge_count':1}}
+        def interpret(messages):
+            return json.dumps(json.loads(messages[-1]['content'])['action_contract']['interpret_fields'])
+        commands=iter([interpret,
+            {'action':'replace','path':'fixture/app/service.py','old':'x=1','new':'x=2','reason':'repair'},
+            {'action':'validate'}, {'action':'finish','summary':'must not be requested'}])
+        report,model,backend=self.run_actions(commands,'B2',measured,
+            {'complete':False,'decision':'invalid_evaluation','cases':[], 'secret':'private schedule'})
+        self.assertEqual('unresolved',report['decision'])
+        self.assertIn('Protected feedback incomplete',report['reason'])
+        self.assertEqual(1,report['protected_feedback_requests'])
+        self.assertFalse(report['protected_feedback']['complete'])
+        self.assertNotIn('private schedule',json.dumps(report))
+        self.assertIsNone(report['candidate_revision'])
+        self.assertEqual(3,len(model.history))
+        self.assertEqual(2,backend.count)
+        self.assertEqual('finish',next(commands)['action'])
+
     def test_failed_feedback_persists_without_private_case_details(self):
         measured={'condition':{'committed_charge_count':1}}
         def interpret(messages):return json.dumps(json.loads(messages[-1]['content'])['action_contract']['interpret_fields'])

@@ -221,6 +221,8 @@ protected behavioral feedback during repair.'''
                         from .investigation import feedback
                         validations+=1;result=feedback(self.backend.run(self.workspace.root,'protected'))
                         protected_feedback=result;feedback_revision=self.workspace.revision()
+                        if result['complete'] is not True:
+                            raise RuntimeError('Protected feedback incomplete; stopping before further model calls or candidate freeze')
                     elif kind=='developer_test':
                         from fixture.harness.developer_tests import validate
                         spec=validate(command['spec'] if isinstance(command['spec'],dict) else json.loads(command['spec']))

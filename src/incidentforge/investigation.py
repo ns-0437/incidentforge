@@ -184,5 +184,5 @@ def feedback(result):
         for prop,value in case.get('properties',{}).items():
             if value.get('status')=='fail': failures.add(prop)
     return {'decision':result.get('decision','invalid_evaluation'),
-            'complete':bool(result.get('complete')),'failed_properties':sorted(failures),
+            'complete':result.get('complete') is True,'failed_properties':sorted(failures),
             'scope':'Protected development feedback only; not final holdout.'}
