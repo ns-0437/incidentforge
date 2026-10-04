@@ -256,6 +256,34 @@ class TraceTests(unittest.TestCase):
             self.assertIn('spoofed',result['trust'])
 
 class SymbolFeedbackTests(unittest.TestCase):
+    def test_symbol_catalog_excludes_data_keys_and_operation_strings(self):
+        from incidentforge.investigation import source_symbols
+        source="class App:\n    def step(self, order):\n        self.pending.add(order['reservation_id'])\n        return 'release'\n"
+        symbols=source_symbols(source)
+        self.assertEqual(['App','add','order','pending','self','step'],symbols)
+        self.assertNotIn('reservation_id',symbols)
+        self.assertNotIn('release',symbols)
+
+    def test_first_investigation_prompt_supplies_exact_validator_vocabulary(self):
+        import tempfile,json
+        from pathlib import Path
+        from types import SimpleNamespace
+        from incidentforge.investigation import investigate,source_symbols
+        source="def step(order):\n    return order['reservation_id']\n"
+        class Captured(Exception): pass
+        class Model:
+            def call(inner,messages):
+                payload=json.loads(messages[-1]['content'])
+                self.assertEqual(source_symbols(source),payload['allowed_source_symbols'])
+                self.assertIn('selected verbatim from allowed_source_symbols',messages[0]['content'])
+                raise Captured()
+        with tempfile.TemporaryDirectory() as tmp:
+            file=Path(tmp)/'service.py';file.write_text(source)
+            workspace=SimpleNamespace(read=lambda name: source if name=='fixture/app/service.py' else '{}',
+                                      revision=lambda:'baseline',path=lambda name:file)
+            controller=SimpleNamespace(workspace=workspace,backend=SimpleNamespace(incident='IF-002'),model=Model())
+            with self.assertRaises(Captured): investigate(controller,{'observations':[]})
+
     def test_invalid_identifiers_report_exact_choices_without_accepting_them(self):
         from incidentforge.investigation import validate_plan
         h={'mechanism':'cause','symbols':['invented'],'supporting_refs':['L1'],

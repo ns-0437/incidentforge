@@ -341,3 +341,12 @@ Cost estimate **$0.003487**; cumulative exposure **$0.254663 / $0.40**, remainin
 in conservative reservations. No reliability improvement claimed.
 See [v13 record](../benchmarks/reliability/v13-pilot.json). Further inference is
 paused while release work and the source-grounding failure are reviewed.
+
+## Upfront source vocabulary — October 4
+
+The investigator now receives `allowed_source_symbols` before its first call.
+The list and validator share the same AST extractor. String keys and operation
+labels remain invalid in `symbols`; their exact source lines can be cited in
+`supporting_refs`. Regression tests check the initial prompt and exclusion of
+data-only strings. All 81 portable tests pass. No additional live pilot was run,
+so this change establishes prompt/validator consistency, not improved repair rate.

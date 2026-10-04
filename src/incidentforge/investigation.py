@@ -34,6 +34,15 @@ Use this shape (replace placeholders with your own analysis):
 "same_key_concurrent":{"H1":"...","H2":"..."},"different_keys":{"H1":"...","H2":"..."}},"repetitions":1,
 "reason":"...","limits":{"seconds":100}}}'''
 
+def source_symbols(source):
+    """The exact identifier vocabulary accepted by the investigation validator."""
+    import ast
+    tree=ast.parse(source)
+    symbols={n.name for n in ast.walk(tree) if isinstance(n,(ast.FunctionDef,ast.ClassDef))}
+    symbols|={n.id for n in ast.walk(tree) if isinstance(n,ast.Name)}
+    symbols|={n.attr for n in ast.walk(tree) if isinstance(n,ast.Attribute)}
+    return sorted(symbols)
+
 def validate_plan(obj,intervention='identity_probe',conditions=None,source=None):
     if not isinstance(obj,dict) or set(obj)!={'hypotheses','experiment'}: raise ValueError('investigation fields')
     hs=obj['hypotheses']
@@ -54,11 +63,7 @@ def validate_plan(obj,intervention='identity_probe',conditions=None,source=None)
             raise ValueError('Each prediction must be an object with H1 and H2 nonempty strings')
     if not any(v['H1']!=v['H2'] for v in spec['predictions'].values()): raise ValueError('At least one condition must distinguish hypotheses')
     if source is not None:
-        import ast
-        tree=ast.parse(source)
-        symbols={n.name for n in ast.walk(tree) if isinstance(n,(ast.FunctionDef,ast.ClassDef))}
-        symbols|={n.id for n in ast.walk(tree) if isinstance(n,ast.Name)}
-        symbols|={n.attr for n in ast.walk(tree) if isinstance(n,ast.Attribute)}
+        symbols=set(source_symbols(source))
         for h in hs:
             invalid=[s for s in h['symbols'] if s not in symbols]
             if not h['symbols'] or invalid:
@@ -103,11 +108,16 @@ Name hypotheses H1 and H2 in prediction objects, and state a distinct falsifying
     from .trace_focus import focus
     prompt['execution_path_focus']=focus(reproduction.get('observations',[]),
         workspace.path('fixture/app/service.py').read_bytes())
+    prompt['allowed_source_symbols']=source_symbols(prompt['source'])
     prompt['source_line_index']='\n'.join('L'+str(n)+': '+line for n,line in enumerate(prompt['source'].splitlines(),1))
     system+='''\nExactly TWO hypotheses, H1 then H2.
 Every condition prediction must be {"H1":"expected measured outcome","H2":"different expected outcome"}.
 At least one condition must distinguish the hypotheses. symbols must be actual simple
-AST names in the supplied source (e.g. step, worker), not invented dotted paths.
+AST names selected verbatim from allowed_source_symbols, not invented dotted paths.
+Dictionary keys, string literals and operation labels are not identifiers unless
+they also appear in that list. Discuss them in mechanism and cite their source
+line in supporting_refs; do not put them in symbols. The list is a vocabulary,
+not evidence that a symbol causes this incident.
 supporting_refs should use line IDs from source_line_index, e.g. ["L163","L165"].
 The controller resolves IDs to exact source text; never invent IDs or quote paraphrased code.
 Keep both hypotheses tied to the supplied incident symptom. Probe names label test
