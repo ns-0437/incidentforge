@@ -580,3 +580,14 @@ The change is tested offline, not yet evaluated in a new live pilot.
 Final verification for the correction guard: 114 portable tests passed; Python
 compilation, JavaScript syntax and Git whitespace checks passed. Original brief
 SHA256 remains unchanged. The separate 19-check Linux suite remains green.
+
+## v25 declaration
+
+One IF-002/B2 Sandbox development rehearsal tests the mandatory affected-file
+read after an edit rejection. Offline replay of all three v24 proposals confirmed
+no source mutation; the recovery schema permits only the affected source read.
+Acceptance remains an authored assertion failing on baseline and passing after
+repair, plus accepted independent protected validation. Recovery success is a
+separate observation, not equivalent to repair success. Keep every outcome.
+Starting exposure $0.325425, remaining $0.074575; retain the cumulative $0.40 cap,
+ten-call bound and unknown-operation guards. No automatic retry or new benchmark.
