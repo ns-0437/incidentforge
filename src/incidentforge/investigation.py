@@ -123,6 +123,10 @@ For each source-based mechanism, explain why that path is reachable under the
 failing condition and what state is reconstructed after restart. If not known,
 state the missing evidence rather than inferring it from a final status alone.
 Use execution_path_focus first to compare observed return sites and surrounding guards.
+For each relevant guard, inspect attribute_references to find initialization and
+updates. Explain whether the state needed to pass the guard is reconstructed on
+restart. These are syntax references, not proof of persistence. Test your explanation
+against both no-restart and restart observations before choosing an edit.
 Cite source identifiers from those contexts when relevant; do not assume every
 return is a defect. Then compare the hypotheses with the full observations.
 When execution_trace is available, compare process generations and inspect the

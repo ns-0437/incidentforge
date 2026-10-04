@@ -382,3 +382,24 @@ class VerifierPreflightTests(unittest.TestCase):
         for outputs in ([Mock(stdout='windows')],[Mock(stdout='linux'),Mock(stdout='sha256:bad')]):
             with patch('incidentforge.remote_backend.subprocess.run',side_effect=outputs):
                 with self.assertRaises(RuntimeError): reader_preflight()
+
+class GuardReferenceTests(unittest.TestCase):
+    def test_return_guard_links_initialization_and_updates_without_known_bug_names(self):
+        import hashlib
+        from incidentforge.trace_focus import focus
+        source=b"class Worker:\n    def __init__(self):\n        self.queue=set()\n    def enqueue(self,key):\n        self.queue.add(key)\n    def step(self,key):\n        if key not in self.queue:\n            return\n        send(key)\n"
+        obs=[{'condition':'restart','execution_trace':{'source_sha256':hashlib.sha256(source).hexdigest(),
+             'processes':[{'generation':1,'events':[{'event':'return','line':8}]}]}}]
+        value=focus(obs,source);guard=value['conditions'][0]['processes'][0]['observed_returns'][0]['enclosing_guards'][0]
+        self.assertEqual(7,guard['guard_line'])
+        refs=guard['attribute_references'][0]
+        self.assertEqual('self.queue',refs['attribute'])
+        self.assertEqual([3,5,7],[r['line'] for r in refs['source_references']])
+        self.assertIn('not proof',value['static_scope'])
+    def test_ordinary_function_return_does_not_invent_guard(self):
+        import hashlib
+        from incidentforge.trace_focus import focus
+        source=b'def step():\n    return 7\n'
+        obs=[{'execution_trace':{'source_sha256':hashlib.sha256(source).hexdigest(),
+             'processes':[{'events':[{'event':'return','line':2}]}]}}]
+        self.assertEqual([],focus(obs,source)['conditions'][0]['processes'][0]['observed_returns'][0]['enclosing_guards'])
