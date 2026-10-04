@@ -420,3 +420,18 @@ artifacts are unchanged. The last dispatched prompt shrinks from 95,659 to 73283
 bytes under this transform. The 100 KB cap is unchanged. Two regressions verify
 no evidence loss and bounded repeated guidance; all 96 portable tests pass.
 No automatic live retry was made and no improved repair rate is claimed.
+
+## v15: edit syntax failure — October 4
+
+Run b2-if-002-20261004T054703Z-7c5bea remained unresolved after six calls
+($0.008474). Three rejected edits exhausted corrections: an indented pass after
+a removed guard, a non-unique return replacement, then the repeated syntax error.
+Zero edits applied; no protected feedback or freeze. All 44 evidence events and
+artifact hashes verified. No prompt-byte-bound failure occurred. Exposure is
+$0.273633 / $0.40; $0.126367 remains, no pending calls.
+
+Offline follow-up supplies bounded proposed-source context on syntax errors,
+marks it unapplied, and retains the actual source. It does not auto-repair model
+code. A scripted regression verifies rejection, unchanged source, correction
+feedback and a later valid edit. All 97 portable tests pass; no additional live
+run was made. See [v15 record](../benchmarks/reliability/v15-pilot.json).

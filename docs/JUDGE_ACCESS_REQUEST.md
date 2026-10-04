@@ -1,29 +1,47 @@
-# Draft request for judge access and free credits
+# Draft follow-up: judge access and credits
 
-Owner action: send through the existing Nebius support conversation or hackathon
-credit request channel. This draft has not been sent.
+Not sent. Reply in the existing Nebius support conversation.
 
-Subject: IncidentForge hackathon — free inference access through December judging
+Subject: IncidentForge hackathon — pending credits and judge-access setup
 
 Hello Nebius team,
 
-I am building IncidentForge for the Coding and Agentic Engineering Track of the
-Nebius Global AI Hackathon. It uses NVIDIA Nemotron through Token Factory at
-runtime and ConTree Sandboxes for isolated incident investigation and repair
-validation. Thank you for enabling Sandbox beta access and confirming it is free.
+Thank you for enabling Sandbox beta access. I am building IncidentForge for the
+Coding and Agentic Engineering Track, using NVIDIA Nemotron through Token Factory
+and Nebius Sandboxes for incident investigation and repair validation.
 
-My account currently has the $1 trial credit, with expiry before the December
-judging period. Could you confirm whether hackathon inference credits or an
-extension can support a bounded working judge demonstration through December 15,
-2026? Please also confirm whether my Sandbox beta access will remain available
-through that date and whether there are additional usage restrictions.
+I checked the official rules: a working demo or test build must remain accessible
+free of charge through the end of judging on December 15. Could you clarify:
 
-I can supply judges a controlled test build with server-side credentials, strict
-per-run limits and no requirement for judges to buy credits. Please advise the
-supported way to provide that access without distributing my personal API key.
+1. The Resources page lists $25 Token Factory credits using activation code
+   NEBIUS-DEVPOST-GLOBAL26 and another $25 through the Builders Program. My account
+   has only shown the $1 trial allocation. Could you check my pending hackathon
+   credit request and explain any additional steps for the Builder credits?
+2. Will the inference credits and Sandbox access remain usable through December
+   15, 2026? Does continued account access include extended credit validity?
+3. What judge-access setup do you recommend for a test build requiring both
+   inference and Sandbox APIs, without distributing my personal API key? Are
+   dedicated evaluation credentials available, or should I provide app-level
+   access backed by server-side credentials?
+4. Our agent uses per-run execution/time/token limits and a cumulative spending
+   cap. Are these safety limits compatible with the rules' unrestricted testing
+   requirement, and what capacity should we reserve for judges?
+5. Where should private testing instructions and application login credentials
+   be included in the submission?
 
-Recorded project demonstration: https://ns-0437.github.io/incidentforge-demo/
-Source is private during development and will be public at submission.
+The code repository will be public for submission. I want judges to be able to
+run the working project without purchasing credits or accessing my personal account.
 
 Thank you,
 Navin Kumar
+GitHub: https://github.com/ns-0437
+
+## Research checked October 4
+
+- Rules: https://nebiusglobalaihackathon.devpost.com/rules
+  Section 4 Testing requires free working access through judging, with login
+  credentials in testing instructions for private websites. Judges may elect
+  not to test. Separate Nebius judge accounts are not expressly required.
+- Resources: https://nebiusglobalaihackathon.devpost.com/resources
+  Advertises the two $25 credit routes above. This does not confirm this account
+  received them or establish their expiry. Ask support about those specifics.

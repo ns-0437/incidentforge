@@ -3,7 +3,7 @@ import hashlib
 import json
 import time
 from .records import action,record,digest,encoded
-from .workspace import Workspace,EDITABLE,EditMismatch
+from .workspace import Workspace,EDITABLE,EditMismatch,EditSyntaxError
 from .backend import Cancelled,BackendUnknown
 
 SYSTEM='''You are IncidentForge's B0 coding worker. Diagnose and repair the supplied
@@ -283,6 +283,7 @@ protected behavioral feedback during repair.'''
                     if bad>2: raise RuntimeError('format/action correction limit')
                     correction={'error':str(exc)[:300],'remaining_corrections':2-bad,'action_contract':guidance()}
                     if isinstance(exc,EditMismatch): correction['current_source']=exc.context
+                    if isinstance(exc,EditSyntaxError): correction['rejected_proposal']=exc.context
                     self.evidence.event('correction_feedback',{'artifact':self.evidence.artifact(correction)})
                     messages.append({'role':'user','content':json.dumps(correction)})
             if frozen is None:

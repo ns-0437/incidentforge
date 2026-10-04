@@ -20,6 +20,15 @@ class EditMismatch(ValueError):
                       'source_excerpt':''.join(lines[start:end]),
                       'instruction':'Use a short unique verbatim old string from current source. Read the file if more context is needed. No fuzzy edit was applied.'}
 
+class EditSyntaxError(SyntaxError):
+    def __init__(self,name,before,after,error):
+        super().__init__(error.msg)
+        lines=after.splitlines(True);number=error.lineno or 1
+        start=max(0,number-4);end=min(len(lines),number+3)
+        self.context={'path':name,'line':number,'offset':error.offset,
+            'proposed_first_line':start+1,'proposed_source_excerpt':''.join(lines[start:end]),
+            'applied':False,'instruction':'Proposed source failed Python parsing; current file is unchanged. Preserve indentation of the enclosing block. Read current source before retrying; a comment alone is not a statement.'}
+
 class Workspace:
     def __init__(self,root): self.root=root
     def path(self,name,edit=False):
@@ -56,6 +65,7 @@ class Workspace:
         after=before.replace(old,new,1)
         if after==before: raise ValueError('replacement makes no source change')
         if len(after.encode())>64000: raise ValueError('source size bound')
-        ast.parse(after)
+        try: ast.parse(after)
+        except SyntaxError as exc: raise EditSyntaxError(name,before,after,exc) from exc
         path.write_text(after,encoding='utf-8')
         return ''.join(difflib.unified_diff(before.splitlines(True),after.splitlines(True),fromfile=name,tofile=name))
