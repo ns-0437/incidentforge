@@ -70,6 +70,52 @@ class T4Tests(unittest.TestCase):
         e.event('tool_result',{'artifact':{'sha256':ref['sha256'],'bytes':ref['bytes']+1}})
         with self.assertRaises(ValueError): verify(e.root)
 
+    def test_same_artifact_referenced_twice_with_the_correct_size_passes(self):
+        e=Evidence(self.root/'events','r');ref=e.artifact(b'abcdef')
+        e.event('a',{'artifact':ref});e.event('b',{'artifact':dict(ref)})
+        self.assertEqual(2,verify(e.root))
+
+    def test_conflicting_sizes_for_one_digest_always_fail(self):
+        # Swept rather than single-valued: the previous implementation keyed its
+        # visited set on the digest alone, so whether the false reference was
+        # validated depended on set iteration order. 4, 5, 10, 11, 12 and 16 all
+        # escaped it for a six-byte artifact.
+        for fake in (1,4,5,7,10,11,12,16,99,2_000_000):
+            with self.subTest(claimed=fake):
+                root=self.root/('conflict%d'%fake)
+                e=Evidence(root,'r');ref=e.artifact(b'abcdef')
+                e.event('a',{'artifact':ref})
+                e.event('b',{'artifact':{'sha256':ref['sha256'],'bytes':fake}})
+                with self.assertRaises(ValueError): verify(e.root)
+
+    def test_conflict_between_event_payload_and_nested_artifact_fails(self):
+        e=Evidence(self.root/'events','r');inner=e.artifact(b'abcdef')
+        outer=e.artifact({'specification':{'sha256':inner['sha256'],'bytes':4}})
+        e.event('a',{'artifact':inner});e.event('b',{'artifact':outer})
+        with self.assertRaisesRegex(ValueError,'conflicting artifact reference sizes'): verify(e.root)
+
+    def test_malformed_digest_is_rejected_before_any_path_is_touched(self):
+        for bad in ('../../../../../../etc/passwd','ABCDEF'+'a'*58,'abc','a'*63,'g'*64,None,5):
+            with self.subTest(digest=bad):
+                root=self.root/('bad%s'%abs(hash(str(bad))))
+                e=Evidence(root,'r');e.event('a',{'artifact':{'sha256':bad,'bytes':5}})
+                touched=[]
+                real=Path.exists
+                def spy(self,*a,**k): touched.append(Path(self).as_posix());return real(self,*a,**k)
+                with patch.object(Path,'exists',spy):
+                    with self.assertRaisesRegex(ValueError,'malformed artifact reference digest'): verify(e.root)
+                inside=(e.root/'artifacts').as_posix()
+                self.assertFalse([p for p in touched if not p.startswith(inside)],
+                                 'verification touched a path outside the artifact directory')
+
+    def test_malformed_sizes_are_rejected(self):
+        for bad in (True,-1,2_000_001,'6',6.0,None):
+            with self.subTest(size=bad):
+                root=self.root/('size%s'%abs(hash(str(bad))))
+                e=Evidence(root,'r');ref=e.artifact(b'abcdef')
+                e.event('a',{'artifact':{'sha256':ref['sha256'],'bytes':bad}})
+                with self.assertRaisesRegex(ValueError,'malformed artifact reference size'): verify(e.root)
+
     def test_unreferenced_artifact_does_not_fail_verification(self):
         e=Evidence(self.root/'events','r');e.artifact(b'orphan');e.event('note',{})
         self.assertEqual(1,verify(e.root))
