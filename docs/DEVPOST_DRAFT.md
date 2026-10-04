@@ -66,11 +66,36 @@ NVIDIA Nemotron, HTML/CSS/JavaScript. GitHub Pages deployment is prepared for re
 Track: Coding and Agentic Engineering.
 
 ## Platform feedback
-Sandbox image snapshots and evidence export enabled repeatable isolated workloads.
-Runtime uncertainty required durable operation guards and bounded polling. Inference
-timeouts left usage unknown; per-request reconciliation would simplify budget-safe
-recovery. Strict structured-output contracts needed explicit field examples and
-clear separation between developer and experiment observations.
+Nebius Sandboxes let us run isolated repairs and export artifacts for independent
+checks. Token Factory served the NVIDIA Nemotron Nano agent at runtime. The
+IF-002 development example completed eight model calls and produced a patch whose
+restart assertion failed before the repair and passed afterward.
+
+Our frozen comparison also exposed three inference timeouts with unknown usage.
+We retained the full reservations instead of assuming those requests were free.
+A request-status and usage-reconciliation API would let budget-limited agents
+recover safely after a client timeout. A useful response would distinguish a
+request still running, a terminal request with usage, and a request that was
+never accepted. This is a product suggestion based on our client observations,
+not a claim that the provider lost usage records.
+
+For Sandboxes, a documented recovery example linking an operation ID, terminal
+status and downloadable output would reduce the work needed to recover failed
+runs. Our adapter now preserves diagnostic archives even when the command exits
+unsuccessfully. An SDK example should cover both successful and nonzero exits,
+with bounded polling and artifact verification.
+
+For Nemotron coding workflows, examples combining structured action schemas,
+exact source edits and source rereads after rejected edits would help. Our
+retained development runs include an uncompilable edit and repeated nonmatching
+edits. We added local compilation and mandatory rereads; the later successful
+run does not prove either change caused success. These observations describe
+this fixture, prompt and bounded budget, not general model capability.
+
+Evidence: [frozen results](../benchmarks/t8/summary.json),
+[compile failure](../benchmarks/reliability/v23-pilot.json),
+[edit mismatch](../benchmarks/reliability/v24-pilot.json),
+[successful development example](../benchmarks/reliability/v25-pilot.json).
 
 ## Maintainer notes — resolve before pasting the final entry
 - Recorded demo: https://ns-0437.github.io/incidentforge-demo/

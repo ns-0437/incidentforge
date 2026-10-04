@@ -40,11 +40,13 @@ credits. The static recorded viewer alone does not settle live execution access.
 
 ## Timing and constraints
 
-Rules were previously checked at https://nebiusglobalaihackathon.devpost.com/rules:
+Official rules rechecked October 4 at https://nebiusglobalaihackathon.devpost.com/rules:
 October 30, 10:00 PDT (22:30 IST) submission; judging through December 15; public
 licensed source, working demo/test build, English description, public YouTube video
 under three minutes, track and platform feedback. Recheck the live rules and entry
-form before submitting; this document is not a new rules verification.
+form before submitting; the signed-in submission form has not been audited.
+Separate provider accounts for judges are not explicitly required. The supported
+access method still needs to satisfy free working access through judging.
 
 The cumulative development allocation remains $0.40. Current accounted exposure
 is $0.337380, including unknown historical usage reserved at full cost; $0.062620

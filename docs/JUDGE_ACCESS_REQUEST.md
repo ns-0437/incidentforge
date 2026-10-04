@@ -1,6 +1,8 @@
 # Draft follow-up: judge access and credits
 
-Not sent. Reply in the existing Nebius support conversation.
+Owner reports the support email was sent; reply pending. The text below is the
+prepared draft, not a verified copy of the delivered message. Do not resend
+automatically.
 
 Subject: IncidentForge hackathon — pending credits and judge-access setup
 
