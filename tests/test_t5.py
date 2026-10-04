@@ -113,7 +113,7 @@ class ExperimentCompletenessTests(unittest.TestCase):
             file=Path(tmp)/'service.py';file.write_text('def step():\n    return\n')
             workspace=SimpleNamespace(root=Path(tmp),read=lambda name:file.read_text() if name=='fixture/app/service.py' else '{}',
                                       path=lambda name:file,revision=lambda:'baseline')
-            controller=SimpleNamespace(workspace=workspace,model=SimpleNamespace(call=lambda messages:json.dumps(plan)),
+            controller=SimpleNamespace(workspace=workspace,model=SimpleNamespace(call=lambda messages,**kwargs:json.dumps(plan)),
                 backend=SimpleNamespace(run=lambda root,mode:bad,count=1,name='test'),
                 emit=lambda kind,data:emitted.append(kind))
             with self.assertRaisesRegex(ValueError,'exactly once'): investigate(controller,{'observations':[]})

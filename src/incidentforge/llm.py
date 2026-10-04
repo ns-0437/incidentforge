@@ -55,16 +55,18 @@ class Nebius:
         self.budget,self.run_id,self.evidence=budget,run_id,evidence
         self.cancel_file=cancel_file
 
-    def call(self,messages):
+    def call(self,messages,*,response_format=None):
         if time.monotonic()+REQUEST_SECONDS+10>getattr(self,'deadline',float('inf')):
             raise TimeoutError('Insufficient controller time for bounded inference')
         if self.cancel_file and self.cancel_file.exists(): raise RuntimeError('Cancellation requested before inference dispatch')
         if len(encoded(messages))>100000: raise ValueError('prompt byte bound')
+        payload={'model':MODEL,'messages':messages,'max_tokens':MAX_OUTPUT,'temperature':0.2,
+                 'response_format':response_format if response_format is not None else {'type':'json_object'}}
+        if len(encoded(payload))>110000: raise ValueError('payload byte bound')
         token=self.budget.reserve(self.run_id,CALL_RESERVATION,200000,10)
         self.evidence.event('model_reserved',{'reservation':token,'maximum_microusd':CALL_RESERVATION,
-                            'model':MODEL,'prompt':self.evidence.artifact(messages)})
-        payload={'model':MODEL,'messages':messages,'max_tokens':MAX_OUTPUT,'temperature':0.2,
-                 'response_format':{'type':'json_object'}}
+                            'model':MODEL,'prompt':self.evidence.artifact(messages),
+                            'response_format':self.evidence.artifact(payload['response_format'])})
         # Killable wall-time bound, not just a socket inactivity timeout.
         # A timeout leaves its reservation unresolved and blocks redispatch.
         raw=request_once(payload)

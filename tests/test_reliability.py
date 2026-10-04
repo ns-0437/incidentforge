@@ -18,6 +18,33 @@ def accepted_receipt():
                 'boundary':{'scripted-isolation-check':True},
                 'properties':{f'P{i}':{'status':'pass'} for i in range(1,8)}}]}
 
+class StructuredInvestigationTests(unittest.TestCase):
+    setUp=test_t4.T4Tests.setUp
+
+    def test_format_reaches_provider_and_is_retained_in_evidence(self):
+        from incidentforge.investigation import investigation_format
+        fmt=investigation_format('compensation_probe',['no_restart','order_restart'],['step'])
+        budget=Budget(self.root/'b.db',200000);evidence=Evidence(self.root/'e','r')
+        model=Nebius(budget,'r',evidence)
+        response={'usage':{'prompt_tokens':10,'completion_tokens':10},
+                  'choices':[{'message':{'content':'{}'},'finish_reason':'stop'}]}
+        with patch('incidentforge.llm.request_once',return_value=json.dumps(response).encode()) as request:
+            self.assertEqual('{}',model.call([],response_format=fmt))
+        self.assertEqual(fmt,request.call_args.args[0]['response_format'])
+        event=json.loads((evidence.root/'events.jsonl').read_text().splitlines()[0])
+        ref=event['payload']['response_format']
+        self.assertEqual(fmt,json.loads((evidence.root/'artifacts'/ref['sha256']).read_text()))
+        self.assertEqual(2,verify(evidence.root))
+        self.assertEqual(1,budget.totals('r')['calls'])
+
+    def test_oversized_schema_is_rejected_before_reservation(self):
+        budget=Budget(self.root/'b.db',200000);evidence=Evidence(self.root/'e','r')
+        with patch('incidentforge.llm.request_once') as request:
+            with self.assertRaisesRegex(ValueError,'payload byte bound'):
+                Nebius(budget,'r',evidence).call([],response_format={'description':'x'*110000})
+            request.assert_not_called()
+        self.assertEqual(0,budget.totals('r')['calls'])
+
 class PromptGuidanceTests(unittest.TestCase):
     def test_only_latest_contract_retained_without_losing_evidence(self):
         from incidentforge.controller import latest_action_contract
@@ -374,7 +401,13 @@ class SymbolFeedbackTests(unittest.TestCase):
         source="def step(order):\n    return order['reservation_id']\n"
         class Captured(Exception): pass
         class Model:
-            def call(inner,messages):
+            def call(inner,messages,**kwargs):
+                fmt=kwargs['response_format']
+                self.assertEqual('json_schema',fmt['type'])
+                schema=fmt['json_schema']['schema']
+                self.assertEqual(['hypotheses','experiment'],schema['required'])
+                prediction=schema['properties']['experiment']['properties']['predictions']
+                self.assertEqual({'no_restart','order_restart','release_replay','release_replay_inventory_restart'},set(prediction['required']))
                 payload=json.loads(messages[-1]['content'])
                 self.assertEqual(source_symbols(source),payload['allowed_source_symbols'])
                 self.assertIn('selected verbatim from allowed_source_symbols',messages[0]['content'])

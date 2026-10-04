@@ -34,6 +34,27 @@ Use this shape (replace placeholders with your own analysis):
 "same_key_concurrent":{"H1":"...","H2":"..."},"different_keys":{"H1":"...","H2":"..."}},"repetitions":1,
 "reason":"...","limits":{"seconds":100}}}'''
 
+def investigation_format(intervention,conditions,symbols):
+    """Constrain shape and available vocabulary, never the diagnosis or outcome."""
+    def obj(properties):
+        return {'type':'object','properties':properties,'required':list(properties),'additionalProperties':False}
+    text={'type':'string','minLength':1}
+    strings={'type':'array','items':text}
+    hypothesis=obj({
+        'mechanism':text,
+        'symbols':{'type':'array','minItems':1,'items':{'type':'string','enum':symbols}},
+        'supporting_refs':{'type':'array','minItems':1,'items':text},
+        'counterevidence':strings,'alternatives':strings,'predicted_signatures':strings,
+        'distinguishing_experiment':{'type':'string','enum':[intervention]},'confidence_basis':text})
+    experiment=obj({'question':text,'baseline':text,'reset':text,
+        'intervention':{'type':'string','enum':[intervention]},'controlled_variables':strings,
+        'workload':text,'predictions':obj({name:obj({'H1':text,'H2':text}) for name in conditions}),
+        'repetitions':{'type':'integer','enum':[1]},'reason':text,
+        'limits':obj({'seconds':{'type':'integer','minimum':1,'maximum':100}})})
+    schema=obj({'hypotheses':{'type':'array','items':hypothesis,'minItems':2,'maxItems':2},'experiment':experiment})
+    return {'type':'json_schema','json_schema':{'name':'incident_investigation','strict':True,'schema':schema}}
+
+
 def source_symbols(source):
     """The exact identifier vocabulary accepted by the investigation validator."""
     import ast
@@ -152,8 +173,9 @@ not prove a path is impossible. Do not conflate initial and restarted processes.
     if is_comp:
         system+='\nCANCELLED_DECLINED means compensation has completed; COMPENSATING is a pending state.'
     messages=[{'role':'system','content':system},{'role':'user','content':json.dumps(prompt)}]
+    response_format=investigation_format(intervention,conditions,prompt['allowed_source_symbols'])
     for attempt in range(2):
-        raw=controller.model.call(messages)
+        raw=controller.model.call(messages,response_format=response_format)
         try: plan=validate_plan(json.loads(raw),intervention,conditions,prompt['source']);break
         except (ValueError,TypeError,KeyError) as exc:
             if attempt: raise
