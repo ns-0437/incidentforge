@@ -1,82 +1,56 @@
-# Release checklist â€” October 3, 2026
+# Release checklist — October 4, 2026
 
-Rules rechecked: https://nebiusglobalaihackathon.devpost.com/rules
+[Submission package](SUBMISSION_PACKAGE.md) contains the copy, recording walkthrough
+and claim-to-evidence map. [Completion gates](COMPLETION_GATES.md) tracks limitations.
+This checklist describes release work, not authorization to publish now.
 
-The official deadline is October 30, 10:00 PDT (22:30 IST). The rules call for a
-public licensed source repository, a working demo or test-build link, an English
-description, a public YouTube video under three minutes, track selection and
-platform feedback. Free working access must last through judging, which ends
-December 15. Recheck the live entry form before final submission.
+## Engineering evidence ready
 
-## Engineering artifacts
-- [x] Original brief retained; MIT license present.
-- [x] Real Token Factory inference and Sandbox execution evidenced.
-- [x] Frozen twelve-slot T8 results, failures and accounting retained.
-- [ ] Restore working frontend deployment; existing URL returned 404 on October 4. Main repository remains private.
-- [x] 115 portable controller/regression tests passed locally; CI status must be checked at release.
-- [x] Judge guide, submission copy and timed recording script prepared.
-- [x] Fresh-checkout Linux/setup rehearsal recorded: 61 portable tests, 16 Linux checks, four HTTP routes; see [record](../benchmarks/release/rehearsal.json).
-- [x] Two live completion attempts retained: IF-001 accepted, IF-002 rejected. A third rejected IF-002 pilot exercised authored-test completion live.
+- [x] Original brief retained byte-identical; MIT license present.
+- [x] Real Token Factory inference and Sandbox execution retained for both incidents.
+- [x] Frozen T8: all 12 attempts retained; 2 accepted, 2 rejected, 8 unresolved; no ranking claim.
+- [x] IF-001 v22 accepted with its weak authored assertion disclosed.
+- [x] IF-002 v25 accepted with a baseline-failing, final-revision-passing restart assertion and eight protected cases per validation.
+- [x] Clean checkout: 115 portable tests, 19 Linux checks, no skips, four operator HTTP routes and seven-file static package passed at 85b4612.
+- [x] Review ZIP CRC and manifest checks passed; immediate browser cancellation rehearsed with zero model calls.
+- [x] Manual public-main-only Pages workflow and publishing consistency checks prepared.
+- [x] README, Devpost draft, judge guide, attribution inventory and timed script prepared for review.
 
-## Owner/access gates
-- [x] Owner approved $0.40 cumulative maximum from existing free credits; no further increase.
-- [x] Owner confirmed free provider access through December 15 on October 4 (not independently verified).
-- [ ] Rehearse the actual judge access and credential-delivery path without requiring judges to buy credits.
-- [ ] Review model/dependency license notices and ownership/reuse disclosure.
-- [ ] Record final demo and publish it on YouTube; verify signed-out playback.
-- [ ] Make main repository public at release, as owner requested.
-- [ ] Verify source/demo/video links and judge instructions from a fresh browser.
+Evidence: [latest clean checkout](../benchmarks/release/rehearsal-v25.json),
+[IF-001](../benchmarks/reliability/v22-pilot.json),
+[IF-002](../benchmarks/reliability/v25-pilot.json),
+[T8](T8_RESULTS.md). Historical rehearsals remain in benchmarks/release/.
+Passing development examples do not establish repeat autonomous repair reliability.
+
+## Owner and external release steps
+
+- [ ] Owner reviews authorship, reuse/model notices and final claims in [THIRD_PARTY_NOTICES.md](THIRD_PARTY_NOTICES.md) and [DEVPOST_DRAFT.md](DEVPOST_DRAFT.md).
+- [ ] Incorporate Nebius's reply into a concrete free judge-access path and rehearse it with a fresh user.
+- [ ] Record the walkthrough, verify duration, publish on YouTube and check signed-out playback.
+- [ ] Make the main repository public at owner-approved release.
+- [ ] Enable Pages Actions and run the manual workflow; verify the deployed site signed out.
+- [ ] Only after successful deployment, replace the retained old About/README demo link and other submission links.
+- [ ] Check final CI, source/demo/video links, setup instructions and actual hackathon entry requirements.
 - [ ] Submit the reviewed Devpost entry and retain confirmation.
 
-No API key needs to be pasted into chat. The operator profile is already usable.
-No paid overage, automatic public-source release or final submission is implied by
-this checklist. A passing historical repair or offline replay does not certify
-the current autonomous workflow; disclose the mixed live results and limits of the tested coverage.
+The owner confirmed continued access to their account through December 15; this
+does not establish judge access. The owner has sent the support email and will
+provide the reply. Never share the owner's personal key or require judges to buy
+credits. The static recorded viewer alone does not settle live execution access.
 
-Supporting materials: [third-party inventory](THIRD_PARTY_NOTICES.md) and
-[draft access request](JUDGE_ACCESS_REQUEST.md). Neither replaces owner review or
-provider confirmation. The historical submission plan proposed Apache; the
-actual project license is MIT.
+## Timing and constraints
 
-An earlier live pilot timed out before response. On October 4 its full reservation
-was conservatively reconciled with actual usage still unknown; exposure unchanged.
-See [timeout recovery](TIMEOUT_RECOVERY.md).
+Rules were previously checked at https://nebiusglobalaihackathon.devpost.com/rules:
+October 30, 10:00 PDT (22:30 IST) submission; judging through December 15; public
+licensed source, working demo/test build, English description, public YouTube video
+under three minutes, track and platform feedback. Recheck the live rules and entry
+form before submitting; this document is not a new rules verification.
 
-Owner clarification, October 4: confirmation covers continued access to the owner
-account only. Separate judge credentials/access have **not** been confirmed.
+The cumulative development allocation remains $0.40. Current accounted exposure
+is $0.337380, including unknown historical usage reserved at full cost; $0.062620
+remains and no inference is pending. Do not reset the ledger or expand spending.
 
-Fresh-checkout repeat: 97 portable tests and 17 Linux controls passed on f6fc999;
-see benchmarks/release/rehearsal-oct4.json. Current source has 115 portable tests, including startup failure reporting.
-Owner sent the updated Nebius access/credit request; response pending.
-
-## Main repository Pages preparation â€” October 4
-
-- [x] Manual public-main-only deployment workflow prepared; uploads only site/.
-- [x] Static artifact allowlist and evidence digest check added to CI.
-- [x] Regression rejects extra files and altered evidence; 115 portable tests pass.
-- [ ] Publish source at owner-approved release, enable Pages Actions and deploy.
-- [ ] Verify the resulting URL signed out before changing the current About link.
-
-Workflow preparation is not a deployment. The local recording handoff now works
-without the unavailable former demo hosting. See JUDGE_FRONTEND.md.
-
-Current requirement-by-requirement status: [completion gates](COMPLETION_GATES.md).
-Review export CRC and manifest checks passed for accepted and unresolved evidence;
-see benchmarks/release/export-oct4.json. A subsequent browser download also passed CRC and manifest checks.
-Immediate browser cancellation stopped before execution with zero model calls;
-see benchmarks/release/cancellation-oct4.json. The latest Linux suite passed all
-17 checks; see benchmarks/release/linux-oct4-final.json.
-
-Subsequent public-observation controls expanded the Linux suite to 19 passing
-checks; see benchmarks/release/linux-oct4-public-observations.json. Live v24
-remained unresolved before editing. Preserve that distinction in submission claims.
-
-October 4 v25 closed the current IF-002 demonstration gate: baseline-failing authored
-assertion, passing final-revision execution, and eight accepted protected cases in
-each validation. The refreshed recorded viewer uses v22/v25 and explicitly discloses
-v22's weak assertion. This is not evidence of repeat reliability or new T8 results.
-
-Latest source-only clean-checkout rehearsal: 115 portable tests, 19 Linux checks
-with zero skips, all four operator HTTP routes, and the seven-file static artifact
-passed at 85b4612. No account calls or budget ledger were created. See
-benchmarks/release/rehearsal-v25.json. This does not replace funded judge access.
+Main source remains private. The old demo link is retained as requested and was
+last observed returning 404; the replacement main-repository Pages site is prepared
+but not deployed. Follow [JUDGE_FRONTEND.md](JUDGE_FRONTEND.md) at release. Do not
+recreate the separate demo repository. Recording setup needs no inference calls.

@@ -161,28 +161,33 @@ Development and evaluator readiness are separate from that campaign:
 See [T8 results](docs/T8_RESULTS.md), [protocol](docs/T8_PROTOCOL.md),
 [pre-T8 review](docs/PRE_T8_STATUS.md), and [curated data](benchmarks/t8/summary.json).
 
-Post-T8 [reliability work](docs/POST_T8_RELIABILITY.md) adds state-specific action
-guidance, native JSON facts, a quote-free factual conclusion, net-change and
-authored-test execution gates, persistent property-only feedback, assertion target
-checks, a developer-field catalog, explicit completion readiness, idempotent test
-specification saves, and a bounded 120-second inference wait. **99 local tests
-pass.** Two follow-up B2 pilots completed: IF-001 produced an accepted frozen
-repair that passed all four previously used final schedules; IF-002 produced a
-rejected compensation repair. Neither authored developer tests. These are
-separate development results, not a new benchmark or evidence of reliable repair
-across incidents. A subsequent instruction-only IF-002 pilot also failed repair
-validation, while successfully exercising the authored-test execution and honest
-completion path. Bounded [development traces](docs/DEVELOPMENT_TRACES.md) now
-show executed source lines by process generation; subsequent pilots still failed
-to repair IF-002. T8 results remain unchanged.
+Post-T8 development now requires authored assertions to run and pass on the final
+candidate revision. Exact edits are compiled before execution, rejected edits require
+a fresh source read, and unknown inference usage remains reserved in the ledger.
+
+| Recorded development evidence | Result | Important limitation |
+| :--- | :--- | :--- |
+| [IF-001 / v22](benchmarks/reliability/v22-pilot.json) | Accepted frozen repair; final authored assertion passed | The assertion also passed before repair; it does not detect duplicate charging |
+| [IF-002 / v25](benchmarks/reliability/v25-pilot.json) | Restart assertion failed before repair and passed afterward; 8/8 protected cases accepted in each of two executions | One successful development run after retained failures; repeat reliability is unproven |
+| [Clean checkout](benchmarks/release/rehearsal-v25.json) | 115 portable tests, 19 Linux checks with no skips, four UI routes and static package verified | Local rehearsal; funded judge access remains pending |
+
+The judge viewer shows these two development runs, their patches and test-quality
+limitations. The frozen T8 results above remain unchanged. Read the full
+[development history](docs/POST_T8_RELIABILITY.md) for unsuccessful attempts.
+
+As of October 4, accounted development exposure is **$0.337380 / $0.40**,
+including conservative reservations for unknown historical usage. Remaining
+allocation is **$0.062620**; there are no pending calls at this checkpoint.
 
 ## Try it
 
 Start with the [judge guide](docs/JUDGE_GUIDE.md). The
 [release checklist](docs/RELEASE_CHECKLIST.md), [submission draft](docs/DEVPOST_DRAFT.md)
 and [video script](docs/VIDEO_SCRIPT.md) track the remaining handoff work.
-A [fresh-checkout rehearsal](benchmarks/release/rehearsal.json) passed 61 portable
-tests, 16 Linux checks and local HTTP startup without model calls.
+The latest [fresh-checkout rehearsal](benchmarks/release/rehearsal-v25.json)
+passed 115 portable tests, 19 Linux checks and local HTTP startup without model calls.
+The [submission package](docs/SUBMISSION_PACKAGE.md) links the reviewed copy,
+recording instructions, evidence and remaining release steps.
 
 **Prerequisites:** Python 3.12+, Docker with Linux containers, and a cached
 `python:3.12-slim` image. Sandbox execution also needs enabled Nebius access and an

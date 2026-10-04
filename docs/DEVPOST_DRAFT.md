@@ -28,20 +28,26 @@ The static frontend explores recorded synthetic evidence without
 exposing keys or triggering paid operations.
 
 ## Challenges and measured results
-A frozen twelve-attempt B0/B1/B2 comparison produced two accepted final repairs,
+The frozen twelve-attempt B0/B1/B2 comparison produced two accepted final repairs,
 two rejected frozen candidates and eight unresolved attempts. Three inference
-timeouts crossed our predeclared infrastructure threshold, so we make no variant
-ranking claim. Later development reduced JSON-escaping friction, added explicit
-completion guidance, and prevented unrun or placeholder tests from masquerading
-as completed work. The current implementation passes 115 portable tests. Later development includes
-an accepted IF-002 Sandbox repair after schema-constrained investigation, as well
-as retained failed attempts. That compensation pilot omitted authored tests. The current completion gate
-requires passing authored regression assertions. A later payment-family run
-completed that gate and passed protected checks; its retry-count assertion also
-passed on the original observations, so it does not detect the original defect. These are
-development results, not a new benchmark. A later IF-002 run completed the same
-gate with a restart assertion that failed before repair and passed afterward,
-plus eight accepted protected cases. Repeated reliability remains unproven.
+timeouts crossed the predeclared infrastructure threshold, so we make no variant
+ranking claim. All attempts remain in the published results.
+
+Later development added constrained action formats, compile checks, source rereads
+after rejected edits, and required authored assertions on the final revision.
+The recorded IF-001 repair passed protected checks, but its retry-count assertion
+also passed before repair and therefore does not detect the original defect.
+The recorded IF-002 repair has a restart assertion that fails before repair and
+passes afterward; eight protected cases accepted the candidate in each of two
+executions. These are development examples, not replacement benchmark results.
+Repeat autonomous repair reliability remains unproven.
+
+A clean checkout passed 115 portable tests and 19 Linux behavioral/isolation checks
+with no skips. The local console and static replay started without model calls.
+Evidence: [frozen results](../benchmarks/t8/summary.json),
+[IF-001](../benchmarks/reliability/v22-pilot.json),
+[IF-002](../benchmarks/reliability/v25-pilot.json),
+[clean checkout](../benchmarks/release/rehearsal-v25.json).
 
 ## What we learned
 Correct measurements, plausible explanations, useful edits and a completed agent
@@ -56,7 +62,7 @@ completion on arbitrary repositories.
 
 ## Built with / track
 Python, Docker, SQLite, Nebius Token Factory, Nebius Sandboxes/ConTree,
-NVIDIA Nemotron, HTML/CSS/JavaScript, GitHub Pages.
+NVIDIA Nemotron, HTML/CSS/JavaScript. GitHub Pages deployment is prepared for release.
 Track: Coding and Agentic Engineering.
 
 ## Platform feedback
@@ -66,7 +72,7 @@ timeouts left usage unknown; per-request reconciliation would simplify budget-sa
 recovery. Strict structured-output contracts needed explicit field examples and
 clear separation between developer and experiment observations.
 
-## Links and release placeholders
+## Maintainer notes — resolve before pasting the final entry
 - Recorded demo: https://ns-0437.github.io/incidentforge-demo/
 - Source: https://github.com/ns-0437/incidentforge (PRIVATE until release)
 - Video: NOT RECORDED / NOT PUBLISHED

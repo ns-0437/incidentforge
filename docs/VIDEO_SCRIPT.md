@@ -1,23 +1,38 @@
 # Demonstration recording script — target 2:45
 
-Record the actual application at readable zoom. Keep a visible "Recorded execution"
-label during replay. Use no music or third-party footage. Do not show API keys,
-account settings, raw prompts or unrelated desktop windows. A script is not a video;
-recording, timing verification and a public YouTube URL remain required.
+Use the committed viewer with IF-001 v22 and IF-002 v25. Setup:
+[RECORDING_HANDOFF.md](RECORDING_HANDOFF.md). This is recorded synthetic execution;
+keep the recorded-replay label visible. Readable text and measured pauses matter more
+than fitting extra claims. The narration is 243 words: roughly 112 seconds at
+130 words per minute, leaving about 53 seconds for navigation and pauses in a
+2:45 cut. This is an estimate, not measured recording duration.
+[Plain narration](VIDEO_NARRATION.txt) is available for reading while recording.
+Rehearse once and check the actual duration before upload.
 
-| Time | Screen | Narration |
-| --- | --- | --- |
-| 0:00–0:20 | IncidentForge overview | "A payment response disappears after the charge commits. Retrying with a new key can charge twice. IncidentForge investigates the failure and checks whether a proposed repair preserves the business." |
-| 0:20–0:45 | IF-001 Observe tab | "This is recorded synthetic execution evidence. Reusing a payment key produced one committed charge across retries and restart. Different keys produced two. Successful HTTP responses alone cannot establish safety." |
-| 0:45–1:05 | Investigate tab | "Nemotron proposes competing explanations through a runtime Token Factory call. These are model claims. Measurements are checked separately, and causal prose remains unverified." |
-| 1:05–1:25 | Repair then Verify | "The candidate preserves the payment identity. A protected evaluator checks independent effects. This recorded development candidate passed its declared cases; that is finite evidence, not proof of universal correctness." |
-| 1:25–1:45 | IF-002 Observe and Repair | "Our second failure strands compensation after restart. The agent removes a process-local guard. Its restart assertion fails before repair and passes afterward; eight independent protected cases also pass. This is one development result." |
-| 1:45–2:05 | Interactive architecture | "The model edits an allowlisted bundle. Isolated Sandbox services execute it. The protected broker records transactional effects, and a restricted reader recomputes the result. A person reviews the patch." |
-| 2:05–2:30 | Evaluation section, expand attempts | "We preserve failures. Twelve frozen attempts produced two accepted final repairs, two rejected candidates and eight unresolved attempts. Three timeouts invalidate ranking. Subsequent reliability work is reported separately." |
-| 2:30–2:45 | Evidence download / guide | "IncidentForge makes repairs reviewable through conditions, effects and uncertainty. The recorded viewer is free to explore. The source and judge guide explain how to reproduce the test build and its limitations." |
+| Time | Exact screen action | Narration |
+|---|---|---|
+| 0:00–0:15 | Overview; click Explore an investigation | “A payment response disappears after a charge commits. Retrying with a new key can charge twice. IncidentForge investigates the incident and returns a patch with evidence for human review.” |
+| 0:15–0:35 | IF-001 selected, 01 Observe | “This is recorded synthetic execution. Reusing a key produced one committed charge across retries and restart. Different keys produced two. Successful HTTP responses alone cannot establish payment safety.” |
+| 0:35–0:50 | 02 Investigate | “Nemotron proposes competing explanations through Nebius Token Factory. The controller checks measured facts separately. The model's causal explanation remains a claim, not a verified conclusion.” |
+| 0:50–1:10 | 03 Repair; show authored checks; 04 Verify | “The repair preserves payment identity. Independent protected checks accepted it. Its authored retry-count test also passed before repair, so we disclose that it does not detect the original defect.” |
+| 1:10–1:40 | Select IF-002; 01 Observe, then 03 Repair; scroll to authored checks; 04 Verify | “The second incident strands compensation after restart. The agent removes a process-local guard. Its restart assertion fails before repair and passes afterward. All eight protected cases pass. This is one successful development run after retained failures.” |
+| 1:40–2:00 | Architecture navigation; select broker, then restricted reader | “The model edits an allowlisted bundle. Sandbox services run under separate identities. A protected broker records transactional effects, and an independent reader checks the returned evidence. The model cannot choose its own verdict.” |
+| 2:00–2:25 | Evaluation navigation; expand Inspect every launched attempt | “The frozen comparison preserves all twelve attempts: two accepted final repairs, two rejected candidates and eight unresolved. Three inference timeouts invalidate variant ranking. Later development examples do not replace those results.” |
+| 2:25–2:45 | Investigation navigation; Download evidence; finish on the desk | “A clean checkout passed 115 portable and nineteen Linux checks. This viewer is free to explore and does not call the model. IncidentForge makes the patch, tested conditions and remaining uncertainty inspectable.” |
 
-Before recording, replace the last line with the verified live judge-access path
-if one is available. Never imply the Pages replay runs the agent. If showing a
-live run, use labeled cuts to fit its actual runtime into the video. Record the
-final submission build, keep the finished video under three minutes, and check
-public playback from a signed-out browser before submitting its URL.
+The narration is a draft, not a recorded video. Keep the finished video strictly
+under three minutes. If judge execution access is verified before recording, add
+one short accurate sentence about that path without exceeding the limit. Never
+imply that the Pages replay runs the agent or that checks prove universal safety.
+Do not show API keys, account settings, raw prompts or unrelated windows.
+
+## Recording acceptance
+
+- Both incidents, the source diff, IF-002 before/after assertion and protected result are legible.
+- IF-001's weak assertion and the frozen unsuccessful attempts are disclosed.
+- Recorded-replay label is visible; no implication of a live run or public deployment.
+- Audio is clear, actual duration is under three minutes, and no credentials appear.
+- After owner upload, public YouTube playback is checked signed out.
+
+If the final source or curated evidence changes, verify this script against the
+new build before recording. The planned Pages URL is not a deployed link yet.

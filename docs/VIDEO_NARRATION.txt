@@ -1,0 +1,15 @@
+A payment response disappears after a charge commits. Retrying with a new key can charge twice. IncidentForge investigates the incident and returns a patch with evidence for human review.
+
+This is recorded synthetic execution. Reusing a key produced one committed charge across retries and restart. Different keys produced two. Successful HTTP responses alone cannot establish payment safety.
+
+Nemotron proposes competing explanations through Nebius Token Factory. The controller checks measured facts separately. The model's causal explanation remains a claim, not a verified conclusion.
+
+The repair preserves payment identity. Independent protected checks accepted it. Its authored retry-count test also passed before repair, so we disclose that it does not detect the original defect.
+
+The second incident strands compensation after restart. The agent removes a process-local guard. Its restart assertion fails before repair and passes afterward. All eight protected cases pass. This is one successful development run after retained failures.
+
+The model edits an allowlisted bundle. Sandbox services run under separate identities. A protected broker records transactional effects, and an independent reader checks the returned evidence. The model cannot choose its own verdict.
+
+The frozen comparison preserves all twelve attempts: two accepted final repairs, two rejected candidates and eight unresolved. Three inference timeouts invalidate variant ranking. Later development examples do not replace those results.
+
+A clean checkout passed 115 portable and nineteen Linux checks. This viewer is free to explore and does not call the model. IncidentForge makes the patch, tested conditions and remaining uncertainty inspectable.
