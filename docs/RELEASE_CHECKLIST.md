@@ -13,7 +13,7 @@ December 15. Recheck the live entry form before final submission.
 - [x] Real Token Factory inference and Sandbox execution evidenced.
 - [x] Frozen twelve-slot T8 results, failures and accounting retained.
 - [ ] Restore working frontend deployment; existing URL returned 404 on October 4. Main repository remains private.
-- [x] 114 portable controller/regression tests passed locally; CI status must be checked at release.
+- [x] 115 portable controller/regression tests passed locally; CI status must be checked at release.
 - [x] Judge guide, submission copy and timed recording script prepared.
 - [x] Fresh-checkout Linux/setup rehearsal recorded: 61 portable tests, 16 Linux checks, four HTTP routes; see [record](../benchmarks/release/rehearsal.json).
 - [x] Two live completion attempts retained: IF-001 accepted, IF-002 rejected. A third rejected IF-002 pilot exercised authored-test completion live.
@@ -46,14 +46,14 @@ Owner clarification, October 4: confirmation covers continued access to the owne
 account only. Separate judge credentials/access have **not** been confirmed.
 
 Fresh-checkout repeat: 97 portable tests and 17 Linux controls passed on f6fc999;
-see benchmarks/release/rehearsal-oct4.json. Current source has 114 portable tests, including startup failure reporting.
+see benchmarks/release/rehearsal-oct4.json. Current source has 115 portable tests, including startup failure reporting.
 Owner sent the updated Nebius access/credit request; response pending.
 
 ## Main repository Pages preparation â€” October 4
 
 - [x] Manual public-main-only deployment workflow prepared; uploads only site/.
 - [x] Static artifact allowlist and evidence digest check added to CI.
-- [x] Regression rejects extra files and altered evidence; 114 portable tests pass.
+- [x] Regression rejects extra files and altered evidence; 115 portable tests pass.
 - [ ] Publish source at owner-approved release, enable Pages Actions and deploy.
 - [ ] Verify the resulting URL signed out before changing the current About link.
 
@@ -75,3 +75,8 @@ October 4 v25 closed the current IF-002 demonstration gate: baseline-failing aut
 assertion, passing final-revision execution, and eight accepted protected cases in
 each validation. The refreshed recorded viewer uses v22/v25 and explicitly discloses
 v22's weak assertion. This is not evidence of repeat reliability or new T8 results.
+
+Latest source-only clean-checkout rehearsal: 115 portable tests, 19 Linux checks
+with zero skips, all four operator HTTP routes, and the seven-file static artifact
+passed at 85b4612. No account calls or budget ledger were created. See
+benchmarks/release/rehearsal-v25.json. This does not replace funded judge access.

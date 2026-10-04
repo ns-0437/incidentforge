@@ -51,7 +51,8 @@ their own disposable container and volume. Do not use a global Docker prune.
 ## Live execution — access must be arranged before submission
 
 Nebius Sandbox beta access, a Token Factory account and funded model access are
-required. The existing operator profile is already authenticated. Do not paste
+required. The developer account is configured locally; a fresh judge installation
+needs its own arranged access and credentials. Do not paste
 keys into issue trackers, the public frontend, screenshots or source files.
 Set `CONTREE_PYTHON` to the installed ConTree SDK Python if it differs from the
 Windows default. Docker independently checks returned protected evidence.

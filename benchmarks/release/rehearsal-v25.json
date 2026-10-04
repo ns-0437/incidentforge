@@ -1,0 +1,30 @@
+{
+  "date": "2026-10-04",
+  "source_commit": "85b4612707598d2e699c36fab66caae65afd9759",
+  "checkout": "Fresh local git clone --no-hardlinks; tracked files only, no local history or credentials copied",
+  "portable_tests": 115,
+  "linux_checks": {
+    "tests": 19,
+    "failures": 0,
+    "errors": 0,
+    "skips": 0
+  },
+  "linux_report_sha256": "9e69d19c6026a6f2dc1dcf433e9df6323980e5da5b572379d1e26917cc222376",
+  "image_id": "sha256:dddfd7e07f9d15aeeca61529320492139d21cac7f0070c00609243e51e4e0016",
+  "ui_routes_200": [
+    "/",
+    "/app.js",
+    "/style.css",
+    "/api/state"
+  ],
+  "fresh_history_empty": true,
+  "budget_ledger_created": false,
+  "inference_calls": 0,
+  "static_files": 7,
+  "static_evidence_sha256": "a1e18da9507e07c49d6cfda0dca897a98e3daf0fc287460f9aab2b641509e04b",
+  "limitations": [
+    "Local source-only clone; not a separate judge account or public access rehearsal.",
+    "Authored controls do not establish repeat model reliability.",
+    "HTTP smoke checks are not a new browser launch/cancellation rehearsal."
+  ]
+}

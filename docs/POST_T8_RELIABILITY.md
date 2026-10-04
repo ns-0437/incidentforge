@@ -617,3 +617,18 @@ in addition to the exact file allowlist and digest. Seven corrupted-data variant
 are rejected even after recomputing the digest. The viewer labels wholly non-applicable
 checks separately from passing checks and treats empty lists as missing evidence.
 Twelve UI/publishing tests passed. No inference was used for this change.
+
+## Clean-checkout release rehearsal
+
+A tracked-files-only local clone of 85b4612 passed 115 portable tests, 19 Linux
+behavioral/isolation checks without skips, four operator HTTP routes and the static
+publishing check. Fresh run history was empty and no budget ledger was created.
+No provider requests were made. Both v22/v25 curated review ZIPs passed CRC and
+manifest verification. See benchmarks/release/rehearsal-v25.json. Judge account
+access, public deployment and submission remain separate pending steps.
+
+Setup diagnostics now distinguish absent guards and a successful SDK import from
+actual blockers. The judge guide no longer implies a fresh user inherits the
+owner's authenticated profile. The frontend guide explains that committed curated
+data can be served from a clean checkout, while regeneration requires maintainer
+raw runs; a checksum is not independent attestation of execution.

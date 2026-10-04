@@ -27,7 +27,8 @@ def inspect(root,backend='contree'):
         add('allocation',ready,{'ledger_exists':(root/'runs/t4-budget.sqlite').exists(),**budget})
     except Exception:
         add('allocation',False,'Ledger unreadable; inspect it without deleting or resetting it')
-    add('local_launch',not (root/'runs/ui-launches/active.json').exists(),'An existing launch guard requires terminal-state reconciliation')
+    local_guard=(root/'runs/ui-launches/active.json').exists()
+    add('local_launch',not local_guard,'An existing launch guard requires terminal-state reconciliation' if local_guard else 'No tracked local launch guard')
     if backend=='contree':
         runtime=Path(os.environ.get('CONTREE_PYTHON',str(Path.home()/'AppData/Roaming/uv/tools/contree-cli/Scripts/python.exe')))
         installed=False
@@ -37,8 +38,9 @@ def inspect(root,backend='contree'):
                                       creationflags=getattr(subprocess,'CREATE_NO_WINDOW',0))
                 installed=result.returncode==0
             except (OSError,subprocess.SubprocessError): pass
-        add('sandbox_sdk',installed,'CONTREE_PYTHON must point to Python with contree_client installed')
-        add('sandbox_operation',not (root/'runs/contree-active.json').exists(),'An existing remote guard requires terminal-state reconciliation')
+        add('sandbox_sdk',installed,'ConTree client import succeeded' if installed else 'CONTREE_PYTHON must point to Python with contree_client installed')
+        remote_guard=(root/'runs/contree-active.json').exists()
+        add('sandbox_operation',not remote_guard,'An existing remote guard requires terminal-state reconciliation' if remote_guard else 'No unconfirmed Sandbox operation guard')
     return {'backend':backend,'ready_for_preflighted_launch':all(c['ready'] for c in checks),'checks':checks,
             'limitations':['Local checks only; no provider authentication, credit, expiry or judge-access confirmation.',
                            'An absent ledger uses the default $0.20 allocation on first launch; this does not supply provider credits.',

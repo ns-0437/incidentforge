@@ -33,3 +33,18 @@ reply and a concrete access rehearsal. A passing Pages deployment does not close
 
 Workflow reference checked October 4:
 https://docs.github.com/en/pages/getting-started-with-github-pages/using-custom-workflows-with-github-pages
+
+## Clean checkout and evidence provenance
+
+The seven files in `site/` are committed release artifacts. A clean checkout can
+verify them with `python scripts/check-site.py` and serve them using the command
+above; it does not need an API key, SDK, account balance, or local run history.
+The publishing check also rejects inconsistent property coverage and campaign counts.
+
+`scripts/build-judge-data.py` is the maintainer's export tool. It intentionally
+requires the original local runs, which are excluded from Git to avoid publishing
+raw prompts and environment details. Judges should use the committed curated data;
+rebuilding that data from raw runs is not part of the clean-checkout quick start.
+Its SHA256 detects changes to the curated artifact, not independent attestation of
+historical execution. Sanitized pilot receipts identify runs and retained archive
+hashes. The live workflow creates a new evidence chain for its own execution.

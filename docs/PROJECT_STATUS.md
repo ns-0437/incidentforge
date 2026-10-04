@@ -31,8 +31,8 @@ budget; repeatedly tuning against old schedules cannot support that claim.
 
 ## Next priorities
 
-1. Rehearse the complete local judge flow including Sandbox selection, cancellation
-   and export, using retained evidence and bounded funded runs only when useful.
+1. Preserve the verified local launch, immediate cancellation, review export and
+   clean-checkout checks; repeat them only for material changes or final release.
 2. Address IF-002 diagnosis-to-patch consistency with a specific testable change;
    do not burn remaining credits on identical retries or claim improved reliability.
 3. Rehearse delivery of free working judge access through December 15. The owner
@@ -48,7 +48,7 @@ Cumulative accounted exposure: **$0.337380 / $0.40**. Remaining allocation:
 The other trial credits are unallocated. The GitHub Pages site is a recorded replay,
 not a hosted inference service. The main source repository stays private until release.
 
-Validation for the backend selector: **114 portable tests passed** and JavaScript
+Validation for the backend selector: **115 portable tests passed** and JavaScript
 syntax validation passed. Tests verify HTTP allowlisting, recorded selection,
 child-process arguments and failure before launch when Docker is unavailable.
 October 4 browser review confirmed Sandbox selection, recorded patch and validation
