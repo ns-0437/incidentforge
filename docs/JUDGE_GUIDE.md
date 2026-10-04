@@ -1,5 +1,26 @@
 # IncidentForge judge guide
 
+## Prepare the checkout
+
+Use Windows PowerShell, Git, and Python 3.12 or newer. Docker Desktop with
+Linux containers is needed for the Linux checks and live validation, but not
+for the recorded replay or portable tests.
+
+From a directory where you want the project:
+
+```powershell
+git clone https://github.com/ns-0437/incidentforge.git
+cd incidentforge
+python --version
+```
+
+The repository is private during development; public cloning becomes available
+at release. A signed-out 404 before release is not a setup failure.
+All commands below run from this checkout directory. If `python` is not found,
+try `py -3 --version` and use `py -3` instead of `python` in the commands below.
+If neither command works, install Python 3.12 or newer and reopen PowerShell.
+No pip installation is needed for the replay or portable tests.
+
 ## Start with the recorded evidence
 
 The retained URL https://ns-0437.github.io/incidentforge-demo/ returned 404 on October 4.
@@ -26,8 +47,6 @@ development and must become public before submission. Do not claim this guide
 provides judge access until that release step is complete.
 
 ```powershell
-git clone https://github.com/ns-0437/incidentforge.git
-cd incidentforge
 python -m unittest tests.test_t4 tests.test_t5 tests.test_t6_controller tests.test_t7 tests.test_prefreeze tests.test_t8 tests.test_reliability
 python scripts/serve-ui.py --port 8765
 ```
@@ -35,6 +54,8 @@ python scripts/serve-ui.py --port 8765
 Visit http://127.0.0.1:8765. A fresh checkout has empty run history; raw local runs
 are intentionally excluded from Git. The public replay supplies curated examples.
 The controller and portable tests use the Python standard library.
+The server keeps its terminal occupied; use Ctrl+C to stop it. Run other commands
+in a second PowerShell terminal opened in the same checkout directory.
 
 For Linux behavioral/isolation checks, in another terminal:
 
