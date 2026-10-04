@@ -259,8 +259,12 @@ protected behavioral feedback during repair.'''
                         if not unchanged:
                             if edits>=3: raise ValueError('edit limit')
                             target.write_bytes(raw);edits+=1
+                        from fixture.harness.developer_tests import assess
+                        baseline_check=assess(spec,reproduction)
                         result={'saved':True,'unchanged':unchanged,'edit_consumed':not unchanged,
-                                'specification':self.evidence.artifact(spec)}
+                                'specification':self.evidence.artifact(spec),
+                                'baseline_assessment':baseline_check,
+                                'test_quality_note':'A test that already passes on original observations does not detect the reported defect. Passing HTTP assertions do not establish protected effect safety.'}
                     elif kind=='replace':
                         if edits>=3: raise ValueError('edit limit')
                         self.transition('PATCH')

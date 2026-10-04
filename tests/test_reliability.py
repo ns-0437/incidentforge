@@ -18,6 +18,18 @@ def accepted_receipt():
                 'boundary':{'scripted-isolation-check':True},
                 'properties':{f'P{i}':{'status':'pass'} for i in range(1,8)}}]}
 
+class RegressionQualityTests(unittest.TestCase):
+    def test_baseline_assessment_distinguishes_weak_and_discriminating_tests(self):
+        from fixture.harness.developer_tests import assess
+        baseline={'observations':[{'condition':'restart','order':{'status':'COMPENSATING','attempts':2}}]}
+        weak={'assertions':[{'name':'retries','condition':'restart','path':'order.attempts','equals':2}]}
+        strong={'assertions':[{'name':'recovers','condition':'restart','path':'order.status','equals':'CANCELLED_DECLINED'}]}
+        self.assertTrue(assess(weak,baseline)['passed'])
+        self.assertFalse(assess(strong,baseline)['passed'])
+        repaired={'observations':[{'condition':'restart','order':{'status':'CANCELLED_DECLINED','attempts':2}}]}
+        self.assertTrue(assess(strong,repaired)['passed'])
+        self.assertEqual('COMPENSATING',baseline['observations'][0]['order']['status'])
+
 class ActionSchemaTests(unittest.TestCase):
     def test_assertion_pairs_use_only_actual_developer_targets(self):
         from incidentforge.action_schema import action_format

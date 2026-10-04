@@ -27,5 +27,11 @@
       "regression_events": 0
     }
   ],
-  "scope": "Current export function with retained successful and failed run evidence; not browser download verification."
+  "scope": "Current export function with retained successful and failed run evidence; not browser download verification.",
+  "browser_download": {
+    "run": "b2-if-002-20261004T063114Z-cec613",
+    "crc_verified": true,
+    "manifest_verified": true,
+    "source": "Local UI Export review link at port 8784"
+  }
 }

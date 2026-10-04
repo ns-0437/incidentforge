@@ -53,6 +53,11 @@ def execute(path,result):
     if not path.exists(): return {'authored':False,'assertions':[]}
     if path.is_symlink() or path.stat().st_size>8192: raise ValueError('developer tests bound')
     spec=validate(json.loads(path.read_text(encoding='utf-8')))
+    return assess(spec,result)
+
+def assess(spec,result):
+    """Evaluate an assertion specification against recorded public observations."""
+    validate(spec)
     outcomes=[]
     for a in spec['assertions']:
         matches=[o for o in result.get('observations',[]) if o.get('condition',o.get('fault'))==a['condition']]

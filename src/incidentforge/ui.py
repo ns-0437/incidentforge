@@ -109,7 +109,9 @@ def details(root,run_id):
             value=json.loads(artifact(path,payload['artifact']))
             if isinstance(value,dict) and value.get('saved') is True and 'specification' in value:
                 spec=json.loads(artifact(path,value['specification']))
-                developer_tests.append({'event':e['seq'],'kind':'authored','specification':spec})
+                developer_tests.append({'event':e['seq'],'kind':'authored','specification':spec,
+                    'baseline_assessment':value.get('baseline_assessment'),
+                    'test_quality_note':value.get('test_quality_note')})
             elif isinstance(value,dict) and isinstance(value.get('developer_tests'),dict):
                 receipt=value['developer_tests']
                 developer_tests.append({'event':e['seq'],'kind':'execution',
