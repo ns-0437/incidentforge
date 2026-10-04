@@ -403,3 +403,20 @@ Four regressions cover valid receipts, contradictory cases/properties/isolation,
 completion typing, and the final controller handoff. All 94 portable tests pass.
 A read-only compatibility scan accepted all 17 retained protected acceptance
 receipts. Historical outcomes remain unchanged. No new inference spending.
+
+## v14 live rehearsal and repeated-guidance correction — October 4
+
+Run b2-if-002-20261004T053915Z-4afb81 on aee0e21 remained unresolved.
+Six model calls cost an estimated $0.010496. Investigation passed after one
+correction and the four-condition compensation probe completed; exact edits
+failed, zero edits were applied, and accumulated context hit the 100 KB prompt
+bound. No protected feedback, candidate freeze, or acceptance occurred. All 43
+events/artifact hashes verified. Exposure is $0.265159 / $0.40, leaving $0.134841,
+with no pending calls. See [v14 record](../benchmarks/reliability/v14-pilot.json).
+
+Offline correction keeps only the latest action contract in the model context.
+Prior actions, measurements, errors and verbatim source remain; original prompt
+artifacts are unchanged. The last dispatched prompt shrinks from 95,659 to 73283
+bytes under this transform. The 100 KB cap is unchanged. Two regressions verify
+no evidence loss and bounded repeated guidance; all 96 portable tests pass.
+No automatic live retry was made and no improved repair rate is claimed.
