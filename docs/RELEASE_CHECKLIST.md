@@ -13,7 +13,7 @@ December 15. Recheck the live entry form before final submission.
 - [x] Real Token Factory inference and Sandbox execution evidenced.
 - [x] Frozen twelve-slot T8 results, failures and accounting retained.
 - [x] Public recorded frontend deployed; main repository remains private.
-- [x] 78 portable controller/regression tests passed locally; CI status must be checked at release.
+- [x] 79 portable controller/regression tests passed locally; CI status must be checked at release.
 - [x] Judge guide, submission copy and timed recording script prepared.
 - [x] Fresh-checkout Linux/setup rehearsal recorded: 61 portable tests, 16 Linux checks, four HTTP routes; see [record](../benchmarks/release/rehearsal.json).
 - [x] Two live completion attempts retained: IF-001 accepted, IF-002 rejected. A third rejected IF-002 pilot exercised authored-test completion live.
@@ -41,3 +41,6 @@ actual project license is MIT.
 An earlier live pilot timed out before response. On October 4 its full reservation
 was conservatively reconciled with actual usage still unknown; exposure unchanged.
 See [timeout recovery](TIMEOUT_RECOVERY.md).
+
+Owner clarification, October 4: confirmation covers continued access to the owner
+account only. Separate judge credentials/access have **not** been confirmed.

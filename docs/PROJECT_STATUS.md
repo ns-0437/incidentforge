@@ -48,9 +48,12 @@ Cumulative accounted exposure: **$0.254663 / $0.40**. Remaining allocation:
 The other trial credits are unallocated. The GitHub Pages site is a recorded replay,
 not a hosted inference service. The main source repository stays private until release.
 
-Validation for the backend selector: **78 portable tests passed** and JavaScript
+Validation for the backend selector: **79 portable tests passed** and JavaScript
 syntax validation passed. Tests verify HTTP allowlisting, recorded selection,
 child-process arguments and failure before launch when Docker is unavailable.
 October 4 browser review confirmed Sandbox selection, recorded patch and validation
 views, and review download. The archive CRC and manifest hashes passed. Live UI
 launch/cancellation and fresh-user judge access were not rehearsed in this check.
+
+Owner clarification, October 4: confirmation covers continued access to the owner
+account only. Separate judge credentials/access have **not** been confirmed.

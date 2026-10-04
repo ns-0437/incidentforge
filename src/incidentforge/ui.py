@@ -156,8 +156,10 @@ class Manager:
                                 creationflags=subprocess.CREATE_NO_WINDOW if os.name=='nt' else 0)
 
     def active(self):
-        if not self.guard.exists(): return None
-        data=read_json(self.guard)
+        try: data=read_json(self.guard)
+        except FileNotFoundError:
+            # The watcher removes the guard after confirming process termination.
+            return None
         data['status']='live' if self.current==data['run_id'] else 'unknown'
         data['cancel_requested']=(run_path(self.root,data['run_id'])/'CANCEL').exists()
         return data

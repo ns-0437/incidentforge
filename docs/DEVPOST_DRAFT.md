@@ -71,3 +71,6 @@ clear separation between developer and experiment observations.
 
 Do not submit this draft with unresolved placeholders. Publishing the repository,
 YouTube video and final Devpost entry are separate release actions.
+
+Owner clarification, October 4: confirmation covers continued access to the owner
+account only. Separate judge credentials/access have **not** been confirmed.

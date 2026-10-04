@@ -78,3 +78,6 @@ diagnostic does not change an unresolved run into a successful autonomous run.
 See T8_RESULTS.md for the comparison, POST_T8_RELIABILITY.md for subsequent
 changes, and benchmarks/ for sanitized results. Frozen T8 reproduction requires
 the recorded historical revision rather than current development source.
+
+Owner clarification, October 4: confirmation covers continued access to the owner
+account only. Separate judge credentials/access have **not** been confirmed.

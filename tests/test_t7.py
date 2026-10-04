@@ -69,6 +69,19 @@ class UITests(unittest.TestCase):
         end=time.time()+2
         while self.manager.active() and time.time()<end: time.sleep(.01)
         self.assertIsNone(self.manager.active());self.assertEqual(1,len(self.spawned))
+    def test_active_guard_removed_during_read(self):
+        from unittest.mock import patch
+        from incidentforge.ui import read_json
+        self.manager.guard.write_text('{"run_id":"finished"}')
+        def removed(path):
+            path.unlink()
+            return read_json(path)
+        with patch('incidentforge.ui.read_json',side_effect=removed):
+            self.assertIsNone(self.manager.active())
+        self.manager.guard.write_text('invalid')
+        with self.assertRaises(json.JSONDecodeError): self.manager.active()
+        self.manager.guard.unlink()
+
     def test_pending_usage_prevents_launch(self):
         b=Budget(self.root/'runs/t4-budget.sqlite',200000);b.reserve('previous',100,200000,10)
         with self.assertRaises(ValueError): self.manager.launch('IF-001','B0')

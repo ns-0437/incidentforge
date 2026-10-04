@@ -19,3 +19,6 @@ The owner confirmed October 4 that free provider access lasts through December 1
 and they can record the video. Credential delivery and fresh-user execution remain
 separate open gates. Keep the main source repository private until the owner
 chooses final release. Recording the replay needs no new inference calls.
+
+Owner clarification, October 4: confirmation covers continued access to the owner
+account only. Separate judge credentials/access have **not** been confirmed.
