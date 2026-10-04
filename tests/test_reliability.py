@@ -11,6 +11,42 @@ from incidentforge.budget import Budget
 from incidentforge.workspace import Workspace
 from incidentforge.llm import Nebius,REQUEST_SECONDS
 
+def accepted_receipt():
+    return {'complete':True,'decision':'accept_for_review','tests_run':1,
+            'errors':0,'failures':0,'skipped':0,'cases':[{
+                'case':'scripted-case','decision':'accept_for_review',
+                'boundary':{'scripted-isolation-check':True},
+                'properties':{f'P{i}':{'status':'pass'} for i in range(1,8)}}]}
+
+class FinalReceiptTests(unittest.TestCase):
+    def test_valid_acceptance_and_applicable_exemptions(self):
+        from incidentforge.grounding import final_decision
+        result=accepted_receipt()
+        for prop in ('P2','P6'): result['cases'][0]['properties'][prop]['status']='not_applicable'
+        self.assertEqual('accept_for_review',final_decision(result))
+
+    def test_empty_duplicate_mismatched_and_failed_cases_rejected(self):
+        from incidentforge.grounding import final_decision
+        for mode in ('empty','duplicate','count','case-failure','property-failure','boundary','missing-property','errors'):
+            result=accepted_receipt()
+            if mode=='empty': result['cases']=[]
+            elif mode=='duplicate': result['cases']*=2;result['tests_run']=2
+            elif mode=='count': result['tests_run']=2
+            elif mode=='case-failure': result['cases'][0]['decision']='reject_behavior'
+            elif mode=='property-failure': result['cases'][0]['properties']['P4']['status']='fail'
+            elif mode=='boundary': result['cases'][0]['boundary']={'check':1}
+            elif mode=='missing-property': del result['cases'][0]['properties']['P7']
+            else: result['errors']=1
+            with self.subTest(mode=mode):self.assertEqual('invalid_evaluation',final_decision(result))
+
+    def test_incomplete_and_unknown_verdicts_cannot_accept(self):
+        from incidentforge.grounding import final_decision
+        for complete in (False,1,'true',None):
+            result=accepted_receipt();result['complete']=complete
+            self.assertEqual('invalid_evaluation',final_decision(result))
+        self.assertEqual('invalid_evaluation',final_decision({'complete':True,'decision':'invented'}))
+        self.assertEqual('reject_behavior',final_decision({'complete':True,'decision':'reject_behavior'}))
+
 class ReliabilityTests(unittest.TestCase):
     setUp=test_t4.T4Tests.setUp
 
@@ -23,7 +59,7 @@ class ReliabilityTests(unittest.TestCase):
             def run(self,path,mode):
                 self.count+=1
                 if mode=='protected' and protected is not None: return protected
-                return {'complete':True,'decision':'accept_for_review','cases':[],
+                return {**accepted_receipt(),
                         'observations':[{'condition':'clean','order':{'status':'CONFIRMED'}}]}
         class Model:
             history=[]
@@ -36,6 +72,15 @@ class ReliabilityTests(unittest.TestCase):
             report=Controller('r',root,e,backend,model,Budget(self.root/'b.db',200000),variant=variant).run()
         verify(e.root)
         return report,model,backend
+
+    def test_contradictory_final_acceptance_remains_invalid(self):
+        report,_,_=self.run_actions(iter([
+            {'action':'replace','path':'fixture/app/service.py','old':'x=1','new':'x=2','reason':'repair'},
+            {'action':'finish','summary':'candidate for review'}]),protected={
+                'complete':True,'decision':'accept_for_review','cases':[]})
+        self.assertEqual('invalid_evaluation',report['decision'])
+        self.assertIsNotNone(report['candidate_revision'])
+        self.assertIn('inconsistent',report['reason'])
 
     def test_native_objects_keep_exact_factual_gate(self):
         expected={'restart':{'order_status':'COMPENSATING','compensation_complete':False}}

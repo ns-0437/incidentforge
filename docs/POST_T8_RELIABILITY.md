@@ -388,3 +388,18 @@ limits. Two regression tests verify completion typing and the controller stop,
 including no extra model calls, no final execution, and no private-data leakage.
 All 90 portable tests pass. No live inference was used and no historical result
 was changed. Exposure remains $0.254663 of the $0.40 allocation.
+
+## Final acceptance receipt consistency — October 4
+
+The controller now checks final acceptance receipts before assigning an accepted
+verdict: literal completion, a positive test count matching distinct case records,
+zero runner errors/failures/skips, accepted case decisions, all seven property
+results, and nonempty isolation receipts containing only literal true values.
+Only P2/P6 may be not applicable, matching the evaluator. Missing or contradictory
+acceptance evidence becomes invalid_evaluation. This checks internal consistency;
+it does not authenticate evidence or prove universal correctness.
+
+Four regressions cover valid receipts, contradictory cases/properties/isolation,
+completion typing, and the final controller handoff. All 94 portable tests pass.
+A read-only compatibility scan accepted all 17 retained protected acceptance
+receipts. Historical outcomes remain unchanged. No new inference spending.

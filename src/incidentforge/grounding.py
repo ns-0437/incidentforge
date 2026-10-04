@@ -55,3 +55,35 @@ def check_interpretation(command,expected):
         raise ValueError('conclusion must equal required_factual_conclusion exactly; causal claims belong in the unverified hypothesis commentary')
     # This checks the structured factual portion, not arbitrary natural-language reasoning.
     return {'facts_verified':True,'causal_prose_verified':False}
+
+def final_decision(result):
+    """Check internal consistency of an acceptance receipt, not its authenticity."""
+    if not isinstance(result,dict) or result.get('complete') is not True:
+        return 'invalid_evaluation'
+    decision=result.get('decision')
+    if decision not in ('accept_for_review','reject_behavior','reject_patch_invalid','invalid_evaluation'):
+        return 'invalid_evaluation'
+    if decision!='accept_for_review': return decision
+    count=result.get('tests_run');cases=result.get('cases')
+    if type(count) is not int or count<=0 or not isinstance(cases,list) or len(cases)!=count:
+        return 'invalid_evaluation'
+    if any(type(result.get(key)) is not int or result[key]!=0 for key in ('errors','failures','skipped')):
+        return 'invalid_evaluation'
+    names=set()
+    for case in cases:
+        if not isinstance(case,dict): return 'invalid_evaluation'
+        name=case.get('case')
+        if not isinstance(name,str) or not name.strip() or name in names: return 'invalid_evaluation'
+        names.add(name)
+        if case.get('decision')!='accept_for_review': return 'invalid_evaluation'
+        boundary=case.get('boundary')
+        if not isinstance(boundary,dict) or not boundary or any(v is not True for v in boundary.values()):
+            return 'invalid_evaluation'
+        properties=case.get('properties')
+        if not isinstance(properties,dict) or set(properties)!={f'P{i}' for i in range(1,8)}:
+            return 'invalid_evaluation'
+        for prop,value in properties.items():
+            if not isinstance(value,dict): return 'invalid_evaluation'
+            allowed=('pass','not_applicable') if prop in ('P2','P6') else ('pass',)
+            if value.get('status') not in allowed: return 'invalid_evaluation'
+    return decision

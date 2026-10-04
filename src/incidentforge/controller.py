@@ -274,8 +274,10 @@ protected behavioral feedback during repair.'''
                 self.transition('VERIFY')
                 result=self.backend.run(self.workspace.root,'protected')
                 if self.workspace.revision()!=frozen: raise RuntimeError('candidate changed during validation')
-                decision=result['decision'] if result.get('complete') else 'invalid_evaluation'
+                from .grounding import final_decision
+                decision=final_decision(result)
                 reason=('All declared protected development checks passed.' if decision=='accept_for_review'
+                        else 'Protected validation receipt is incomplete or inconsistent; no acceptance established.' if decision=='invalid_evaluation'
                         else 'Protected development validation did not accept the candidate; inspect case evidence.')
                 self.emit('ValidationReport',{'candidate_hash':frozen,'evaluator_version':'T2-development-v1',
                     'conditions':str(result.get('tests_run'))+' protected development scenarios; '+self.backend.name,
