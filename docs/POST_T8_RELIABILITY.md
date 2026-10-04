@@ -528,3 +528,36 @@ Failed-run archives are now retained after hash and size verification while the
 helper still returns failure. Recovery of the existing v23 archive confirmed the
 compile error without rerunning its workload or making an inference call.
 The final portable suite passed 113 tests.
+
+## Public regression observations and console lifecycle
+
+Developer workloads now expose GET /stock for both compensation conditions and
+scalar counts of observed charge requests/distinct operation keys for payment
+conditions. These summarize public HTTP evidence, never private audit rows or
+protected schedules. They allow authored assertions to distinguish preserved retry
+identity and released stock from unchanged or status-only behavior. Historical
+runs and the frozen T8 matrix are unchanged. Model use of these fields is not yet
+measured in a new live pilot.
+
+The operator console distinguishes tracked execution, completed reports, process
+exit without a report, and unknown external process state. A missing terminal report
+does not prove that a CLI run is stopped. Lifecycle changes refresh the detail panel
+without collapsing unchanged expanded evidence every polling interval. Five local
+lifecycle scenarios and a browser load without JavaScript errors passed.
+
+All 19 Linux checks passed (zero failures, errors or skips). The added authored
+control assertions failed on changed retry identity and unreleased inventory, and
+passed on reference behavior. This establishes observation usefulness for those
+controls, not that the model reliably authors useful tests.
+
+## v24 declaration
+
+One IF-002/B2 Sandbox development pilot will test the public stock observations,
+compile-only edit rejection and defect-detection guidance together. Success requires
+an authored assertion that fails on baseline observations and passes on the final
+candidate, plus accepted independent protected validation. Retain a failed or weak
+result equally. This is a declared development rehearsal, not a fresh comparison.
+Use the existing $0.40 cumulative ledger, ten-call bound and unknown-operation guards.
+Do not reset accounting or perform an automatic retry. Starting exposure: $0.316698;
+remaining allocation: $0.083302. No causal or population reliability claim follows
+from a single successful attempt.

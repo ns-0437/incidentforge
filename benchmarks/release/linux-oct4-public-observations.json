@@ -1,0 +1,10 @@
+{
+  "tests": 19,
+  "failures": 0,
+  "errors": 0,
+  "skips": 0,
+  "complete": true,
+  "evidence": "runs/t6-linux-20261004-091141/report.json",
+  "report_sha256": "654d0a01d418714a944273e77b7a5a4669a6a87cf224d97f5226ada991269157",
+  "scope": "Public assertion discrimination on faulty/reference controls plus existing Linux behavioral/isolation suite. No inference."
+}

@@ -65,3 +65,34 @@ class CompensationTests(ContractTests):
                 self.assertEqual('CANCELLED_DECLINED',result['order']['status'])
                 self.assertTrue(any('/release' in e['source'] for e in events))
             w.close()
+
+    def test_public_payment_assertion_detects_changed_retry_identity(self):
+        from probes.run_candidate import payment_observation
+        from fixture.harness.developer_tests import assess,validate_targets
+        spec={'assertions':[{'name':'retry preserves operation identity','condition':'payment response loss',
+                            'path':'payment_requests.distinct_charge_operation_keys','equals':1}]}
+        for control,expected in [('fresh_key',False),('reference',True)]:
+            with self.subTest(control=control):
+                w=self.world(control=control,fault=True)
+                code,_=w.submit();order=w.observe()
+                observations=[payment_observation(w,code,order)]
+                validate_targets(spec,observations)
+                self.assertEqual(expected,assess(spec,{'observations':observations})['passed'])
+                self.assertNotIn('committed_charge_count',observations[0])
+                w.close()
+
+    def test_public_stock_assertion_rejects_status_only_compensation(self):
+        from probes.run_candidate import public_stock
+        from fixture.harness.developer_tests import assess,validate_targets
+        spec={'assertions':[{'name':'decline releases inventory','condition':'no_restart',
+                            'path':'stock.A.held','equals':0}]}
+        for control,expected in [('terminal_without_release',False),('reference',True)]:
+            with self.subTest(control=control):
+                w=self.world(control=control)
+                w.submit('decline',expect='decline',customer_id='CUST-DECLINE')
+                order=w.observe('decline')
+                self.assertEqual('CANCELLED_DECLINED',order['status'])
+                observations=[{'condition':'no_restart','order':order,'stock':public_stock()}]
+                validate_targets(spec,observations)
+                self.assertEqual(expected,assess(spec,{'observations':observations})['passed'])
+                w.close()

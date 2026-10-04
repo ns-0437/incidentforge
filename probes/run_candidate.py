@@ -11,6 +11,24 @@ from fixture.harness.t2 import PORTS,read_rows
 from fixture.app.common import http
 from concurrent.futures import ThreadPoolExecutor
 
+def payment_observation(w,accepted_http,order):
+    """Summarize public proxy exchanges; these are not committed-effect counts."""
+    with w.event_lock:
+        responses=[e for e in w.events if e['event']=='payment_response']
+    charges=[e for e in responses if e['path']=='/charges']
+    keys={e['body'].get('operation_key') for e in charges}
+    return {'fault':'payment response loss' if w.fault else 'none',
+            'accepted_http':accepted_http,'order':order,'payment_responses':responses,
+            'payment_requests':{'charge_requests_observed':len(charges),
+                                'distinct_charge_operation_keys':len(keys)}}
+
+
+def public_stock():
+    code,stock=http(PORTS['inventory'],'GET','/stock')
+    if code!=200 or not isinstance(stock,dict): raise RuntimeError('public stock observation unavailable')
+    return stock
+
+
 def main():
     parser=argparse.ArgumentParser()
     parser.add_argument('--mode',choices=['developer','protected','identity_probe','compensation_probe','calibration','final_holdout'],required=True)
@@ -49,6 +67,7 @@ def main():
                         second=http(PORTS['inventory'],'POST','/reservations/rsv:probe/release',{'operation_key':'rel:probe'})
                         observation={'condition':condition,'responses':[first,second],
                                      'stock':http(PORTS['inventory'],'GET','/stock')[1]}
+                    if condition in ('no_restart','order_restart'): observation['stock']=public_stock()
                     from fixture.harness.trace_observation import observation as trace_observation
                     observation['execution_trace']=trace_observation(w)
                     observations.append(observation)
@@ -66,12 +85,10 @@ def main():
                     w.start();code,_=w.submit();order=w.observe()
                     # Developer observations only, not hidden evaluator feedback.
                     # Replaying public HTTP responses is not an effect-safety verdict.
-                    observations.append({'fault':'payment response loss' if fault else 'none',
-                        'accepted_http':code,'order':order,'payment_responses':[
-                            e for e in w.events if e['event']=='payment_response']})
+                    observations.append(payment_observation(w,code,order))
                 finally: w.close()
         result={'mode':'developer','observations':observations,'complete':True,
-                'note':'HTTP observations and order state only; no protected verdict.'}
+                'note':'HTTP observations, request identity counts and order state only; no committed-effect count or protected verdict.'}
     elif args.mode=='identity_probe':
         observations=[]
         for condition in ('same_key_sequential','same_key_restart','same_key_concurrent','different_keys'):

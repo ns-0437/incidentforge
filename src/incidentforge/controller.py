@@ -30,6 +30,9 @@ SYSTEM+='''\nYou MUST author developer regression tests using developer_test and
 Up to 12 assertions, condition selects the public observation condition or fault label;
 path selects nested object fields, equals is a scalar. These are saved in developer-tests.json
 and run on subsequent test actions. They cannot alter protected validation.
+Choose assertions from the public contract that fail on the original failing observations
+and pass after repair. Include the affected business outcome, not just a retry count
+or a successful status. Baseline assessment reports whether your test detects a change.
 Count test-authoring against the same three-edit limit. For exact replacement errors,
 read the relevant source before retrying; preserve its whitespace. Prefer the smallest
 unique replacement that expresses the repair. Do not reconstruct entire functions

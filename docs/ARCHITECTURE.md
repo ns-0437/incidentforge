@@ -1,6 +1,38 @@
 # IncidentForge: architecture
 
-Updated 2026-10-03. T0–T2 local foundations are implemented; see T2_STATUS.md for measured coverage. Controller/model/remote/UI sections remain proposed. ORIGINAL_BRIEF.md governs scope. This architecture replaces earlier claims that HTTP responses prove commits, snapshots capture all effects, or host-side grading alone protects evidence.
+Updated October 4, 2026. T0-T7 are implemented and the frozen T8 campaign is
+reported. ORIGINAL_BRIEF.md governs scope. The sections below preserve the design
+contract; the implementation map identifies concrete modules and remaining limits.
+
+## Implementation map
+
+| Responsibility | Current implementation |
+|---|---|
+| Bounded orchestration and action validation | `src/incidentforge/controller.py`, `action_schema.py`, `investigation.py` |
+| Token Factory calls and persistent allocation | `llm.py`, `budget.py` |
+| Source edits and evidence | `workspace.py`, `evidence.py`, `records.py` |
+| Local/remote workload execution | `backend.py`, `remote_backend.py`, `scripts/contree-execute.py` |
+| HTTP services and protected store broker | `fixture/app/service_v2.py`, `fixture/harness/persistence/v2.py` |
+| Trusted workload and developer assertions | `probes/run_candidate.py`, `fixture/harness/developer_tests.py` |
+| Independent evaluation | `evaluation/verifier.py`, `evaluation/holdout.py` |
+| Operator console and recorded frontend | `src/incidentforge/ui.py`, `src/incidentforge/web/`, `site/` |
+
+The service and UI servers use Python standard-library HTTP implementations;
+FastAPI was a planning option, not an installed dependency. Services run under
+separate Linux identities. The trusted execution image contains evaluation tools;
+its candidate-readable bundle excludes them. A separate restricted Docker reader
+checks exported protected evidence. Image boundaries and filesystem permissions
+must not be confused.
+
+Developer assertions observe declared public HTTP data. Public stock counts can
+expose unreleased holds; payment-request identity counts can expose changed retry
+keys. Neither is a committed-payment-effect verdict. The protected evaluator
+remains responsible for effect safety. Baseline assessment reveals assertions that
+already pass before repair; such assertions do not demonstrate defect detection.
+
+See [completion gates](COMPLETION_GATES.md) for unresolved release and reliability
+work. No additional end-to-end success rate is implied by this implementation map.
+
 
 ## Workflow and component interfaces
 
