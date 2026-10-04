@@ -58,7 +58,7 @@ Windows default. Docker independently checks returned protected evidence.
 python scripts/run-t4.py --live --variant B2 --incident IF-001 --backend contree
 ```
 
-The local UI launches Docker; the command above uses real Nebius Sandbox. The
+The local UI offers Docker and Nebius Sandbox; the command above selects Sandbox. The
 persisted budget blocks dispatch that is not funded or has unknown pending usage.
 Never delete the ledger or start a fresh one to evade the project allocation.
 The owner approved a $0.40 cumulative development allocation; remaining capacity

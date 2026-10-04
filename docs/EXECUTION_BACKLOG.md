@@ -4,6 +4,10 @@ Current checkpoint (October 3, 2026): T0–T7 delivered; T8 execution and report
 
 Historical T2 checkpoint: 32 tests, 17 case reports, all five required harmful fixes rejected; separate T0/T1 regression: 34 tests, zero skips. T3 subsequently verified remote compatibility. Solo, 6–7 hours/day: roughly 162–189 hours across October 3–29, with October 30 reserved as contingency. Estimates are ranges, not guarantees.
 
+Latest progress assessment: [PROJECT_STATUS.md](PROJECT_STATUS.md), October 4.
+T9 remains incomplete; the estimated overall completion is 70%, including quality
+and release gates rather than just counting implemented stages.
+
 ## Ordered work and gates
 
 | Task | Dependencies | Hours | Deliverable and acceptance |
