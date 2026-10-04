@@ -34,7 +34,7 @@ Use this shape (replace placeholders with your own analysis):
 "same_key_concurrent":{"H1":"...","H2":"..."},"different_keys":{"H1":"...","H2":"..."}},"repetitions":1,
 "reason":"...","limits":{"seconds":100}}}'''
 
-def investigation_format(intervention,conditions,symbols):
+def investigation_format(intervention,conditions,symbols,source):
     """Constrain shape and available vocabulary, never the diagnosis or outcome."""
     def obj(properties):
         return {'type':'object','properties':properties,'required':list(properties),'additionalProperties':False}
@@ -43,7 +43,8 @@ def investigation_format(intervention,conditions,symbols):
     hypothesis=obj({
         'mechanism':text,
         'symbols':{'type':'array','minItems':1,'items':{'type':'string','enum':symbols}},
-        'supporting_refs':{'type':'array','minItems':1,'items':text},
+        'supporting_refs':{'type':'array','minItems':1,'items':{'type':'string',
+            'enum':['L'+str(n) for n,line in enumerate(source.splitlines(),1) if line.strip()]}},
         'counterevidence':strings,'alternatives':strings,'predicted_signatures':strings,
         'distinguishing_experiment':{'type':'string','enum':[intervention]},'confidence_basis':text})
     experiment=obj({'question':text,'baseline':text,'reset':text,
@@ -173,7 +174,7 @@ not prove a path is impossible. Do not conflate initial and restarted processes.
     if is_comp:
         system+='\nCANCELLED_DECLINED means compensation has completed; COMPENSATING is a pending state.'
     messages=[{'role':'system','content':system},{'role':'user','content':json.dumps(prompt)}]
-    response_format=investigation_format(intervention,conditions,prompt['allowed_source_symbols'])
+    response_format=investigation_format(intervention,conditions,prompt['allowed_source_symbols'],prompt['source'])
     for attempt in range(2):
         raw=controller.model.call(messages,response_format=response_format)
         try: plan=validate_plan(json.loads(raw),intervention,conditions,prompt['source']);break

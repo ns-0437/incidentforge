@@ -95,6 +95,20 @@ class UITests(unittest.TestCase):
             for secret in ('PRIVATE_CASE','PRIVATE_SCHEDULE','NEVER_EXPORT'): self.assertNotIn(secret,review)
         status,_,headers=self.request('/api/runs/sample/export')
         self.assertEqual(200,status);self.assertEqual('application/zip',headers['Content-Type'])
+    def test_authored_tests_and_receipts_are_exported_without_other_tool_data(self):
+        e=Evidence(self.root/'runs'/'tests-only','tests-only')
+        spec={'assertions':[{'name':'recover','condition':'restart','path':'order.status','equals':'CANCELLED_DECLINED'}]}
+        e.event('tool_result',{'artifact':e.artifact({'saved':True,'specification':e.artifact(spec)})})
+        e.event('tool_result',{'artifact':e.artifact({'developer_tests':{'authored':True,'passed':True,'assertions':[{'passed':True}]},'private':'NEVER_EXPORT'})})
+        report={'run_id':'tests-only','variant':'B2','decision':'unresolved','model_claim_unverified':None,'verified_work':{'developer_tests_passed_on_current_revision':True}}
+        e.event('report',report);(e.root/'report.json').write_text(json.dumps(report))
+        data=details(self.root,'tests-only')
+        self.assertEqual(spec,data['developer_tests'][0]['specification'])
+        self.assertTrue(data['developer_tests'][1]['receipt']['passed'])
+        self.assertNotIn('NEVER_EXPORT',json.dumps(data))
+        with zipfile.ZipFile(io.BytesIO(export_run(self.root,'tests-only'))) as archive:
+            self.assertEqual(data['developer_tests'],json.loads(archive.read('review.json'))['developer_tests'])
+
     def test_tampered_evidence_export_rejected(self):
         e=self.evidence();(e.root/'events.jsonl').write_text('')
         # A report with a truncated stream must not be treated as verified.

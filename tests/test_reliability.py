@@ -49,7 +49,7 @@ class StructuredInvestigationTests(unittest.TestCase):
 
     def test_format_reaches_provider_and_is_retained_in_evidence(self):
         from incidentforge.investigation import investigation_format
-        fmt=investigation_format('compensation_probe',['no_restart','order_restart'],['step'])
+        fmt=investigation_format('compensation_probe',['no_restart','order_restart'],['step'],'def step():\n    return\n')
         budget=Budget(self.root/'b.db',200000);evidence=Evidence(self.root/'e','r')
         model=Nebius(budget,'r',evidence)
         response={'usage':{'prompt_tokens':10,'completion_tokens':10},
@@ -62,6 +62,12 @@ class StructuredInvestigationTests(unittest.TestCase):
         self.assertEqual(fmt,json.loads((evidence.root/'artifacts'/ref['sha256']).read_text()))
         self.assertEqual(2,verify(evidence.root))
         self.assertEqual(1,budget.totals('r')['calls'])
+
+    def test_provider_citations_exclude_blank_and_nonexistent_lines(self):
+        from incidentforge.investigation import investigation_format
+        fmt=investigation_format('identity_probe',['one'],['step'],'\ndef step():\n    \n    return\n')
+        allowed=fmt['json_schema']['schema']['properties']['hypotheses']['items']['properties']['supporting_refs']['items']['enum']
+        self.assertEqual(['L2','L4'],allowed)
 
     def test_oversized_schema_is_rejected_before_reservation(self):
         budget=Budget(self.root/'b.db',200000);evidence=Evidence(self.root/'e','r')
@@ -456,6 +462,8 @@ class SymbolFeedbackTests(unittest.TestCase):
                 self.assertEqual('json_schema',fmt['type'])
                 schema=fmt['json_schema']['schema']
                 self.assertEqual(['hypotheses','experiment'],schema['required'])
+                references=schema['properties']['hypotheses']['items']['properties']['supporting_refs']['items']['enum']
+                self.assertEqual(['L1','L2'],references)
                 prediction=schema['properties']['experiment']['properties']['predictions']
                 self.assertEqual({'no_restart','order_restart','release_replay','release_replay_inventory_restart'},set(prediction['required']))
                 payload=json.loads(messages[-1]['content'])

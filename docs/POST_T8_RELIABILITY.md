@@ -469,3 +469,16 @@ See [v17 record](../benchmarks/reliability/v17-pilot.json).
 Schema protocol: https://docs.tokenfactory.nebius.com/ai-models-inference/json
 (accessed October 4). Full request size is checked before reserving budget, and
 the response format is retained as a hashed evidence artifact.
+
+## v18: browser rehearsal stopped on source citation — October 4
+
+The IF-002 B2 run was launched through the browser with Sandbox selected. The
+launch receipt confirmed terminal exit; 16 evidence events verified. It used two
+calls ($0.004352), then stopped because both investigation responses cited blank
+source line L13. No edit or regression test occurred. See
+[v18 record](../benchmarks/reliability/v18-pilot.json).
+
+The provider schema now restricts citations to nonblank line IDs from the supplied
+source. This prevents unavailable citations without selecting a causal explanation.
+The local validator still checks every reference. Cumulative exposure after v18:
+$0.287189, leaving $0.112811 of the $0.40 allocation.

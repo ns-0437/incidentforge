@@ -88,7 +88,7 @@ def overview(root,run_id):
 
 def details(root,run_id):
     path=run_path(root,run_id);result=overview(root,run_id);events=events_for(path)
-    records=[];diffs=[];timeline=[];interpretations=[]
+    records=[];diffs=[];timeline=[];interpretations=[];developer_tests=[]
     for e in events:
         kind=e['kind'];payload=e['payload']
         if kind=='record':
@@ -105,6 +105,15 @@ def details(root,run_id):
                 r={**r,'artifacts':[],'data':{**data,'properties':properties}}
             records.append(r)
         if kind=='model_interpretation': interpretations.append(payload)
+        if kind=='tool_result':
+            value=json.loads(artifact(path,payload['artifact']))
+            if isinstance(value,dict) and value.get('saved') is True and 'specification' in value:
+                spec=json.loads(artifact(path,value['specification']))
+                developer_tests.append({'event':e['seq'],'kind':'authored','specification':spec})
+            elif isinstance(value,dict) and isinstance(value.get('developer_tests'),dict):
+                receipt=value['developer_tests']
+                developer_tests.append({'event':e['seq'],'kind':'execution',
+                    'receipt':{k:receipt[k] for k in ('authored','passed','assertions','scope') if k in receipt}})
         if kind in ('transition','action_rejected','stopped','execution_reserved','execution_cleanup','model_response'):
             label=(payload.get('to') if kind=='transition' else payload.get('reason') if kind in ('action_rejected','stopped')
                    else payload.get('mode') if kind=='execution_reserved' else
@@ -118,7 +127,7 @@ def details(root,run_id):
                 raise ValueError('Terminal report missing or mismatched')
             integrity='verified'
         except (ValueError,OSError): integrity='failed'
-    result.update(records=records,diffs=diffs,timeline=timeline,interpretations=interpretations,integrity=integrity,
+    result.update(records=records,diffs=diffs,timeline=timeline,interpretations=interpretations,developer_tests=developer_tests,integrity=integrity,
                   scope='Development evidence; not a final holdout or comparative study.')
     return result
 
