@@ -14,6 +14,9 @@ Main source remains private. No publication or provider call is triggered by the
 - [Recording setup](RECORDING_HANDOFF.md): serve the retained frontend locally with no inference.
 - [Judge guide](JUDGE_GUIDE.md): prerequisites, tests, local console and live-access limitations.
 - [License and reuse inventory](THIRD_PARTY_NOTICES.md): owner review and AI-assistance disclosure.
+- [Submission form audit](SUBMISSION_FORM_AUDIT.md): verified entry requirements mapped
+  to prepared content, copy-ready testing instructions, placeholders and owner actions.
+  The form UI itself remains unaudited pending a signed-in session.
 
 ## Claims and supporting evidence
 

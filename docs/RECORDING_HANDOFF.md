@@ -22,7 +22,13 @@ Target 2:45; keep the final video strictly under three minutes.
    Do not claim ranking, universal correctness, or reliable IF-002 repair.
 4. Explain Pages is a recorded evidence viewer. Only describe live judge
    execution access after its delivery path has been rehearsed.
-5. Review readable text, clear audio, duration, and absence of secrets.
+5. Review readable text, clear audio, duration, and absence of secrets. The rules
+   require that the video "must not include third party trademarks, or copyrighted
+   music or other material unless the Entrant has permission to use such material",
+   so add no background music and keep third-party branding incidental to showing
+   the tools actually used. The rules also require the project to function as
+   depicted, so keep the recorded-replay labelling visible rather than implying
+   live inference.
 6. Upload the reviewed video as public on YouTube and check signed-out playback.
    Provide its URL for the submission materials.
 
