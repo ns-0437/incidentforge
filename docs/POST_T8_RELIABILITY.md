@@ -350,3 +350,12 @@ labels remain invalid in `symbols`; their exact source lines can be cited in
 `supporting_refs`. Regression tests check the initial prompt and exclusion of
 data-only strings. All 81 portable tests pass. No additional live pilot was run,
 so this change establishes prompt/validator consistency, not improved repair rate.
+
+## Evidence-reference validation — October 4
+
+Blank and whitespace-only source quotes are rejected rather than counting as
+grounding through substring matching. Each hypothesis must also name the actual
+selected experiment. Three regression tests cover both rejection paths and valid
+line IDs/verbatim excerpts. All 84 portable tests pass. These are validation
+corrections, not evidence of a higher autonomous repair success rate. No new
+inference spending or replacement of frozen results occurred.

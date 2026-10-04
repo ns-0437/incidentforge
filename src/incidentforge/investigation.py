@@ -53,6 +53,9 @@ def validate_plan(obj,intervention='identity_probe',conditions=None,source=None)
             if not isinstance(h[key],str) or not h[key].strip(): raise ValueError(key+' must be a nonempty string, not an array or object')
         for key in ('symbols','supporting_refs','counterevidence','alternatives','predicted_signatures'):
             if not isinstance(h[key],list) or any(not isinstance(x,str) for x in h[key]): raise ValueError(key+' must be an array of strings')
+    for h in hs:
+        if h['distinguishing_experiment']!=intervention:
+            raise ValueError('hypothesis must name the selected distinguishing experiment')
     spec=obj['experiment'];record('ExperimentSpec','validation',spec)
     if spec['intervention']!=intervention or spec['repetitions']!=1: raise ValueError('unavailable experiment')
     conditions=conditions or {'same_key_sequential','same_key_restart','same_key_concurrent','different_keys'}
@@ -72,6 +75,7 @@ def validate_plan(obj,intervention='identity_probe',conditions=None,source=None)
             if not h['supporting_refs']: raise ValueError('supporting_refs must contain exact source excerpts')
             resolved=[]
             for ref in h['supporting_refs']:
+                if not ref.strip(): raise ValueError('source reference must contain non-whitespace source text')
                 import re
                 line=re.fullmatch(r'L([1-9][0-9]*)',ref)
                 if line:

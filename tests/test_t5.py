@@ -22,6 +22,34 @@ class T5Tests(unittest.TestCase):
             'supported':'a','weakened':'b','uncertainty':'c'}))
         with self.assertRaises(ValueError): validate_plan({'hypotheses':[],'experiment':{}})
 
+class SourceEvidenceTests(unittest.TestCase):
+    def plan(self):
+        h={'mechanism':'cause','symbols':['step'],'supporting_refs':['L1'],
+           'counterevidence':[],'alternatives':[],'predicted_signatures':[],
+           'distinguishing_experiment':'identity_probe','confidence_basis':'limited'}
+        return {'hypotheses':[dict(h),dict(h)],'experiment':{
+            'question':'q','baseline':'b','reset':'fresh','intervention':'identity_probe',
+            'controlled_variables':[],'workload':'w','predictions':{'one':{'H1':'yes','H2':'no'}},
+            'repetitions':1,'reason':'r','limits':{'seconds':100}}}
+
+    def test_empty_source_quotes_cannot_ground_a_hypothesis(self):
+        for quote in ('', ' ', '\t', '\n'):
+            with self.subTest(quote=quote):
+                plan=self.plan();plan['hypotheses'][0]['supporting_refs']=[quote]
+                with self.assertRaisesRegex(ValueError,'non-whitespace'):
+                    validate_plan(plan,conditions={'one'},source='def step():\n    return\n')
+
+    def test_hypotheses_must_refer_to_the_experiment_actually_selected(self):
+        plan=self.plan();plan['hypotheses'][1]['distinguishing_experiment']='compensation_probe'
+        with self.assertRaisesRegex(ValueError,'selected distinguishing experiment'):
+            validate_plan(plan,conditions={'one'},source='def step():\n    return\n')
+
+    def test_valid_source_line_and_quote_remain_accepted(self):
+        plan=self.plan();plan['hypotheses'][1]['supporting_refs']=['    return']
+        result=validate_plan(plan,conditions={'one'},source='def step():\n    return\n')
+        self.assertEqual(['L1: def step():'],result['hypotheses'][0]['supporting_refs'])
+        self.assertEqual(['    return'],result['hypotheses'][1]['supporting_refs'])
+
 class GateTests(unittest.TestCase):
     setUp=test_t4.T4Tests.setUp
     def test_b2_refuses_patch_before_interpretation(self):
