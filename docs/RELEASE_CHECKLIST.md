@@ -13,7 +13,7 @@ December 15. Recheck the live entry form before final submission.
 - [x] Real Token Factory inference and Sandbox execution evidenced.
 - [x] Frozen twelve-slot T8 results, failures and accounting retained.
 - [ ] Restore working frontend deployment; existing URL returned 404 on October 4. Main repository remains private.
-- [x] 98 portable controller/regression tests passed locally; CI status must be checked at release.
+- [x] 99 portable controller/regression tests passed locally; CI status must be checked at release.
 - [x] Judge guide, submission copy and timed recording script prepared.
 - [x] Fresh-checkout Linux/setup rehearsal recorded: 61 portable tests, 16 Linux checks, four HTTP routes; see [record](../benchmarks/release/rehearsal.json).
 - [x] Two live completion attempts retained: IF-001 accepted, IF-002 rejected. A third rejected IF-002 pilot exercised authored-test completion live.
@@ -46,5 +46,16 @@ Owner clarification, October 4: confirmation covers continued access to the owne
 account only. Separate judge credentials/access have **not** been confirmed.
 
 Fresh-checkout repeat: 97 portable tests and 17 Linux controls passed on f6fc999;
-see benchmarks/release/rehearsal-oct4.json. Current source has 98 portable tests.
+see benchmarks/release/rehearsal-oct4.json. Current source has 99 portable tests.
 Owner sent the updated Nebius access/credit request; response pending.
+
+## Main repository Pages preparation — October 4
+
+- [x] Manual public-main-only deployment workflow prepared; uploads only site/.
+- [x] Static artifact allowlist and evidence digest check added to CI.
+- [x] Regression rejects extra files and altered evidence; 99 portable tests pass.
+- [ ] Publish source at owner-approved release, enable Pages Actions and deploy.
+- [ ] Verify the resulting URL signed out before changing the current About link.
+
+Workflow preparation is not a deployment. The local recording handoff now works
+without the unavailable former demo hosting. See JUDGE_FRONTEND.md.

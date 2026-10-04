@@ -131,4 +131,20 @@ class UITests(unittest.TestCase):
                 self.manager._spawn('ui-'+'b'*32,'IF-002','B2','contree',Mock())
             popen.assert_not_called()
 
+class StaticPublishTests(unittest.TestCase):
+    def test_static_allowlist_and_evidence_hash(self):
+        import importlib.util
+        import shutil
+        root=Path(__file__).resolve().parents[1]
+        spec=importlib.util.spec_from_file_location('check_site',root/'scripts/check-site.py')
+        module=importlib.util.module_from_spec(spec);spec.loader.exec_module(module)
+        with tempfile.TemporaryDirectory() as tmp:
+            site=Path(tmp)/'site';shutil.copytree(root/'site',site)
+            self.assertEqual(7,module.check(site)['files'])
+            extra=site/'unreviewed.txt';extra.write_text('unexpected')
+            with self.assertRaisesRegex(ValueError,'allowlist'):module.check(site)
+            extra.unlink()
+            evidence=site/'evidence.json';evidence.write_bytes(evidence.read_bytes()+b' ')
+            with self.assertRaisesRegex(ValueError,'digest'):module.check(site)
+
 if __name__=='__main__': unittest.main()

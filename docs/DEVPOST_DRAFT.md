@@ -33,7 +33,7 @@ two rejected frozen candidates and eight unresolved attempts. Three inference
 timeouts crossed our predeclared infrastructure threshold, so we make no variant
 ranking claim. Later development reduced JSON-escaping friction, added explicit
 completion guidance, and prevented unrun or placeholder tests from masquerading
-as completed work. The current implementation passes 98 portable tests. Two follow-up B2 attempts completed: an
+as completed work. The current implementation passes 99 portable tests. Two follow-up B2 attempts completed: an
 accepted IF-001 repair and a rejected IF-002 repair. These are development results,
 not a new benchmark.
 

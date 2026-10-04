@@ -1,6 +1,17 @@
 # Recording handoff
 
-Open https://ns-0437.github.io/incidentforge-demo/ and follow [VIDEO_SCRIPT.md](VIDEO_SCRIPT.md).
+The existing demo link https://ns-0437.github.io/incidentforge-demo/ is retained
+but returned 404 on October 4. Until the main repository Pages release, record
+the retained frontend locally:
+
+```powershell
+cd C:\Documents2\resume-optimizer\incidentforge
+python -m http.server 8766 --bind 127.0.0.1 --directory site
+```
+
+Open http://127.0.0.1:8766 and follow [VIDEO_SCRIPT.md](VIDEO_SCRIPT.md).
+The planned release URL is https://ns-0437.github.io/incidentforge/; it is not
+published yet. Update the final recording links only after successful deployment.
 Target 2:45; keep the final video strictly under three minutes.
 
 1. Rehearse overview, IF-001 Observe/Investigate/Repair/Verify, IF-002,
