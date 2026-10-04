@@ -330,7 +330,7 @@ The actual restored engine passed the new check without spending inference credi
 Exposure is **$0.251176 / $0.40**; **$0.148824** remains. No pending reservations
 or active Sandbox guard remain. No further model attempt was started.
 
-## v13: return-guard source references — October 4
+## v13: return-guard source references â€” October 4
 
 Revision 6d51cc2 adds bounded AST references to state used by an observed return
 guard. The IF-002 B2 Sandbox pilot remained **unresolved**: two calls returned
@@ -342,7 +342,7 @@ in conservative reservations. No reliability improvement claimed.
 See [v13 record](../benchmarks/reliability/v13-pilot.json). Further inference is
 paused while release work and the source-grounding failure are reviewed.
 
-## Upfront source vocabulary — October 4
+## Upfront source vocabulary â€” October 4
 
 The investigator now receives `allowed_source_symbols` before its first call.
 The list and validator share the same AST extractor. String keys and operation
@@ -351,7 +351,7 @@ labels remain invalid in `symbols`; their exact source lines can be cited in
 data-only strings. All 81 portable tests pass. No additional live pilot was run,
 so this change establishes prompt/validator consistency, not improved repair rate.
 
-## Evidence-reference validation — October 4
+## Evidence-reference validation â€” October 4
 
 Blank and whitespace-only source quotes are rejected rather than counting as
 grounding through substring matching. Each hypothesis must also name the actual
@@ -360,7 +360,7 @@ line IDs/verbatim excerpts. All 84 portable tests pass. These are validation
 corrections, not evidence of a higher autonomous repair success rate. No new
 inference spending or replacement of frozen results occurred.
 
-## Exact experiment coverage — October 4
+## Exact experiment coverage â€” October 4
 
 The investigation-to-repair handoff now requires a literal completed result and
 each declared condition exactly once, with a supported measurement. Previously
@@ -376,7 +376,7 @@ all 23 retained results explicitly labeled declared four-condition experiments;
 Historical evidence and frozen benchmark outcomes were not modified. No live
 inference was used; cumulative exposure remains $0.254663 of the $0.40 cap.
 
-## Incomplete protected feedback stops B2 — October 4
+## Incomplete protected feedback stops B2 â€” October 4
 
 B2 now stops unresolved when its protected-feedback execution is incomplete.
 The request remains counted and its sanitized feedback retained, but no further
@@ -389,7 +389,7 @@ including no extra model calls, no final execution, and no private-data leakage.
 All 90 portable tests pass. No live inference was used and no historical result
 was changed. Exposure remains $0.254663 of the $0.40 allocation.
 
-## Final acceptance receipt consistency — October 4
+## Final acceptance receipt consistency â€” October 4
 
 The controller now checks final acceptance receipts before assigning an accepted
 verdict: literal completion, a positive test count matching distinct case records,
@@ -404,7 +404,7 @@ completion typing, and the final controller handoff. All 94 portable tests pass.
 A read-only compatibility scan accepted all 17 retained protected acceptance
 receipts. Historical outcomes remain unchanged. No new inference spending.
 
-## v14 live rehearsal and repeated-guidance correction — October 4
+## v14 live rehearsal and repeated-guidance correction â€” October 4
 
 Run b2-if-002-20261004T053915Z-4afb81 on aee0e21 remained unresolved.
 Six model calls cost an estimated $0.010496. Investigation passed after one
@@ -421,7 +421,7 @@ bytes under this transform. The 100 KB cap is unchanged. Two regressions verify
 no evidence loss and bounded repeated guidance; all 96 portable tests pass.
 No automatic live retry was made and no improved repair rate is claimed.
 
-## v15: edit syntax failure — October 4
+## v15: edit syntax failure â€” October 4
 
 Run b2-if-002-20261004T054703Z-7c5bea remained unresolved after six calls
 ($0.008474). Three rejected edits exhausted corrections: an indented pass after
@@ -436,7 +436,7 @@ code. A scripted regression verifies rejection, unchanged source, correction
 feedback and a later valid edit. All 97 portable tests pass; no additional live
 run was made. See [v15 record](../benchmarks/reliability/v15-pilot.json).
 
-## v16 and release rehearsal — October 4
+## v16 and release rehearsal â€” October 4
 
 The syntax-feedback pilot stopped at investigation schema validation: a bugs
 envelope followed by an error object. Two calls cost $0.002115, zero edits; the
@@ -451,7 +451,7 @@ skips and four HTTP startup routes, with empty history and no credentials copied
 See [rehearsal](../benchmarks/release/rehearsal-oct4.json). This is setup evidence,
 not autonomous efficacy or completed judge access.
 
-## v17: structured investigation and accepted repair � October 4
+## v17: structured investigation and accepted repair — October 4
 
 At revision 27e637f, one predeclared IF-002 B2 Sandbox run completed with
 accept_for_review: five calls, estimated $0.007089, one source edit, 44 verified
@@ -470,7 +470,7 @@ Schema protocol: https://docs.tokenfactory.nebius.com/ai-models-inference/json
 (accessed October 4). Full request size is checked before reserving budget, and
 the response format is retained as a hashed evidence artifact.
 
-## v18: browser rehearsal stopped on source citation � October 4
+## v18: browser rehearsal stopped on source citation — October 4
 
 The IF-002 B2 run was launched through the browser with Sandbox selected. The
 launch receipt confirmed terminal exit; 16 evidence events verified. It used two
@@ -482,3 +482,21 @@ The provider schema now restricts citations to nonblank line IDs from the suppli
 source. This prevents unavailable citations without selecting a causal explanation.
 The local validator still checks every reference. Cumulative exposure after v18:
 $0.287189, leaving $0.112811 of the $0.40 allocation.
+
+## v19-v20: retained failure evidence and startup reporting
+
+v19 passed structured investigation and the measured experiment but repeated a
+nonexistent exact edit three times. It stopped unresolved with zero edits, five
+calls and $0.007954 estimated usage. The browser receipt confirmed termination.
+See benchmarks/reliability/v19-pilot.json. No identical IF-002 retry followed.
+
+v20 failed before inference because Docker Desktop was stopped. No model call or
+Sandbox workload ran. The original launcher left no terminal report; the curated
+startup record explicitly preserves that limitation rather than reconstructing events.
+Docker was restarted and the local setup diagnostic passed. The launcher now records
+backend startup failures as verifiable unresolved reports without serializing arbitrary
+exception details. A separate payment-family rehearsal is declared as v21.
+
+The current controller requires authored, passing regression tests before freeze.
+The operator Patch view and review ZIP include saved specifications and execution
+receipts. Historical reports remain unchanged. 108 portable tests pass.

@@ -132,7 +132,7 @@ class GateTests(unittest.TestCase):
                 self.count+=1
                 return {'complete':True}
         class Model:
-            def call(self,messages):
+            def call(self,messages,**kwargs):
                 return json.dumps({'action':'replace','path':'fixture/app/service.py',
                     'old':'x=1','new':'x=2','reason':'unsupported guess'})
         e=Evidence(self.root/'e','r')

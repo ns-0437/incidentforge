@@ -108,7 +108,7 @@ class T4Tests(unittest.TestCase):
                 return {'decision':'accept_for_review','complete':False,'cases':[]}
         class Model:
             calls=0
-            def call(self,messages):
+            def call(self,messages,**kwargs):
                 self.calls+=1
                 if self.calls==1: return json.dumps({'action':'replace','path':'fixture/app/service.py','old':'x=1','new':'x=2','reason':'test change'})
                 if self.calls==2: return json.dumps({'action':'developer_test','spec':{'assertions':[{'name':'r','condition':'clean','path':'order.status','equals':'CONFIRMED'}]},'reason':'regression'})

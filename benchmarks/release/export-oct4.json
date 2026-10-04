@@ -1,0 +1,31 @@
+{
+  "checks": [
+    {
+      "run": "b2-if-002-20261004T063114Z-cec613",
+      "decision": "accept_for_review",
+      "files": [
+        "review.json",
+        "patch.diff",
+        "README.txt",
+        "SHA256SUMS.txt"
+      ],
+      "archive_sha256": "ee0000615f2f2af16772266b7469af1e24808648b76d7f3ef4d122c3164684c7",
+      "manifest_verified": true,
+      "regression_events": 0
+    },
+    {
+      "run": "ui-19d720a94f7d4a04bc9d3964b048cab0",
+      "decision": "unresolved",
+      "files": [
+        "review.json",
+        "patch.diff",
+        "README.txt",
+        "SHA256SUMS.txt"
+      ],
+      "archive_sha256": "9ce712cf792a78030805d475a5c87830bd448c57c8dc457581c549c72cfe1693",
+      "manifest_verified": true,
+      "regression_events": 0
+    }
+  ],
+  "scope": "Current export function with retained successful and failed run evidence; not browser download verification."
+}

@@ -22,7 +22,7 @@ class VariantTests(unittest.TestCase):
             def run(self,path,mode):
                 self.count+=1;self.modes.append(mode);return {'complete':True}
         class Model:
-            def call(self,messages): return '{"action":"validate"}'
+            def call(self,messages,**kwargs): return '{"action":"validate"}'
         b=Backend();e=Evidence(self.root/'e','r')
         with patch('incidentforge.investigation.investigate',return_value={}):
             result=Controller('r',self.root/'candidate',e,b,Model(),Budget(self.root/'b.db',200000),variant='B1').run()

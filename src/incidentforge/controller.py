@@ -212,7 +212,9 @@ protected behavioral feedback during repair.'''
                 if self.cancel_file and self.cancel_file.exists(): raise Cancelled('cancelled before action')
                 if time.monotonic()>=deadline: raise TimeoutError('run wall-time cap')
                 messages=latest_action_contract(messages)
-                raw=self.model.call(messages)
+                from .action_schema import action_format
+                contract=guidance()
+                raw=self.model.call(messages,response_format=action_format(contract['allowed_actions'],contract['developer_test_targets'],measured_facts))
                 messages.append({'role':'assistant','content':raw})
                 try:
                     command=action(raw)

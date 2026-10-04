@@ -18,6 +18,28 @@ def accepted_receipt():
                 'boundary':{'scripted-isolation-check':True},
                 'properties':{f'P{i}':{'status':'pass'} for i in range(1,8)}}]}
 
+class ActionSchemaTests(unittest.TestCase):
+    def test_assertion_pairs_use_only_actual_developer_targets(self):
+        from incidentforge.action_schema import action_format
+        fmt=action_format(['read','developer_test','finish'],[
+            {'condition':'clean','fields':[{'path':'order.status'}]},
+            {'condition':'response_loss','fields':[{'path':'order.status'},{'path':'stock.A'}]}],{})
+        variants=fmt['json_schema']['schema']['anyOf']
+        test=next(v for v in variants if v['properties']['action']['enum']==['developer_test'])
+        spec=test['properties']['spec']
+        self.assertEqual(['assertions'],spec['required'])
+        pairs=spec['properties']['assertions']['items']['anyOf']
+        self.assertEqual(['clean'],pairs[0]['properties']['condition']['enum'])
+        self.assertEqual(['order.status'],pairs[0]['properties']['path']['enum'])
+        self.assertNotIn('same_key_restart',json.dumps(fmt))
+        self.assertFalse(spec['additionalProperties'])
+
+    def test_unavailable_actions_and_missing_targets_are_not_offered(self):
+        from incidentforge.action_schema import action_format
+        fmt=action_format(['read','developer_test'],[],{})
+        variants=fmt['json_schema']['schema']['anyOf']
+        self.assertEqual([['read']],[v['properties']['action']['enum'] for v in variants])
+
 class StartupReportTests(unittest.TestCase):
     setUp=test_t4.T4Tests.setUp
 
@@ -173,7 +195,7 @@ class ReliabilityTests(unittest.TestCase):
                 return result
         class Model:
             history=[]
-            def call(self,messages):
+            def call(self,messages,**kwargs):
                 self.history.append(json.loads(json.dumps(messages)))
                 command=next(commands)
                 return command(messages) if callable(command) else json.dumps(command)
