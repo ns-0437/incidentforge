@@ -288,3 +288,20 @@ This is an infrastructure failure, not evidence for or against repair quality.
 Cumulative exposure is **$0.241412 / $0.40**. The nominal remainder is **$0.158588**,
 but dispatch is blocked pending explicit accounting reconciliation. All prior
 usage remains in the same ledger. See [v11 evidence](../benchmarks/reliability/v11-pilot.json).
+
+
+## October 4: audited timeout accounting and clearer budget display
+
+The [timeout recovery tool](TIMEOUT_RECOVERY.md) now previews by default and can
+apply an explicit full-reservation reconciliation after checking terminal evidence.
+The v11 timeout is accounted as `conservative_unknown`, with actual usage still
+NULL and its full $0.017695 counted. The transaction preserves exposure and the
+$0.40 cap; no inference was issued or retried. Its historical result is unchanged.
+
+Exposure remains **$0.241412**, including **$0.070780** in four unknown reservations.
+The remaining allocation is **$0.158588**, and no reservation remains pending.
+The local UI now headlines this total exposure instead of only settled estimates.
+**71 portable tests pass**, including preview immutability, atomic accounting,
+repeat rejection, nonterminal/tampered evidence and settled-call protection.
+JavaScript syntax validation also passes. This improves recovery and reporting;
+it makes no new repair-quality claim.

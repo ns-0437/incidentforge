@@ -55,12 +55,14 @@ def artifact(path,ref):
 
 def budget_status(root):
     path=root/'runs/t4-budget.sqlite'
-    if not path.exists(): return {'cap_usd':.20,'estimated_usd':0,'reserved_usd':0,'pending':0,'remaining_usd':.20}
+    if not path.exists(): return {'cap_usd':.20,'estimated_usd':0,'reserved_usd':0,'pending':0,'remaining_usd':.20,'unknown_usd':0,'unknown_calls':0}
     with closing(sqlite3.connect(path.resolve().as_uri()+'?mode=ro',uri=True)) as db:
         cap=db.execute('SELECT cap FROM settings').fetchone()[0]
+        unknown,unknown_calls=db.execute('SELECT COALESCE(SUM(cap),0),COUNT(*) FROM calls WHERE actual IS NULL').fetchone()
         spent,reserved,pending=db.execute("SELECT COALESCE(SUM(actual),0),COALESCE(SUM(CASE WHEN actual IS NULL THEN cap ELSE actual END),0),COALESCE(SUM(status='reserved'),0) FROM calls").fetchone()
     return {'cap_usd':cap/1e6,'estimated_usd':spent/1e6,'reserved_usd':reserved/1e6,
-            'pending':pending,'remaining_usd':max(0,cap-reserved)/1e6}
+            'pending':pending,'remaining_usd':max(0,cap-reserved)/1e6,
+            'unknown_usd':unknown/1e6,'unknown_calls':unknown_calls}
 
 def overview(root,run_id):
     path=run_path(root,run_id);events=events_for(path)

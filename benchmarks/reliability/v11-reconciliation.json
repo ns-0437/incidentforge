@@ -1,0 +1,13 @@
+{
+  "run_id": "b2-if-002-20261003T182559Z-12a807",
+  "reservation": "a1e4d65b7f67491c8d08d38e0e68cd5f",
+  "counted_microusd": 17695,
+  "actual_microusd": null,
+  "exposure_microusd": 241412,
+  "project_cap_microusd": 400000,
+  "terminal_event_sha256": "0236a42b18f66141740c03c59301a8b2f692979ab2aaeb613e8192c3cbc219f5",
+  "event_file_sha256": "73b9eaf9b2b3e40cf534d80cc87c0defa2d9bb436a56ef63d387ea634d2358cd",
+  "from_status": "reserved",
+  "to_status": "conservative_unknown",
+  "applied": true
+}
