@@ -5,7 +5,9 @@ param(
 )
 $ErrorActionPreference = 'Stop'
 $projectRoot = Split-Path -Parent $PSScriptRoot
-$resultDir = Join-Path $projectRoot ('runs\' + $Stage + '-linux-' + [DateTime]::UtcNow.ToString('yyyyMMdd-HHmmss'))
+# Join each segment separately: a literal 'runs\' creates one backslash-named
+# directory when this script runs under pwsh on Linux, as CI does.
+$resultDir = Join-Path (Join-Path $projectRoot 'runs') ($Stage + '-linux-' + [DateTime]::UtcNow.ToString('yyyyMMdd-HHmmss'))
 New-Item -ItemType Directory -Path $resultDir -Force | Out-Null
 
 function Require-DockerSuccess([string]$label) {

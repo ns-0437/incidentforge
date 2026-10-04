@@ -19,3 +19,39 @@ jobs:
         run: python -m compileall -q src fixture evaluation probes scripts tests
       - name: Verify static publishing artifact
         run: python scripts/check-site.py
+
+  # The portable job above skips 61 collected Linux entries (49 distinct: 12
+  # ContractTests ids are collected twice, in tests.test_t2 and again in
+  # tests.test_t6's namespace). They gate on linux and geteuid()==0, so a normal
+  # runner skips them. This job runs them inside the existing restricted
+  # container so the isolation boundary is exercised on every push.
+  linux-isolation:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v6
+      - uses: actions/setup-python@v6
+        with:
+          python-version: '3.12'
+      - name: Pin the candidate image
+        run: docker pull python:3.12-slim
+      # Reuses scripts/run-t0-linux.ps1 unchanged, so CI and local runs share one
+      # isolation configuration: --read-only, --network none, --cap-drop ALL,
+      # no-new-privileges, pids/memory/cpu limits, read-only bind mounts, a
+      # disposable evidence volume, and no Docker socket or credential mount.
+      - name: Restricted Docker acceptance, stages T1, T2 and T6
+        shell: pwsh
+        run: |
+          ./scripts/run-t0-linux.ps1 -Stage t1
+          ./scripts/run-t0-linux.ps1 -Stage t2
+          ./scripts/run-t0-linux.ps1 -Stage t6
+      - name: Assert reports exist with no failures, errors or skips
+        if: always()
+        run: python scripts/check-linux-reports.py
+      - name: Upload stage reports on failure
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: linux-isolation-reports
+          path: runs/
+          retention-days: 7
