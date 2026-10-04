@@ -450,3 +450,22 @@ A fresh clone of f6fc999 passed 97 portable tests, 17 Linux checks with zero
 skips and four HTTP startup routes, with empty history and no credentials copied.
 See [rehearsal](../benchmarks/release/rehearsal-oct4.json). This is setup evidence,
 not autonomous efficacy or completed judge access.
+
+## v17: structured investigation and accepted repair — October 4
+
+At revision 27e637f, one predeclared IF-002 B2 Sandbox run completed with
+accept_for_review: five calls, estimated $0.007089, one source edit, 44 verified
+events. Both protected development validations independently checked eight cases.
+The provider accepted the investigation JSON Schema. Local source grounding and
+measured-fact checks remained active. The repair removed the process-local guard
+that prevented compensation after restart. No reference repair was supplied.
+
+The agent authored no regression test. Although the declared behavioral checks
+accepted the repair, this omits a deliverable in the original brief. The next
+change will enforce an authored, executed regression test before candidate freeze.
+This success is development evidence, not a reliability rate or fresh holdout.
+See [v17 record](../benchmarks/reliability/v17-pilot.json).
+
+Schema protocol: https://docs.tokenfactory.nebius.com/ai-models-inference/json
+(accessed October 4). Full request size is checked before reserving budget, and
+the response format is retained as a hashed evidence artifact.

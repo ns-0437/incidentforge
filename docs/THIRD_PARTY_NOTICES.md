@@ -20,7 +20,7 @@ the `python:3.12-slim` image and the externally installed ConTree CLI/SDK retain
 their own licenses and terms. Runtime image IDs are recorded with executions;
 these images and external SDKs are not bundled as repository source.
 Nebius Token Factory and Sandbox access remain subject to their service terms.
-GitHub Pages hosts the separate static demonstration.
+The static demonstration is prepared for main-repository GitHub Pages at public release; it is not currently deployed.
 
 ## Attribution and ownership review
 

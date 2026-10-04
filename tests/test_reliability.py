@@ -18,6 +18,32 @@ def accepted_receipt():
                 'boundary':{'scripted-isolation-check':True},
                 'properties':{f'P{i}':{'status':'pass'} for i in range(1,8)}}]}
 
+class SetupPreflightTests(unittest.TestCase):
+    setUp=test_t4.T4Tests.setUp
+
+    def test_pending_ledger_blocks_without_changing_accounting(self):
+        from incidentforge.preflight import inspect
+        (self.root/'runs').mkdir()
+        budget=Budget(self.root/'runs/t4-budget.sqlite',200000)
+        budget.reserve('pending',17695,200000,10)
+        before=budget.totals('pending')
+        with patch('incidentforge.preflight.reader_preflight',return_value='image'),patch('incidentforge.preflight.credential',return_value='SECRET_TEST_VALUE'):
+            result=inspect(self.root,'docker')
+        self.assertFalse(result['ready_for_preflighted_launch'])
+        self.assertNotIn('SECRET_TEST_VALUE',json.dumps(result))
+        self.assertEqual(before,budget.totals('pending'))
+
+    def test_unconfigured_checkout_stays_unmodified_and_reports_missing_access(self):
+        from incidentforge.preflight import inspect
+        with patch('incidentforge.preflight.reader_preflight',side_effect=RuntimeError('Start Docker')),patch('incidentforge.preflight.credential',side_effect=RuntimeError('SECRET_TEST_VALUE')):
+            result=inspect(self.root,'docker')
+        self.assertFalse(result['ready_for_preflighted_launch'])
+        self.assertFalse((self.root/'runs').exists())
+        self.assertNotIn('SECRET_TEST_VALUE',json.dumps(result))
+        checks={c['check']:c for c in result['checks']}
+        self.assertFalse(checks['inference_credential']['ready'])
+        self.assertFalse(checks['allocation']['detail']['ledger_exists'])
+
 class StructuredInvestigationTests(unittest.TestCase):
     setUp=test_t4.T4Tests.setUp
 

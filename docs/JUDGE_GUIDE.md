@@ -2,7 +2,9 @@
 
 ## Start with the recorded evidence
 
-Open https://ns-0437.github.io/incidentforge-demo/. This is a static recorded replay,
+The retained URL https://ns-0437.github.io/incidentforge-demo/ returned 404 on October 4.
+Until the main-repository Pages release, run `python -m http.server 8766 --bind 127.0.0.1 --directory site`
+and open http://127.0.0.1:8766. This is a static recorded replay,
 not a hosted inference service. It cannot spend credits or launch a sandbox.
 
 Select IF-001 for duplicate payment after a lost response, or IF-002 for stranded
@@ -55,8 +57,14 @@ Set `CONTREE_PYTHON` to the installed ConTree SDK Python if it differs from the
 Windows default. Docker independently checks returned protected evidence.
 
 ```powershell
+python scripts/check-setup.py --backend contree
+# Continue only after local checks pass and funded provider access is arranged:
 python scripts/run-t4.py --live --variant B2 --incident IF-001 --backend contree
 ```
+
+The setup check makes no inference or Sandbox requests, changes no ledger, and
+prints no credentials. Passing it checks local prerequisites only; it does not
+confirm provider credit, credential validity, or judge access.
 
 The local UI offers Docker and Nebius Sandbox; the command above selects Sandbox. The
 persisted budget blocks dispatch that is not funded or has unknown pending usage.
