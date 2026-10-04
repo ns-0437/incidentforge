@@ -163,7 +163,7 @@ Post-T8 [reliability work](docs/POST_T8_RELIABILITY.md) adds state-specific acti
 guidance, native JSON facts, a quote-free factual conclusion, net-change and
 authored-test execution gates, persistent property-only feedback, assertion target
 checks, a developer-field catalog, explicit completion readiness, idempotent test
-specification saves, and a bounded 120-second inference wait. **76 local tests
+specification saves, and a bounded 120-second inference wait. **78 local tests
 pass.** Two follow-up B2 pilots completed: IF-001 produced an accepted frozen
 repair that passed all four previously used final schedules; IF-002 produced a
 rejected compensation repair. Neither authored developer tests. These are

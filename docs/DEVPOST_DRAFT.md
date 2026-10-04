@@ -64,7 +64,8 @@ clear separation between developer and experiment observations.
 - Recorded demo: https://ns-0437.github.io/incidentforge-demo/
 - Source: https://github.com/ns-0437/incidentforge (PRIVATE until release)
 - Video: NOT RECORDED / NOT PUBLISHED
-- Working judge access through December 15: NOT CONFIRMED
+- Free provider availability through December 15: owner-confirmed October 4.
+- Working judge access delivery and fresh-user rehearsal: PENDING.
 - AI assistance disclosure: developed with Claude Code and Codex assistance;
   Navin Kumar must review authorship, reused components and final claims.
 

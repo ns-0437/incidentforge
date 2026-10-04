@@ -62,9 +62,11 @@ The local UI offers Docker and Nebius Sandbox; the command above selects Sandbox
 persisted budget blocks dispatch that is not funded or has unknown pending usage.
 Never delete the ledger or start a fresh one to evade the project allocation.
 The owner approved a $0.40 cumulative development allocation; remaining capacity
-depends on the persisted ledger. Judge credentials
-and funding through December 15 are not yet confirmed; do not require judges to
-purchase credits. The public replay does not resolve this access requirement.
+depends on the persisted ledger. On October 4 the owner confirmed free provider
+access through December 15. This is owner-reported confirmation, not an independently
+verified service guarantee. Judge credential delivery and a fresh-user execution
+rehearsal remain pending; do not require judges to purchase credits or share the
+owner personal API key. The public replay does not resolve this delivery requirement.
 
 ## Inspect results honestly
 

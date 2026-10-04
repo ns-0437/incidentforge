@@ -329,3 +329,15 @@ The actual restored engine passed the new check without spending inference credi
 
 Exposure is **$0.251176 / $0.40**; **$0.148824** remains. No pending reservations
 or active Sandbox guard remain. No further model attempt was started.
+
+## v13: return-guard source references — October 4
+
+Revision 6d51cc2 adds bounded AST references to state used by an observed return
+guard. The IF-002 B2 Sandbox pilot remained **unresolved**: two calls returned
+invalid AST symbol references (`reservation_id`, `release`). No edits, freeze or
+protected feedback occurred. All 16 evidence events and artifact hashes verified.
+Cost estimate **$0.003487**; cumulative exposure **$0.254663 / $0.40**, remaining
+**$0.145337**, pending calls zero. Four unknown-usage calls retain **$0.070780**
+in conservative reservations. No reliability improvement claimed.
+See [v13 record](../benchmarks/reliability/v13-pilot.json). Further inference is
+paused while release work and the source-grounding failure are reviewed.
