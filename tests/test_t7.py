@@ -23,7 +23,7 @@ class UITests(unittest.TestCase):
         owner=self
         class Process:
             def wait(self): owner.terminal.wait(5);return 0
-        def spawn(run_id,incident,variant,log):
+        def spawn(run_id,incident,variant,backend,log):
             self.spawned.append(run_id);(self.root/'runs'/run_id).mkdir();return Process()
         self.manager=Manager(self.root,spawn)
         self.server=make_server(self.root,0,self.manager)
@@ -93,5 +93,29 @@ class UITests(unittest.TestCase):
         js=self.request('/app.js')[1].decode()
         self.assertNotIn('innerHTML',js);self.assertIn('textContent',js)
         headers=self.request('/')[2];self.assertIn("frame-ancestors 'none'",headers['Content-Security-Policy'])
+
+
+    def test_backend_selection_is_recorded_and_invalid_choice_rejected(self):
+        token=self.token()
+        with self.assertRaises(urllib.error.HTTPError):
+            self.request('/api/launch',{'incident':'IF-002','variant':'B2','backend':'arbitrary'},token)
+        self.assertEqual([],self.spawned)
+        status,raw,_=self.request('/api/launch',{'incident':'IF-002','variant':'B2','backend':'contree'},token)
+        self.assertEqual(202,status);self.assertEqual('contree',json.loads(raw)['backend'])
+        self.assertEqual('contree',self.manager.active()['backend'])
+
+    def test_spawn_passes_backend_and_preflight_failure_cannot_launch(self):
+        from unittest.mock import patch,Mock
+        import os
+        with patch('incidentforge.remote_backend.reader_preflight',return_value='sha256:'+'a'*64), patch.dict(
+                os.environ,{'CONTREE_PYTHON':sys.executable}), patch('incidentforge.ui.subprocess.Popen') as popen:
+            self.manager._spawn('ui-'+'a'*32,'IF-002','B2','contree',Mock())
+            command=popen.call_args.args[0]
+            self.assertEqual('contree',command[command.index('--backend')+1])
+        with patch('incidentforge.remote_backend.reader_preflight',side_effect=RuntimeError('Docker unavailable')), patch(
+                'incidentforge.ui.subprocess.Popen') as popen:
+            with self.assertRaisesRegex(ValueError,'Docker unavailable'):
+                self.manager._spawn('ui-'+'b'*32,'IF-002','B2','contree',Mock())
+            popen.assert_not_called()
 
 if __name__=='__main__': unittest.main()

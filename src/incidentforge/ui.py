@@ -143,10 +143,15 @@ class Manager:
         self.meta=root/'runs/ui-launches';self.meta.mkdir(parents=True,exist_ok=True)
         self.guard=self.meta/'active.json'
 
-    def _spawn(self,run_id,incident,variant,log):
-        check=subprocess.run(['docker','image','inspect','python:3.12-slim'],capture_output=True,timeout=15)
-        if check.returncode: raise ValueError('Docker or the cached python:3.12-slim image is unavailable')
-        args=[sys.executable,str(self.root/'scripts/run-t4.py'),'--live','--incident',incident,'--variant',variant,'--run-id',run_id]
+    def _spawn(self,run_id,incident,variant,backend,log):
+        from .remote_backend import reader_preflight
+        try: reader_preflight()
+        except RuntimeError as exc: raise ValueError(str(exc)) from exc
+        if backend=='contree':
+            sdk=Path(os.environ.get('CONTREE_PYTHON',str(Path.home()/'AppData/Roaming/uv/tools/contree-cli/Scripts/python.exe')))
+            if not sdk.is_file(): raise ValueError('Set CONTREE_PYTHON to the installed ConTree SDK Python')
+            if (self.root/'runs/contree-active.json').exists(): raise ValueError('Sandbox operation remains unconfirmed; reconcile before launch')
+        args=[sys.executable,str(self.root/'scripts/run-t4.py'),'--live','--incident',incident,'--variant',variant,'--backend',backend,'--run-id',run_id]
         return subprocess.Popen(args,stdout=log,stderr=log,stdin=subprocess.DEVNULL,cwd=self.root,
                                 creationflags=subprocess.CREATE_NO_WINDOW if os.name=='nt' else 0)
 
@@ -157,8 +162,9 @@ class Manager:
         data['cancel_requested']=(run_path(self.root,data['run_id'])/'CANCEL').exists()
         return data
 
-    def launch(self,incident,variant):
+    def launch(self,incident,variant,backend='docker'):
         if incident not in ('IF-001','IF-002') or variant not in ('B0','B1','B2'): raise ValueError('Unsupported incident or variant')
+        if backend not in ('docker','contree'): raise ValueError('Unsupported execution backend')
         with self.lock:
             if self.guard.exists(): raise ValueError('A live or unconfirmed launch already exists')
             budget=budget_status(self.root)
@@ -166,11 +172,11 @@ class Manager:
             from .llm import CALL_RESERVATION
             if budget['remaining_usd']<CALL_RESERVATION/1e6: raise ValueError('Insufficient remaining project allocation')
             run_id='ui-'+uuid.uuid4().hex
-            metadata={'run_id':run_id,'incident':incident,'variant':variant,'started':datetime.now(timezone.utc).isoformat()}
+            metadata={'run_id':run_id,'incident':incident,'variant':variant,'backend':backend,'started':datetime.now(timezone.utc).isoformat()}
             # Exclusive creation also guards against a second local UI server.
             with self.guard.open('x',encoding='utf-8') as file: json.dump(metadata,file)
             log=(self.meta/(run_id+'.log')).open('wb')
-            try: process=self.spawn(run_id,incident,variant,log)
+            try: process=self.spawn(run_id,incident,variant,backend,log)
             except Exception:
                 log.close();self.guard.unlink();raise
             self.current=run_id;self.process=process
@@ -247,7 +253,7 @@ def make_server(root=ROOT,port=8765,manager=None):
                 size=int(self.headers.get('Content-Length','0'))
                 if not 0<size<=2048: raise ValueError('Request size bound')
                 body=json.loads(self.rfile.read(size));path=urlparse(self.path).path
-                if path=='/api/launch' and set(body)=={'incident','variant'}: return self.send(202,manager.launch(**body))
+                if path=='/api/launch' and set(body) in ({'incident','variant'},{'incident','variant','backend'}): return self.send(202,manager.launch(**body))
                 if path=='/api/cancel' and set(body)=={'run_id'}: return self.send(202,manager.cancel(body['run_id']))
                 self.send(400,{'error':'Unsupported action'})
             except (ValueError,OSError,TypeError,KeyError,subprocess.SubprocessError) as exc: self.send(400,{'error':str(exc)[:200]})
