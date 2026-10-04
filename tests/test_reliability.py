@@ -18,6 +18,29 @@ def accepted_receipt():
                 'boundary':{'scripted-isolation-check':True},
                 'properties':{f'P{i}':{'status':'pass'} for i in range(1,8)}}]}
 
+class PromptGuidanceTests(unittest.TestCase):
+    def test_only_latest_contract_retained_without_losing_evidence(self):
+        from incidentforge.controller import latest_action_contract
+        original=[{'role':'system','content':'rules'},
+            {'role':'user','content':json.dumps({'tool_result':{'observation':'failed'},'action_contract':{'remaining_edits':3}})},
+            {'role':'assistant','content':'exact proposed edit'},
+            {'role':'user','content':json.dumps({'error':'no match','current_source':'verbatim source','action_contract':{'remaining_edits':2}})}]
+        before=json.dumps(original);result=latest_action_contract(original)
+        self.assertEqual(before,json.dumps(original))
+        old=json.loads(result[1]['content']);self.assertNotIn('action_contract',old)
+        self.assertEqual({'observation':'failed'},old['tool_result'])
+        self.assertEqual(original[0],result[0]);self.assertEqual(original[2:],result[2:])
+        self.assertEqual(result,latest_action_contract(result))
+
+    def test_repeated_large_guidance_no_longer_accumulates(self):
+        from incidentforge.controller import latest_action_contract
+        from incidentforge.records import encoded
+        messages=[{'role':'user','content':json.dumps({'tool_result':i,'action_contract':{'context':'x'*7000}})} for i in range(10)]
+        result=latest_action_contract(messages)
+        self.assertLess(len(encoded(result)),10000)
+        self.assertEqual(list(range(10)),[json.loads(m['content'])['tool_result'] for m in result])
+        self.assertEqual(1,sum('action_contract' in json.loads(m['content']) for m in result))
+
 class FinalReceiptTests(unittest.TestCase):
     def test_valid_acceptance_and_applicable_exemptions(self):
         from incidentforge.grounding import final_decision

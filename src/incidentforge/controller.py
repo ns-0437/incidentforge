@@ -53,6 +53,22 @@ revisit the source rather than suppressing the failed check.'''
 SYSTEM=SYSTEM.replace('"spec":"JSON-encoded assertion specification"','"spec":{"assertions":[]}').replace(
     'spec is a JSON-encoded object','spec is a JSON object (legacy JSON-encoded strings also work)')
 
+def latest_action_contract(messages):
+    """Remove superseded guidance only; keep observations, actions and errors."""
+    decoded=[]
+    for index,message in enumerate(messages):
+        if message.get('role')!='user': continue
+        try: value=json.loads(message['content'])
+        except (ValueError,TypeError): continue
+        if isinstance(value,dict) and 'action_contract' in value:
+            decoded.append((index,value))
+    result=[dict(message) for message in messages]
+    for index,value in decoded[:-1]:
+        value.pop('action_contract')
+        value['action_contract_superseded']=True
+        result[index]['content']=json.dumps(value)
+    return result
+
 class Controller:
     def __init__(self,run_id,workspace,evidence,backend,model,budget,cancel_file=None,variant='B0'):
         if variant not in ('B0','B1','B2'): raise ValueError('variant')
@@ -191,6 +207,7 @@ protected behavioral feedback during repair.'''
             for turn in range(10):
                 if self.cancel_file and self.cancel_file.exists(): raise Cancelled('cancelled before action')
                 if time.monotonic()>=deadline: raise TimeoutError('run wall-time cap')
+                messages=latest_action_contract(messages)
                 raw=self.model.call(messages)
                 messages.append({'role':'assistant','content':raw})
                 try:
