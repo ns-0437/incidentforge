@@ -42,12 +42,15 @@ if report['decision']=='accept_for_review':
     assert all(c['decision']=='accept_for_review' for v in verifications for c in v['cases'])
 assert not (ROOT/'runs/contree-active.json').exists()
 with sqlite3.connect(ROOT/'runs/t4-budget.sqlite') as db:
-    spend,pending=db.execute('SELECT SUM(actual),SUM(CASE WHEN actual IS NULL THEN 1 ELSE 0 END) FROM calls').fetchone()
-assert pending==0 and spend<=200000
+    cap=db.execute('SELECT cap FROM settings').fetchone()[0]
+    spend,exposure,pending=db.execute("SELECT COALESCE(SUM(actual),0),COALESCE(SUM(COALESCE(actual,cap)),0),COALESCE(SUM(status='reserved'),0) FROM calls").fetchone()
+assert type(cap) is int and 0<cap<=400000
+assert pending==0 and exposure<=cap
 summary={'run_id':run.name,'decision':report['decision'],'reason':report['reason'],
          'verified_events':count,'source_pins_unchanged':len(pins),'interpretation_gate':grounding,
          'interpretation':interpretations,'protected_verifications':verifications,
-         'run_accounting':report['accounting'],'project_estimated_microusd':spend,'pending_calls':pending,
+         'run_accounting':report['accounting'],'project_estimated_microusd':spend,'project_exposure_microusd':exposure,
+         'project_cap_microusd':cap,'pending_calls':pending,
          'scope':'One development rehearsal; factual gate is not validation of causal reasoning or benchmark superiority.'}
 (run/'rehearsal-review.json').write_text(json.dumps(summary,indent=2))
 print(json.dumps(summary,indent=2))

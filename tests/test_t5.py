@@ -17,6 +17,14 @@ class T5Tests(unittest.TestCase):
         self.assertNotIn('secret',json.dumps(result))
         self.assertNotIn('private',json.dumps(result))
 
+    def test_wrong_investigation_envelope_gets_actionable_replacement_request(self):
+        with self.assertRaises(ValueError) as caught:
+            validate_plan({'bugs':[], 'bugs_found':0})
+        message=str(caught.exception)
+        self.assertIn('exactly hypotheses and experiment',message)
+        self.assertIn("['bugs', 'bugs_found']",message)
+        self.assertIn('replacement investigation JSON',message)
+
     def test_feedback_requires_literal_completion(self):
         for value in (False, None, 0, 1, 'true', 'false', {}, []):
             with self.subTest(value=value):

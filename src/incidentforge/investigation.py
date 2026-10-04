@@ -44,7 +44,9 @@ def source_symbols(source):
     return sorted(symbols)
 
 def validate_plan(obj,intervention='identity_probe',conditions=None,source=None):
-    if not isinstance(obj,dict) or set(obj)!={'hypotheses','experiment'}: raise ValueError('investigation fields')
+    if not isinstance(obj,dict) or set(obj)!={'hypotheses','experiment'}:
+        received=sorted(obj) if isinstance(obj,dict) else type(obj).__name__
+        raise ValueError('Return a replacement investigation JSON object with exactly hypotheses and experiment. Received: '+repr(received)+'. Do not return bugs, patches, or an error report; use the investigation shape in the system instructions.')
     hs=obj['hypotheses']
     if not isinstance(hs,list) or len(hs)!=2: raise ValueError('exactly two competing hypotheses required')
     for h in hs:
