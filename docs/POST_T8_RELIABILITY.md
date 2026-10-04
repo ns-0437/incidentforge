@@ -591,3 +591,20 @@ repair, plus accepted independent protected validation. Recovery success is a
 separate observation, not equivalent to repair success. Keep every outcome.
 Starting exposure $0.325425, remaining $0.074575; retain the cumulative $0.40 cap,
 ten-call bound and unknown-operation guards. No automatic retry or new benchmark.
+
+### v25 result
+
+Accepted for review after eight calls ($0.011955): one source edit removed the
+process-local recovery guard; two authored assertions ran on the final revision.
+The restart assertion failed on original observations and passed after repair.
+Independent readers accepted all eight cases in each of two protected executions.
+The audit verified 56 events, 68 unchanged source pins and the frozen candidate.
+See benchmarks/reliability/v25-pilot.json. No rejected edit occurred, so live
+recovery through the new mandatory-read branch was not exercised.
+
+This is one successful development rehearsal after retained failures, not evidence
+of a reliable success rate or a replacement frozen campaign. The model's causal
+prose remains unverified. Total exposure $0.337380; remaining $0.062620; pending zero.
+The judge viewer now uses v22/v25 and displays authored assertions with baseline
+and final outcomes. v22's weak assertion is disclosed, including the post-run origin
+of its baseline assessment. T8 totals and all twelve attempts are unchanged.

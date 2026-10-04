@@ -70,3 +70,8 @@ see benchmarks/release/cancellation-oct4.json. The latest Linux suite passed all
 Subsequent public-observation controls expanded the Linux suite to 19 passing
 checks; see benchmarks/release/linux-oct4-public-observations.json. Live v24
 remained unresolved before editing. Preserve that distinction in submission claims.
+
+October 4 v25 closed the current IF-002 demonstration gate: baseline-failing authored
+assertion, passing final-revision execution, and eight accepted protected cases in
+each validation. The refreshed recorded viewer uses v22/v25 and explicitly discloses
+v22's weak assertion. This is not evidence of repeat reliability or new T8 results.

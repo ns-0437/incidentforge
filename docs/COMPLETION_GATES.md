@@ -9,7 +9,7 @@ A delivered component is not evidence of reliable autonomous performance.
 | Nebius inference and Sandbox | Retained real Nano calls and isolated Sandbox workloads | Rehearse actual judge credentials/access once provider replies |
 | Competing explanations and experiments | Structured investigation, source references, precommitted predictions, measured-fact checks | Source citation validity does not establish causal correctness; IF-002 diagnosis is inconsistent |
 | Reviewable source repair | Exact allowlisted edits; syntax validation; accepted development patches | Consistent completion under the latest protocol remains unproven |
-| Authored regression tests | Current controller requires authored tests passing on final revision; unit regressions cover omission/failure/stale revision | IF-001 completed the gate in v22; weak baseline discrimination is disclosed; IF-002 remains unresolved |
+| Authored regression tests | Current controller requires authored tests passing on final revision; unit regressions cover omission/failure/stale revision | IF-001 completed in v22 with weak baseline discrimination; IF-002 v25 passed with a baseline-failing assertion; repeated reliability remains unproven |
 | Protected evaluation | Independent effect checks, harmful controls and archived validation receipts | Finite declared cases only; no universal correctness claim |
 | Frozen comparison | All twelve T8 outcomes retained | Timeout threshold prevents ranking; subsequent development cannot replace T8 |
 | Operator UI and export | Browser launch/terminal receipt exercised; source/test evidence views; verified export archives | Browser download and immediate cancellation passed; in-flight request cancellation is not newly claimed |

@@ -43,8 +43,8 @@ budget; repeatedly tuning against old schedules cannot support that claim.
 
 ## Budget and access
 
-Cumulative accounted exposure: **$0.325425 / $0.40**. Remaining allocation:
-**$0.074575**. Includes retained development attempts through v24; no inference remains pending.
+Cumulative accounted exposure: **$0.337380 / $0.40**. Remaining allocation:
+**$0.062620**. Includes retained development attempts through v25; no inference remains pending.
 The other trial credits are unallocated. The GitHub Pages site is a recorded replay,
 not a hosted inference service. The main source repository stays private until release.
 
@@ -60,9 +60,14 @@ account only. Separate judge credentials/access have **not** been confirmed.
 
 Current detailed acceptance matrix: [COMPLETION_GATES.md](COMPLETION_GATES.md).
 IF-001 completed the required authored-test gate in v22, with weak test coverage
-explicitly disclosed. IF-002 remains inconsistent; v23 exposed an edit-compilation
-gap that is now fixed offline. No new reliability percentage is claimed.
+explicitly disclosed. IF-002 has mixed retained outcomes; v23 exposed an edit-compilation
+gap that is now fixed. No new reliability percentage is claimed.
 
 Public regression observations passed 19 Linux checks, including faulty/reference
 assertion discrimination. v24 still stopped before repair after repeated edit
 mismatches. Mandatory source re-reading after rejected edits is now enforced offline.
+
+IF-002 v25 completed the latest authored-test gate: a restart assertion failed on
+baseline and passed after repair, with eight accepted cases in each of two protected
+executions. This closes the single successful end-to-end demonstration gap; reliable
+repeat performance remains unproven. The original T8 comparison is unchanged.

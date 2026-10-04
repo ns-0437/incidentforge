@@ -1,0 +1,162 @@
+{
+  "stage": "post-T8 development v25",
+  "revision": "ccc0fab",
+  "comparative_claim": false,
+  "report": {
+    "schema_version": 1,
+    "run_id": "b2-if-002-20261004T111830Z-d03bc1",
+    "variant": "B2",
+    "decision": "accept_for_review",
+    "reason": "All declared protected development checks passed.",
+    "incident": "IF-002",
+    "protected_feedback_requests": 1,
+    "protected_feedback": {
+      "decision": "accept_for_review",
+      "complete": true,
+      "failed_properties": [],
+      "scope": "Protected development feedback only; not final holdout.",
+      "candidate_unchanged_since_feedback": true
+    },
+    "model_claim_unverified": "Removed the 'pending_compensations' guard in App.step to allow compensation processing to continue after a process restart, fixing the defect where declined orders remained in COMPENSATING phase and stock stayed reserved. Added a developer regression test asserting that a declined order status becomes CANCELLED_DECLINED after restart, which now passes. The fix addresses the observed behavior that compensation does not complete after restart. Limitations: feedback remains developer\u2011only and not yet independently verified; further holdout testing is required before production confidence.",
+    "candidate_revision": "77b5c8d44d10131e63de77a697e81763737a551f8515e9032e677586de22cd96",
+    "edits": 2,
+    "requested_tests": 1,
+    "backend": "nebius-sandbox",
+    "verified_work": {
+      "changed_source_paths": [
+        "fixture/app/service.py"
+      ],
+      "developer_test_file_present": true,
+      "developer_tests_executed_on_current_revision": true,
+      "developer_tests_passed_on_current_revision": true,
+      "requested_test_runs": 1
+    },
+    "accounting": {
+      "calls": 8,
+      "estimated_usage_microusd": 11955,
+      "reserved_or_spent_microusd": 11955,
+      "unknown_or_pending": 0
+    },
+    "next_step": "Review protected report and patch.",
+    "limitations": [
+      "One development pilot, not a B0/B1/B2 comparison.",
+      "Manual controls are not model repairs."
+    ]
+  },
+  "verified_events": 56,
+  "source_pins_unchanged": 68,
+  "baseline_assessment": {
+    "assertions": [
+      {
+        "actual": "CANCELLED_DECLINED",
+        "expected": "CANCELLED_DECLINED",
+        "name": "decline completes",
+        "passed": true,
+        "path_found": true
+      },
+      {
+        "actual": "COMPENSATING",
+        "expected": "CANCELLED_DECLINED",
+        "name": "decline completes after restart",
+        "passed": false,
+        "path_found": true
+      }
+    ],
+    "authored": true,
+    "passed": false,
+    "scope": "Developer assertions only; independent protected verdict unchanged."
+  },
+  "protected_verifications": [
+    {
+      "execution": "execution-4",
+      "verified_cases": 8,
+      "tests_without_case_export": 0,
+      "archive_sha256": "2e997485d9c2cfdcedfb4885d308b9ccec5be001d5ee9c8e9523d09960dc816e",
+      "cases": [
+        {
+          "case": "if002-reference-restart",
+          "decision": "accept_for_review"
+        },
+        {
+          "case": "if002-release-replay",
+          "decision": "accept_for_review"
+        },
+        {
+          "case": "reference-cancel-uncertain-payment",
+          "decision": "accept_for_review"
+        },
+        {
+          "case": "reference-clean",
+          "decision": "accept_for_review"
+        },
+        {
+          "case": "reference-compensation-restart",
+          "decision": "accept_for_review"
+        },
+        {
+          "case": "reference-payment-protocol",
+          "decision": "accept_for_review"
+        },
+        {
+          "case": "reference-response-loss-restart",
+          "decision": "accept_for_review"
+        },
+        {
+          "case": "reference-stock-contention",
+          "decision": "accept_for_review"
+        }
+      ]
+    },
+    {
+      "execution": "execution-5",
+      "verified_cases": 8,
+      "tests_without_case_export": 0,
+      "archive_sha256": "3da9e841ca2deb7f10434ebd48099fb6cc399adc05591b0b7ad4a552646715af",
+      "cases": [
+        {
+          "case": "if002-reference-restart",
+          "decision": "accept_for_review"
+        },
+        {
+          "case": "if002-release-replay",
+          "decision": "accept_for_review"
+        },
+        {
+          "case": "reference-cancel-uncertain-payment",
+          "decision": "accept_for_review"
+        },
+        {
+          "case": "reference-clean",
+          "decision": "accept_for_review"
+        },
+        {
+          "case": "reference-compensation-restart",
+          "decision": "accept_for_review"
+        },
+        {
+          "case": "reference-payment-protocol",
+          "decision": "accept_for_review"
+        },
+        {
+          "case": "reference-response-loss-restart",
+          "decision": "accept_for_review"
+        },
+        {
+          "case": "reference-stock-contention",
+          "decision": "accept_for_review"
+        }
+      ]
+    }
+  ],
+  "declared_acceptance_met": true,
+  "rejected_edit_recovery_exercised": false,
+  "project_exposure_microusd": 337380,
+  "remaining_microusd": 62620,
+  "pending_calls": 0,
+  "limitations": [
+    "Single development success after retained failures; not a new frozen comparison.",
+    "No edit rejection occurred; mandatory reread recovery was not exercised live.",
+    "Authored assertions cover terminal state; protected evaluator separately checks effects and stock.",
+    "Causal prose remains unverified."
+  ]
+}

@@ -39,7 +39,9 @@ as retained failed attempts. That compensation pilot omitted authored tests. The
 requires passing authored regression assertions. A later payment-family run
 completed that gate and passed protected checks; its retry-count assertion also
 passed on the original observations, so it does not detect the original defect. These are
-development results, not a new benchmark.
+development results, not a new benchmark. A later IF-002 run completed the same
+gate with a restart assertion that failed before repair and passed afterward,
+plus eight accepted protected cases. Repeated reliability remains unproven.
 
 ## What we learned
 Correct measurements, plausible explanations, useful edits and a completed agent
