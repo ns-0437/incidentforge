@@ -14,6 +14,7 @@ import sqlite3
 import subprocess
 import sys
 import threading
+import time
 from urllib.parse import urlparse
 import uuid
 import zipfile
@@ -213,7 +214,24 @@ class Manager:
         (self.meta/(run_id+'.json')).write_text(json.dumps(receipt),encoding='utf-8')
         with self.lock:
             self.current=None;self.process=None
-            if self.guard.exists() and read_json(self.guard)['run_id']==run_id: self.guard.unlink()
+            if self.guard.exists() and read_json(self.guard)['run_id']==run_id: self.release_guard()
+
+    def release_guard(self,timeout=10.0):
+        """Remove the launch guard, tolerating a concurrent reader.
+
+        Windows refuses to delete a file another handle has open, and the console
+        polls this guard through /api/state. An unlink that raised would end the
+        watcher thread and strand the guard, so every later launch would be
+        refused with a live run that has already exited. Retry instead.
+        """
+        deadline=time.monotonic()+timeout
+        while True:
+            try:
+                self.guard.unlink();return True
+            except FileNotFoundError: return True
+            except PermissionError:
+                if time.monotonic()>=deadline: raise
+                time.sleep(.05)
 
     def cancel(self,run_id):
         with self.lock:

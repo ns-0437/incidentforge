@@ -82,6 +82,33 @@ class UITests(unittest.TestCase):
         with self.assertRaises(json.JSONDecodeError): self.manager.active()
         self.manager.guard.unlink()
 
+    def test_guard_release_survives_a_concurrent_reader_holding_the_file(self):
+        # /api/state reads the guard while the watcher removes it. On Windows an
+        # open handle makes unlink raise, which previously killed the watcher
+        # thread and stranded the guard, refusing every later launch.
+        from unittest.mock import patch
+        self.manager.guard.write_text('{"run_id":"stuck"}')
+        real=Path.unlink
+        attempts={'n':0}
+        def flaky(path,*args,**kwargs):
+            attempts['n']+=1
+            if attempts['n']<3:
+                raise PermissionError(32,'The process cannot access the file because it is being used by another process')
+            return real(path,*args,**kwargs)
+        with patch.object(Path,'unlink',flaky):
+            self.assertTrue(self.manager.release_guard(timeout=5))
+        self.assertFalse(self.manager.guard.exists())
+        self.assertGreaterEqual(attempts['n'],3,'the transient sharing violation was not retried')
+
+    def test_guard_release_gives_up_rather_than_spinning_forever(self):
+        from unittest.mock import patch
+        self.manager.guard.write_text('{"run_id":"stuck"}')
+        def always(path,*args,**kwargs):
+            raise PermissionError(32,'in use')
+        with patch.object(Path,'unlink',always):
+            with self.assertRaises(PermissionError): self.manager.release_guard(timeout=.2)
+        self.manager.guard.unlink()
+
     def test_pending_usage_prevents_launch(self):
         b=Budget(self.root/'runs/t4-budget.sqlite',200000);b.reserve('previous',100,200000,10)
         with self.assertRaises(ValueError): self.manager.launch('IF-001','B0')
