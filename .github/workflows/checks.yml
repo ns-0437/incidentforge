@@ -20,6 +20,25 @@ jobs:
       - name: Verify static publishing artifact
         run: python scripts/check-site.py
 
+  # Linux deletes a file another handle has open; Windows refuses. The launch
+  # guard, the watcher thread and worker teardown all depend on that difference,
+  # and a guard stranded by a sharing violation blocks every later launch. The
+  # Linux jobs cannot exercise it, so these modules also run on Windows.
+  # Pinned rather than windows-latest so the image cannot move during judging.
+  windows-operator:
+    runs-on: windows-2022
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v6
+      - uses: actions/setup-python@v6
+        with:
+          python-version: '3.12'
+      # Verbose so the log shows exactly which tests executed. These use
+      # temporary roots, temporary ledgers and local subprocesses only: no
+      # credentials, no provider calls, no Docker.
+      - name: Operator lifecycle, guard and controller integration tests
+        run: python -m unittest -v tests.test_t7 tests.test_operator_lifecycle tests.test_controller_integration
+
   # The portable job above skips 61 collected Linux entries (49 distinct: 12
   # ContractTests ids are collected twice, in tests.test_t2 and again in
   # tests.test_t6's namespace). They gate on linux and geteuid()==0, so a normal
