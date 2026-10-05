@@ -158,6 +158,19 @@ def export_run(root,run_id):
         for name,raw in files.items(): archive.writestr(name,raw)
     return buffer.getvalue()
 
+class LaunchCleanupError(RuntimeError):
+    """A launch failed and its guard could not be removed, so relaunch is blocked.
+
+    `original` is the actionable spawn failure the operator must act on. `detail`
+    keeps the cleanup error for local diagnosis and is deliberately not returned
+    over HTTP, because it carries a filesystem path.
+    """
+    def __init__(self,original,guard_name,detail):
+        self.original=original;self.guard_name=guard_name;self.detail=detail
+        super().__init__('Launch failed and its guard could not be removed, so relaunch stays '
+                         'blocked until '+guard_name+' is cleared by hand. Original failure: '
+                         +original+'. Cleanup failure: '+detail)
+
 class Manager:
     def __init__(self,root,spawn=None):
         self.root=root;self.lock=threading.Lock();self.process=None;self.current=None
@@ -221,13 +234,13 @@ class Manager:
                 # Clean up our own guard only, and never let a transient sharing
                 # violation replace the spawn failure the operator has to act on.
                 log.close()
-                try: self.release_guard(run_id=run_id)
+                # Short bound: an operator is waiting on a failed launch, so this
+                # must answer quickly. The watcher keeps the longer retry.
+                try: self.release_guard(timeout=2.0,run_id=run_id)
                 except OSError as cleanup_error:
-                    raise RuntimeError(
-                        'Launch failed and its guard could not be removed, so relaunch stays '
-                        'blocked until '+self.guard.name+' is cleared by hand. Original failure: '
-                        +type(spawn_error).__name__+': '+str(spawn_error)[:200]
-                        +'. Cleanup failure: '+str(cleanup_error)[:120]) from spawn_error
+                    raise LaunchCleanupError(
+                        type(spawn_error).__name__+': '+str(spawn_error)[:200],
+                        self.guard.name,str(cleanup_error)[:120]) from spawn_error
                 raise
             self.current=run_id;self.process=process
             threading.Thread(target=self._watch,args=(process,run_id,log),daemon=True).start()
@@ -235,8 +248,17 @@ class Manager:
 
     def _watch(self,process,run_id,log):
         code=process.wait();log.close()
-        metadata=read_json(self.guard) if self.guard.exists() else {}
-        receipt={**metadata,'run_id':run_id,'exit_code':code,'terminal_confirmed':True}
+        # terminal_confirmed describes this local worker process only. It says
+        # nothing about a remote Sandbox operation, whose own guard is never
+        # touched here.
+        confirmed={'run_id':run_id,'exit_code':code,'terminal_confirmed':True}
+        try: metadata=self.read_guard() or {}
+        except OSError as exc:
+            # Unreadable guard: record the run with what is certain, and do not
+            # guess at an owner. release_guard below will refuse to remove a
+            # guard it cannot attribute to this run.
+            metadata={};confirmed['guard_read_error']=type(exc).__name__+': '+str(exc)[:120]
+        receipt={**metadata,**confirmed}
         with self.lock:
             self.current=None;self.process=None
             # A guard that cannot be released is recorded rather than killing this
@@ -333,6 +355,13 @@ def make_server(root=ROOT,port=8765,manager=None):
                 if path=='/api/launch' and set(body) in ({'incident','variant'},{'incident','variant','backend'}): return self.send(202,manager.launch(**body))
                 if path=='/api/cancel' and set(body)=={'run_id'}: return self.send(202,manager.cancel(body['run_id']))
                 self.send(400,{'error':'Unsupported action'})
+            # Narrow, expected condition: the launch failed and its guard survived.
+            # The operator needs the original failure and the residual state, not a
+            # dropped connection. The cleanup detail carries a path and stays local.
+            except LaunchCleanupError as exc:
+                self.send(409,{'error':exc.original,'cleanup':'unconfirmed',
+                    'residual_guard':exc.guard_name,
+                    'relaunch':'blocked until the residual launch guard is cleared'})
             except (ValueError,OSError,TypeError,KeyError,subprocess.SubprocessError) as exc: self.send(400,{'error':str(exc)[:200]})
     server=ThreadingHTTPServer(('127.0.0.1',port),Handler)
     server.daemon_threads=True

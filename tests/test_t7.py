@@ -148,6 +148,43 @@ class UITests(unittest.TestCase):
         self.assertTrue(manager.guard.exists(),'a stuck guard must remain, conservatively')
         with self.assertRaises(ValueError): manager.launch('IF-002','B2')
 
+    def failing_spawn(self,message):
+        def spawn(*args,**kwargs): raise ValueError(message)
+        self.manager.spawn=spawn
+
+    def test_launch_cleanup_failure_answers_with_structured_json_over_http(self):
+        from unittest.mock import patch
+        self.failing_spawn('Set CONTREE_PYTHON to the installed ConTree SDK Python')
+        token=self.token();real=Path.unlink
+        def blocked(path,*args,**kwargs):
+            if path.name=='active.json': raise PermissionError(32,'in use by another process')
+            return real(path,*args,**kwargs)
+        with patch.object(Path,'unlink',blocked):
+            with self.assertRaises(urllib.error.HTTPError) as caught:
+                self.request('/api/launch',{'incident':'IF-002','variant':'B2'},token,self.url)
+        self.assertEqual(409,caught.exception.code)
+        body=json.loads(caught.exception.read())
+        self.assertIn('CONTREE_PYTHON',body['error'],'the actionable spawn failure was lost')
+        self.assertEqual('unconfirmed',body['cleanup'])
+        self.assertEqual('active.json',body['residual_guard'])
+        self.assertIn('blocked',body['relaunch'])
+        # No filesystem path or other local detail is returned to the client.
+        for value in body.values(): self.assertNotIn(':\\',str(value))
+        self.assertTrue(self.manager.guard.exists(),'the guard must remain while cleanup is unconfirmed')
+        with self.assertRaises(urllib.error.HTTPError) as second:
+            self.request('/api/launch',{'incident':'IF-002','variant':'B2'},token,self.url)
+        self.assertEqual(400,second.exception.code)
+        self.assertIn('already exists',json.loads(second.exception.read())['error'])
+        self.manager.guard.unlink()
+
+    def test_launch_failure_with_successful_cleanup_still_reports_the_cause(self):
+        self.failing_spawn('preflight refused the launch')
+        with self.assertRaises(urllib.error.HTTPError) as caught:
+            self.request('/api/launch',{'incident':'IF-001','variant':'B0'},self.token(),self.url)
+        self.assertEqual(400,caught.exception.code)
+        self.assertIn('preflight refused',json.loads(caught.exception.read())['error'])
+        self.assertFalse(self.manager.guard.exists())
+
     def test_active_survives_a_guard_read_blocked_by_a_concurrent_delete(self):
         # Windows raises PermissionError, not FileNotFoundError, for a file that
         # is open elsewhere or pending deletion. active() caught only the latter,
