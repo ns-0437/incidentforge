@@ -8,119 +8,29 @@ ledger and credentials are never touched.
 """
 import io
 import json
+import zipfile
 from pathlib import Path
-import subprocess
 import sys
-import tempfile
-import threading
-import time
 import unittest
 import urllib.error
-import urllib.request
-import zipfile
 
 REPO = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(REPO / 'src'))
-from incidentforge.ui import Manager, make_server
+from tests.operator_harness import OperatorHarness
 
 WORKER = REPO / 'tests' / 'local_worker.py'
-TIMEOUT = 25.0
-HTTP_TIMEOUT = 10.0
 
 
-class OperatorLifecycleTests(unittest.TestCase):
+class OperatorLifecycleTests(OperatorHarness):
     mode = 'complete'
 
-    def setUp(self):
-        self.temp = tempfile.TemporaryDirectory(ignore_cleanup_errors=True)
-        self.addCleanup(self.temp.cleanup)
-        self.root = Path(self.temp.name)
-        (self.root / 'runs').mkdir()
-        self.processes = []
-        self.controls = {}
-        self.addCleanup(self.reap)
-        self.manager = Manager(self.root, self.spawn)
-        self.server = make_server(self.root, 0, self.manager)
-        self.thread = threading.Thread(target=self.server.serve_forever, daemon=True)
-        self.thread.start()
-        self.addCleanup(self.stop_server)
-        self.url = 'http://127.0.0.1:' + str(self.server.server_port)
-
-    def spawn(self, run_id, incident, variant, backend, log):
-        control = self.root / 'control' / run_id
-        control.mkdir(parents=True)
-        self.controls[run_id] = control
-        process = subprocess.Popen(
-            [sys.executable, str(WORKER), '--root', str(self.root), '--run-id', run_id,
-             '--control', str(control), '--mode', self.mode,
-             '--incident', incident, '--variant', variant],
-            stdout=log, stderr=log, stdin=subprocess.DEVNULL, cwd=str(REPO))
-        self.processes.append(process)
-        return process
-
-    def reap(self):
-        """Never leak a worker, even when an assertion failed mid-scenario."""
-        for control in self.controls.values():
-            (control / 'proceed').write_text('cleanup', encoding='utf-8')
-        for process in self.processes:
-            try:
-                process.wait(5)
-            except subprocess.TimeoutExpired:
-                process.terminate()
-                try:
-                    process.wait(5)
-                except subprocess.TimeoutExpired:
-                    process.kill()
-                    process.wait(5)
-        self.assertEqual([], [p for p in self.processes if p.poll() is None])
-
-    def stop_server(self):
-        self.server.shutdown()
-        self.server.server_close()
-        self.thread.join(5)
-
-    def until(self, predicate, message, timeout=TIMEOUT):
-        end = time.monotonic() + timeout
-        while time.monotonic() < end:
-            value = predicate()
-            if value:
-                return value
-            time.sleep(0.02)
-        self.fail('timed out waiting for ' + message)
-
-    def request(self, path, body=None, token=None, origin=None):
-        headers = {}
-        if token:
-            headers['X-IncidentForge-Token'] = token
-        if origin:
-            headers['Origin'] = origin
-        request = urllib.request.Request(
-            self.url + path, data=json.dumps(body).encode() if body else None, headers=headers)
-        # Bounded so one stalled request cannot outlast the outer polling deadline.
-        with urllib.request.urlopen(request, timeout=HTTP_TIMEOUT) as response:
-            return response.status, response.read(), response.headers
-
-    def state(self):
-        return json.loads(self.request('/api/state')[1])
-
-    def token(self):
-        return self.state()['token']
-
-    def launch(self, incident='IF-002', variant='B2'):
-        status, raw, _ = self.request('/api/launch', {'incident': incident, 'variant': variant},
-                                      self.token(), self.url)
-        self.assertEqual(202, status)
-        run_id = json.loads(raw)['run_id']
-        self.until(lambda: (self.controls[run_id] / 'ready').exists(), 'worker to report ready')
-        return run_id
+    def worker_command(self, run_id, incident, variant, control):
+        return [sys.executable, str(WORKER), '--root', str(self.root), '--run-id', run_id,
+                '--control', str(control), '--mode', self.mode,
+                '--incident', incident, '--variant', variant]
 
     def terminated(self, run_id):
-        """Wait for the real process to exit and the watcher to clear the guard."""
-        self.until(lambda: self.processes[-1].poll() is not None, 'the worker process to exit')
-        self.until(lambda: self.manager.active() is None, 'the launch guard to be cleared')
-        receipt = self.root / 'runs' / 'ui-launches' / (run_id + '.json')
-        self.until(receipt.exists, 'the terminal receipt to be written')
-        return json.loads(receipt.read_text())
+        return self.settle(run_id)
 
     # 1. Normal completion, one run id from launch to export.
     def test_launch_progress_terminal_report_and_export(self):
@@ -160,7 +70,7 @@ class OperatorLifecycleTests(unittest.TestCase):
     def test_cancellation_is_observed_by_the_worker_and_confirmed_by_exit(self):
         self.mode = 'cancel'
         run_id = self.launch()
-        result = json.loads(self.request('/api/cancel', {'run_id': run_id}, self.token(), self.url)[1])
+        result = json.loads(self.request('/api/cancel', {'run_id': run_id}, self.state()['token'], self.url)[1])
         self.assertTrue(result['requested'])
         self.assertFalse(result['terminal_confirmed'],
                          'requesting cancellation must not be reported as termination')
@@ -239,6 +149,36 @@ class OperatorLifecycleTests(unittest.TestCase):
         second = self.launch(incident='IF-001', variant='B0')
         self.assertNotEqual(run_id, second)
 
+    def test_a_permanently_stuck_guard_is_recorded_instead_of_killing_the_watcher(self):
+        """Deterministic fault injection: the guard can never be unlinked.
+
+        The watcher must still write a terminal receipt, record why the guard
+        survived, and leave the stuck guard in place rather than dying silently.
+        """
+        from unittest.mock import patch
+        run_id = self.launch()
+        real = Path.unlink
+
+        def blocked(path, *args, **kwargs):
+            if path.name == 'active.json':
+                raise PermissionError(32, 'in use by another process')
+            return real(path, *args, **kwargs)
+
+        receipt_path = self.manager.meta / (run_id + '.json')
+        with patch.object(Path, 'unlink', blocked):
+            (self.controls[run_id] / 'proceed').write_text('go', encoding='utf-8')
+            self.until(lambda: self.processes[-1].poll() is not None, 'the worker to exit')
+            self.until(receipt_path.exists, 'a terminal receipt despite the stuck guard')
+        receipt = json.loads(receipt_path.read_text())
+        self.assertTrue(receipt['terminal_confirmed'])
+        self.assertEqual(0, receipt['exit_code'])
+        self.assertIn('PermissionError', receipt.get('guard_release_error', ''),
+                      'the watcher did not record why the guard survived')
+        self.assertTrue(self.manager.guard.exists(), 'a stuck guard must not vanish silently')
+        self.assertEqual([], self.thread_errors, 'the watcher thread died instead of recording')
+        # Clear the injected condition so teardown finds a quiet tree.
+        self.manager.release_guard(run_id=run_id)
+
     # 4. Reconnect during the run, then launch again after confirmed termination.
     def test_reconnect_does_not_duplicate_and_a_later_launch_is_allowed(self):
         run_id = self.launch()
@@ -248,7 +188,7 @@ class OperatorLifecycleTests(unittest.TestCase):
             self.assertEqual('live', active['status'])
         self.assertEqual(1, len(self.processes), 'a reconnect started another worker')
         with self.assertRaises(urllib.error.HTTPError) as caught:
-            self.request('/api/launch', {'incident': 'IF-001', 'variant': 'B0'}, self.token(), self.url)
+            self.request('/api/launch', {'incident': 'IF-001', 'variant': 'B0'}, self.state()['token'], self.url)
         self.assertEqual(400, caught.exception.code)
         self.assertEqual(1, len(self.processes))
 
