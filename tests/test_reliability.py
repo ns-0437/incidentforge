@@ -290,6 +290,46 @@ class ReliabilityTests(unittest.TestCase):
         from incidentforge.records import digest
         self.assertEqual(digest(provenance),bundle['lock_hash'])
 
+    def test_reproduction_record_carries_bounds_and_separates_symptom_from_execution(self):
+        report,_,_=self.run_actions(iter([{'action':'finish','summary':'stop'}]*3))
+        records=json.loads((self.root/'e'/'records.json').read_text())
+        result=next(r['data'] for r in records if r['kind']=='ExperimentResult')
+        bounds=result['observations']['reproduction_bounds']
+        self.assertEqual('IF-001',bounds['incident'])
+        self.assertEqual(['clean'],bounds['executed_conditions'])
+        self.assertEqual('new world per case',bounds['reset'])
+        self.assertIn('eligible order',bounds['workload'])
+        self.assertEqual({'seconds':100},bounds['declared_limits'])
+        self.assertEqual('complete',bounds['execution'])
+        self.assertIn('not determined',bounds['symptom_reproduction'])
+        self.assertIn('not measured',bounds['recovery_bound'])
+        self.assertIn('arbitrary production incidents',bounds['scope'])
+        # The record itself must not read as a reproduced symptom.
+        self.assertIn('execution complete',result['completion'])
+        self.assertIn('symptom reproduction not determined',result['completion'])
+
+    def test_incomplete_reproduction_is_reported_as_incomplete(self):
+        from incidentforge.grounding import reproduction_bounds
+        spec={'reset':'new world per case','workload':'one order','limits':{'seconds':100},'repetitions':1}
+        bounds=reproduction_bounds('IF-002',spec,{'complete':False,'observations':[]})
+        self.assertEqual('incomplete',bounds['execution'])
+        self.assertEqual(['not recorded'],bounds['executed_conditions'])
+        self.assertIn('not determined',bounds['symptom_reproduction'])
+        # A controller run whose reproduction never completes cannot claim a repair.
+        report,_,_=self.run_actions(iter([{'action':'finish','summary':'stop'}]),
+                                    protected={'complete':False,'decision':'invalid_evaluation','cases':[]})
+        self.assertNotEqual('accept_for_review',report['decision'])
+
+    def test_historical_experiment_results_without_bounds_remain_valid(self):
+        from incidentforge.records import record
+        legacy={'spec_hash':'a'*64,'backend':'local-docker','reset_result':'fresh stores',
+                'observations':{'complete':True,'observations':[]},'completion':'complete',
+                'completeness':'HTTP-only','violations':[],
+                'resources':{'execution_count':1},'interpretation_author':'controller'}
+        stored=record('ExperimentResult','legacy-run',legacy)
+        self.assertNotIn('reproduction_bounds',stored['data']['observations'])
+        self.assertEqual('complete',stored['data']['completion'])
+
     def test_contradictory_final_acceptance_remains_invalid(self):
         report,_,_=self.run_actions(iter([
             {'action':'replace','path':'fixture/app/service.py','old':'x=1','new':'x=2','reason':'repair'},

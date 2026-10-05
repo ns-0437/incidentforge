@@ -87,3 +87,33 @@ def final_decision(result):
             allowed=('pass','not_applicable') if prop in ('P2','P6') else ('pass',)
             if value.get('status') not in allowed: return 'invalid_evaluation'
     return decision
+
+def reproduction_bounds(incident,spec,result):
+    """Declared execution bounds and limits for one reproduction attempt.
+
+    Execution completing is not the same as reproducing the reported symptom.
+    Developer observations expose HTTP responses, request identity counts and
+    order state; committed-effect counts are not available in that mode, so
+    symptom reproduction is reported as undetermined rather than inferred.
+    Values absent from the spec or result are marked, never invented.
+    """
+    observations=[o for o in (result.get('observations') or []) if isinstance(o,dict)]
+    conditions=[]
+    for observation in observations:
+        label=observation.get('condition') or observation.get('fault')
+        if label and str(label) not in conditions: conditions.append(str(label))
+    stated=list(result.get('limitations') or [])
+    if result.get('note'): stated.append(result['note'])
+    return {'incident':incident,
+            'executed_conditions':conditions or ['not recorded'],
+            'reset':spec.get('reset','not recorded'),
+            'workload':spec.get('workload','not recorded'),
+            'declared_limits':spec.get('limits') or {},
+            'repetitions':spec.get('repetitions','not recorded'),
+            'execution':'complete' if result.get('complete') is True else 'incomplete',
+            'symptom_reproduction':'not determined; this mode exposes HTTP observations and '
+                                   'request identity counts, not committed-effect counts',
+            'recovery_bound':'not measured in this mode',
+            'stated_limitations':stated,
+            'scope':'Finite authored fixture conditions and faults. This does not establish '
+                    'reproduction of arbitrary production incidents.'}

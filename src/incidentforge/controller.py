@@ -124,8 +124,16 @@ class Controller:
             reproduction=self.backend.run(self.workspace.root,'developer')
             if not reproduction.get('complete'): raise ValueError('incomplete reproduction')
             developer_observations=reproduction.get('observations',[])
+            from .grounding import reproduction_bounds
+            bounds=reproduction_bounds(getattr(self.backend,'incident','IF-001'),spec,reproduction)
             self.emit('ExperimentResult',{'spec_hash':digest(spec),'backend':self.backend.name,'reset_result':'fresh stores',
-                'observations':reproduction,'completion':'complete','completeness':'HTTP-only',
+                # The bounds ride inside the observations object consumers already
+                # read, so no separate artifact is created and historical records
+                # that lack the key stay valid.
+                'observations':{**reproduction,'reproduction_bounds':bounds},
+                'completion':'execution '+bounds['execution']+'; symptom reproduction '
+                             +bounds['symptom_reproduction'].split(';')[0],
+                'completeness':'HTTP-only',
                 'violations':[],'resources':{'execution_count':self.backend.count},'interpretation_author':'controller'})
             messages=[{'role':'system','content':SYSTEM},{'role':'user','content':json.dumps({
                 'contract':self.workspace.read('CONTRACT.md'),'incident':self.workspace.read('INCIDENT.json'),
