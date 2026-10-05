@@ -25,13 +25,14 @@ from incidentforge.ui import Manager, make_server
 
 WORKER = REPO / 'tests' / 'local_worker.py'
 TIMEOUT = 25.0
+HTTP_TIMEOUT = 10.0
 
 
 class OperatorLifecycleTests(unittest.TestCase):
     mode = 'complete'
 
     def setUp(self):
-        self.temp = tempfile.TemporaryDirectory()
+        self.temp = tempfile.TemporaryDirectory(ignore_cleanup_errors=True)
         self.addCleanup(self.temp.cleanup)
         self.root = Path(self.temp.name)
         (self.root / 'runs').mkdir()
@@ -95,7 +96,8 @@ class OperatorLifecycleTests(unittest.TestCase):
             headers['Origin'] = origin
         request = urllib.request.Request(
             self.url + path, data=json.dumps(body).encode() if body else None, headers=headers)
-        with urllib.request.urlopen(request) as response:
+        # Bounded so one stalled request cannot outlast the outer polling deadline.
+        with urllib.request.urlopen(request, timeout=HTTP_TIMEOUT) as response:
             return response.status, response.read(), response.headers
 
     def state(self):
@@ -208,6 +210,34 @@ class OperatorLifecycleTests(unittest.TestCase):
         self.assertEqual(400, caught.exception.code)
         # A docker-backend run never creates the unconfirmed remote-operation guard.
         self.assertFalse((self.root / 'runs' / 'contree-active.json').exists())
+
+    def test_guard_clears_even_if_the_first_unlink_hits_a_sharing_violation(self):
+        """A console poll holding the guard open must not strand it.
+
+        Windows refuses to delete a file another handle has open. The watcher used
+        a bare unlink, so one unlucky /api/state poll killed the watcher thread and
+        left the run looking live forever, refusing every later launch.
+        """
+        from unittest.mock import patch
+        run_id = self.launch()
+        real = Path.unlink
+        failed = {'n': 0}
+
+        def flaky(path, *args, **kwargs):
+            if path.name == 'active.json' and failed['n'] < 1:
+                failed['n'] += 1
+                raise PermissionError(32, 'in use by another process')
+            return real(path, *args, **kwargs)
+
+        with patch.object(Path, 'unlink', flaky):
+            (self.controls[run_id] / 'proceed').write_text('go', encoding='utf-8')
+            self.until(lambda: self.processes[-1].poll() is not None, 'the worker to exit')
+            self.until(lambda: self.manager.active() is None,
+                       'the guard to clear despite a sharing violation')
+        self.assertEqual(1, failed['n'], 'the sharing violation was never exercised')
+        # The operator can launch again rather than being stuck behind a dead run.
+        second = self.launch(incident='IF-001', variant='B0')
+        self.assertNotEqual(run_id, second)
 
     # 4. Reconnect during the run, then launch again after confirmed termination.
     def test_reconnect_does_not_duplicate_and_a_later_launch_is_allowed(self):
