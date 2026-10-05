@@ -69,6 +69,16 @@ def overview(root,run_id):
     report=read_json(path/'report.json') if (path/'report.json').exists() else None
     receipt_path=root/'runs/ui-launches'/(run_id+'.json')
     receipt=read_json(receipt_path) if receipt_path.exists() else {}
+    if not receipt:
+        # The per-run receipt is only written once the worker terminates. While a
+        # run is live its launch metadata lives in the guard, so fall back to that
+        # rather than reporting the default incident and an unknown variant.
+        guard=root/'runs/ui-launches/active.json'
+        if guard.exists():
+            try:
+                active=read_json(guard)
+                if active.get('run_id')==run_id: receipt=active
+            except (ValueError,OSError): pass
     if report and 'model_claim_unverified' not in report:
         report={**report,'model_claim_unverified':report.get('reason'),
                 'reason':'Legacy report: use the independent verdict and validation records below. Original narrative is an unverified model claim.'}

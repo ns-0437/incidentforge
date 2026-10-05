@@ -86,6 +86,97 @@ class UITests(unittest.TestCase):
         b=Budget(self.root/'runs/t4-budget.sqlite',200000);b.reserve('previous',100,200000,10)
         with self.assertRaises(ValueError): self.manager.launch('IF-001','B0')
         self.assertEqual([],self.spawned)
+    def finished_run(self,run_id,decision,reason,incident='IF-002',variant='B2',revision='rev-abc'):
+        """A completed run on disk: chained evidence, terminal report event, report.json."""
+        e=Evidence(self.root/'runs'/run_id,run_id)
+        e.event('transition',{'from':'INGEST','to':'REPRODUCE'})
+        e.event('stopped',{'reason':reason})
+        e.event('transition',{'from':'VERIFY','to':'REPORT'})
+        report={'run_id':run_id,'variant':variant,'decision':decision,'reason':reason,
+                'model_claim_unverified':'model narrative','candidate_revision':revision,
+                'accounting':{'calls':2}}
+        e.event('report',report)
+        (e.root/'report.json').write_text(json.dumps(report))
+        (e.root/'candidate').mkdir()
+        (e.root/'candidate'/'INCIDENT.json').write_text(json.dumps({'incident_id':incident}))
+        return report
+
+    def test_reconnecting_while_a_run_is_active_does_not_start_another(self):
+        token=self.token()
+        status,raw,_=self.request('/api/launch',{'incident':'IF-001','variant':'B0'},token,self.url)
+        self.assertEqual(202,status);run_id=json.loads(raw)['run_id']
+        # Each request is a fresh connection, as a browser refresh would be.
+        for _ in range(3):
+            state=json.loads(self.request('/api/state')[1])
+            self.assertIsNotNone(state['active'],'active run disappeared across a refresh')
+            self.assertEqual(run_id,state['active']['run_id'])
+            self.assertEqual('live',state['active']['status'])
+            self.assertFalse(state['active']['cancel_requested'])
+        self.assertEqual(1,len(self.spawned),'a refresh started another worker')
+        self.terminal.set()
+        end=time.time()+2
+        while self.manager.active() and time.time()<end: time.sleep(.01)
+        state=json.loads(self.request('/api/state')[1])
+        self.assertIsNone(state['active'])
+        self.assertEqual(1,len(self.spawned))
+
+    def test_active_run_shows_its_real_incident_and_variant_before_terminating(self):
+        # The per-run receipt is only written when the worker exits. Until then the
+        # launch metadata lives in the guard, so an active run must not be reported
+        # with the default incident and an unknown variant.
+        token=self.token()
+        raw=self.request('/api/launch',{'incident':'IF-002','variant':'B2'},token,self.url)[1]
+        run_id=json.loads(raw)['run_id']
+        guard=json.loads(self.manager.guard.read_text())
+        self.assertEqual(('IF-002','B2'),(guard['incident'],guard['variant']))
+        detail=json.loads(self.request('/api/runs/'+run_id)[1])
+        self.assertEqual('IF-002',detail['incident'],'active run displayed the default incident')
+        self.assertEqual('B2',detail['variant'],'active run displayed an unknown variant')
+        # A live run is surfaced through 'active'; run history lists runs that have
+        # produced evidence, so it is not expected to carry it yet.
+        state=json.loads(self.request('/api/state')[1])
+        self.assertEqual(('IF-002','B2'),(state['active']['incident'],state['active']['variant']))
+        self.assertNotIn(run_id,[r['run_id'] for r in state['runs']])
+
+    def test_unresolved_run_exposes_its_reason_and_evidence(self):
+        self.finished_run('unresolved-run','unresolved','Protected feedback incomplete')
+        status,raw,_=self.request('/api/runs/unresolved-run')
+        self.assertEqual(200,status);data=json.loads(raw)
+        self.assertEqual('unresolved',data['decision'])
+        self.assertEqual('Protected feedback incomplete',data['report']['reason'])
+        self.assertEqual('verified',data['integrity'])
+        self.assertIn('Protected feedback incomplete',[row['label'] for row in data['timeline']])
+        self.assertEqual('REPORT',data['state'])
+        # A finished unresolved run is exportable; the export must carry the
+        # unresolved verdict rather than presenting it as a repair.
+        status,payload,headers=self.request('/api/runs/unresolved-run/export')
+        self.assertEqual(200,status);self.assertEqual('application/zip',headers['Content-Type'])
+        with zipfile.ZipFile(io.BytesIO(payload)) as archive:
+            review=json.loads(archive.read('review.json'))
+        self.assertEqual('unresolved',review['decision'])
+        self.assertEqual([],review['diffs'],'an unresolved run must not export a patch')
+
+    def test_displayed_fields_match_the_underlying_run_artifacts(self):
+        report=self.finished_run('shown-run','accept_for_review','candidate frozen',
+                                 incident='IF-002',variant='B2',revision='rev-7f3')
+        on_disk=json.loads((self.root/'runs'/'shown-run'/'report.json').read_text())
+        self.assertEqual(report,on_disk)
+        listed=next(r for r in json.loads(self.request('/api/state')[1])['runs']
+                    if r['run_id']=='shown-run')
+        detail=json.loads(self.request('/api/runs/shown-run')[1])
+        for shown in (listed,detail):
+            self.assertEqual('IF-002',shown['incident'],'incident differs from candidate/INCIDENT.json')
+            self.assertEqual(on_disk['variant'],shown['variant'])
+            self.assertEqual(on_disk['decision'],shown['decision'])
+            self.assertEqual('REPORT',shown['state'],'state differs from the last transition event')
+            self.assertEqual(on_disk['candidate_revision'],shown['report']['candidate_revision'])
+        # The export carries the same verdict the operator saw.
+        payload=export_run(self.root,'shown-run')
+        with zipfile.ZipFile(io.BytesIO(payload)) as archive:
+            review=json.loads(archive.read('review.json'))
+        self.assertEqual(on_disk['decision'],review['decision'])
+        self.assertEqual('IF-002',review['incident'])
+
     def test_export_is_allowlisted_and_unicode_evidence_verifies(self):
         self.evidence();data=details(self.root,'sample');self.assertEqual('verified',data['integrity'])
         payload=export_run(self.root,'sample')
