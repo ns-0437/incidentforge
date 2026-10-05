@@ -87,7 +87,9 @@ class DerivedMetricTests(unittest.TestCase):
     def test_derived_file_is_current_and_records_an_unmodified_source(self):
         self.assertEqual(0, derive_t8.main(['--check']), 'derived_metrics.json is stale')
         stored = json.loads(DERIVED.read_text())
-        self.assertEqual(hashlib.sha256(SUMMARY.read_bytes()).hexdigest(), stored['source']['sha256'])
+        self.assertEqual(hashlib.sha256(SUMMARY.read_text(encoding='utf-8').encode('utf-8')).hexdigest(),
+                         stored['source']['sha256'],
+                         'the source hash must be of canonical text, not checkout bytes')
         self.assertEqual(json.loads(SUMMARY.read_text())['freeze_sha256'], stored['source']['freeze_sha256'])
 
     def test_deriving_never_writes_the_frozen_summary(self):

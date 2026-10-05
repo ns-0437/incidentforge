@@ -128,7 +128,9 @@ class UITests(unittest.TestCase):
         self.assertFalse(manager.guard.exists(),'the guard was stranded by a transient error')
         self.assertIsNone(manager.current);self.assertIsNone(manager.process)
         # Cleanup succeeded, so the operator may try again.
-        manager.spawn=lambda *a,**k:None
+        class Started:
+            def wait(self): return 0
+        manager.spawn=lambda *a,**k:Started()
         self.assertEqual('IF-002',manager.launch('IF-002','B2')['incident'])
 
     def test_persistent_cleanup_failure_is_explicit_and_blocks_relaunch(self):

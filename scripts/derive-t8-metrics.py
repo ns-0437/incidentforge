@@ -55,9 +55,10 @@ def derive(summary):
     return {
         'schema_version': 1,
         'source': {'path': 'benchmarks/t8/summary.json',
-                   'sha256': hashlib.sha256(SOURCE.read_bytes()).hexdigest(),
+                   'sha256': hashlib.sha256(SOURCE.read_text(encoding='utf-8').encode('utf-8')).hexdigest(),
                    'freeze_sha256': summary.get('freeze_sha256'),
-                   'note': 'Derived view only. The frozen summary is never modified.'},
+                   'note': 'Derived view only. The frozen summary is never modified. The hash is of the '
+                           'canonical UTF-8 text, so it does not vary with checkout line endings.'},
         'attempts_preserved': {'total': len(attempts), 'outcomes': outcomes,
                                'infrastructure_failed_attempts': summary.get('infrastructure_failed_attempts'),
                                'ranking_supported': summary.get('ranking_supported')},
@@ -121,7 +122,8 @@ def main(argv=None):
             return 1
         print('derived metrics are current')
         return 0
-    TARGET.write_text(rendered)
+    # Fixed newline so the committed view is byte-identical on every platform.
+    TARGET.write_text(rendered, newline='\n')
     print(json.dumps(derived['metrics'], indent=2)[:400])
     return 0
 

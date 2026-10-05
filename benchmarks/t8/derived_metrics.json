@@ -2,9 +2,9 @@
   "schema_version": 1,
   "source": {
     "path": "benchmarks/t8/summary.json",
-    "sha256": "27447a6d362bde2bee2bde5002b79bc06cff4ae667635a2a74f8678fe7a66e4f",
+    "sha256": "131c3e3fc9e126490bf83fb5f0fc08f4c30e787ee1598443927e3ec627a2997a",
     "freeze_sha256": "68ee6f0d191abc0789b8224001e7d1b25ee28d2d9fa4e37eaca0004c140f528f",
-    "note": "Derived view only. The frozen summary is never modified."
+    "note": "Derived view only. The frozen summary is never modified. The hash is of the canonical UTF-8 text, so it does not vary with checkout line endings."
   },
   "attempts_preserved": {
     "total": 12,
