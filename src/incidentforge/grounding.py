@@ -88,6 +88,47 @@ def final_decision(result):
             if value.get('status') not in allowed: return 'invalid_evaluation'
     return decision
 
+DECLINE_TERMINAL='CANCELLED_DECLINED'
+
+def _symptom_assessment(incident,observations):
+    """Incident-specific reproduction verdict from observations alone.
+
+    IF-002's order_restart condition establishes a durable COMPENSATING intent
+    with the reservation confirmed HELD, then measures recovery against a
+    declared deadline. A non-terminal status is only called a reproduction once
+    that declared window has elapsed; before then it is an intermediate state.
+
+    IF-001 stays undetermined: developer mode reports HTTP responses and request
+    identity counts, never committed effects, and a duplicate charge cannot be
+    inferred from request counts.
+    """
+    if incident!='IF-002':
+        return ('not determined; this mode exposes HTTP observations and request identity '
+                'counts, not committed-effect counts',
+                'committed-effect evidence unavailable in this mode',None,
+                'not measured in this mode')
+    for observation in observations:
+        if observation.get('condition')!='order_restart': continue
+        order=observation.get('order') or {}
+        status=order.get('status')
+        elapsed,deadline=observation.get('elapsed_seconds'),observation.get('deadline_seconds')
+        support={'condition':'order_restart','status':status,'elapsed_seconds':elapsed,
+                 'deadline_seconds':deadline,'startup_seconds':observation.get('startup_seconds')}
+        numeric=isinstance(elapsed,(int,float)) and isinstance(deadline,(int,float))
+        if not isinstance(status,str) or not numeric:
+            return ('not determined','order_restart lacks a status or a declared recovery window',
+                    support,deadline if numeric else 'not recorded')
+        if status==DECLINE_TERMINAL:
+            return ('not observed','compensation reached '+DECLINE_TERMINAL+
+                    ' within the declared recovery window',support,deadline)
+        if elapsed>=deadline:
+            return ('observed','status stayed '+status+', not '+DECLINE_TERMINAL+
+                    ', after the declared recovery window elapsed',support,deadline)
+        return ('not determined','status '+status+' is non-terminal but the declared recovery '
+                'window had not elapsed; an intermediate state is not a failure',support,deadline)
+    return ('not determined','no order_restart condition was executed',None,'not measured in this mode')
+
+
 def reproduction_bounds(incident,spec,result):
     """Declared execution bounds and limits for one reproduction attempt.
 
@@ -104,6 +145,7 @@ def reproduction_bounds(incident,spec,result):
         if label and str(label) not in conditions: conditions.append(str(label))
     stated=list(result.get('limitations') or [])
     if result.get('note'): stated.append(result['note'])
+    assessment,criterion,support,bound=_symptom_assessment(incident,observations)
     return {'incident':incident,
             'executed_conditions':conditions or ['not recorded'],
             'reset':spec.get('reset','not recorded'),
@@ -111,9 +153,10 @@ def reproduction_bounds(incident,spec,result):
             'declared_limits':spec.get('limits') or {},
             'repetitions':spec.get('repetitions','not recorded'),
             'execution':'complete' if result.get('complete') is True else 'incomplete',
-            'symptom_reproduction':'not determined; this mode exposes HTTP observations and '
-                                   'request identity counts, not committed-effect counts',
-            'recovery_bound':'not measured in this mode',
+            'symptom_reproduction':assessment,
+            'symptom_criterion':criterion,
+            'symptom_observation':support,
+            'recovery_bound':bound,
             'stated_limitations':stated,
             'scope':'Finite authored fixture conditions and faults. This does not establish '
                     'reproduction of arbitrary production incidents.'}

@@ -308,6 +308,49 @@ class ReliabilityTests(unittest.TestCase):
         self.assertIn('execution complete',result['completion'])
         self.assertIn('symptom reproduction not determined',result['completion'])
 
+    def test_if002_reproduction_is_assessed_against_the_declared_recovery_window(self):
+        from incidentforge.grounding import reproduction_bounds
+        spec={'reset':'fresh stores','workload':'declined order','limits':{'seconds':100},'repetitions':1}
+        def observation(status,elapsed,deadline=2.0):
+            return {'condition':'order_restart','order':{'status':status},
+                    'elapsed_seconds':elapsed,'deadline_seconds':deadline,'startup_seconds':.3}
+        def bounds(obs): return reproduction_bounds('IF-002',spec,{'complete':True,'observations':obs})
+
+        stuck=bounds([observation('COMPENSATING',2.4)])
+        self.assertEqual('observed',stuck['symptom_reproduction'])
+        self.assertIn('after the declared recovery window elapsed',stuck['symptom_criterion'])
+        self.assertEqual('COMPENSATING',stuck['symptom_observation']['status'])
+        self.assertEqual(2.0,stuck['recovery_bound'])
+
+        recovered=bounds([observation('CANCELLED_DECLINED',0.9)])
+        self.assertEqual('not observed',recovered['symptom_reproduction'])
+        self.assertIn('CANCELLED_DECLINED',recovered['symptom_criterion'])
+
+        # A non-terminal state inside the window is intermediate, not a failure.
+        early=bounds([observation('COMPENSATING',0.4)])
+        self.assertEqual('not determined',early['symptom_reproduction'])
+        self.assertIn('had not elapsed',early['symptom_criterion'])
+
+        missing=bounds([{'condition':'order_restart','order':{'status':'COMPENSATING'}}])
+        self.assertEqual('not determined',missing['symptom_reproduction'])
+        self.assertIn('declared recovery window',missing['symptom_criterion'])
+
+        absent=bounds([{'condition':'no_restart','order':{'status':'CANCELLED_DECLINED'}}])
+        self.assertEqual('not determined',absent['symptom_reproduction'])
+        self.assertIn('no order_restart condition',absent['symptom_criterion'])
+
+    def test_if001_symptom_stays_undetermined_without_committed_effect_evidence(self):
+        from incidentforge.grounding import reproduction_bounds
+        spec={'reset':'fresh','workload':'one order','limits':{'seconds':100},'repetitions':1}
+        bounds=reproduction_bounds('IF-001',spec,{'complete':True,'observations':[
+            {'fault':'payment response loss','payment_requests':{'charge_requests_observed':2,
+                                                                 'distinct_charge_operation_keys':2}}]})
+        # Two charge requests are not evidence of two committed charges.
+        self.assertIn('not determined',bounds['symptom_reproduction'])
+        self.assertIn('committed-effect',bounds['symptom_criterion'])
+        self.assertIsNone(bounds['symptom_observation'])
+        self.assertEqual('not measured in this mode',bounds['recovery_bound'])
+
     def test_incomplete_reproduction_is_reported_as_incomplete(self):
         from incidentforge.grounding import reproduction_bounds
         spec={'reset':'new world per case','workload':'one order','limits':{'seconds':100},'repetitions':1}
