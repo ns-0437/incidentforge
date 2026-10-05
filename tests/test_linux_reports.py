@@ -102,6 +102,43 @@ class LinuxReportCheckTests(unittest.TestCase):
     def test_wrong_executed_count_is_rejected(self):
         self.assertRejected({**GOOD, 't6': {**GOOD['t6'], 'tests': 18}}, 'ran 18 tests, expected 19')
 
+    def test_completion_gate_requires_the_json_boolean(self):
+        # 1 and 1.0 both equal True in Python, so identity-or-equality accepted them.
+        for value in (False, 1, 1.0, 'true', None, 0, ''):
+            with self.subTest(complete=value):
+                self.assertRejected({**GOOD, 't6': {**GOOD['t6'], 'complete': value}},
+                                    'expected the JSON boolean true')
+        code, problems = self.check({**GOOD, 't6': {**GOOD['t6'], 'complete': True}})
+        self.assertEqual([], problems)
+        self.assertEqual(0, code)
+
+    def test_status_gate_requires_the_pass_string(self):
+        for value in ('FAIL', 1, True, None, ['PASS']):
+            with self.subTest(status=value):
+                self.assertRejected({**GOOD, 't1': {**GOOD['t1'], 'status': value}}, "expected 'PASS'")
+
+    def test_count_alias_types_are_checked_before_comparison(self):
+        # 34.0 == 34 and True == 1, so equality alone bypassed the integer rule.
+        for value in (34.0, True, '34', None, []):
+            with self.subTest(alias=value):
+                self.assertRejected({**GOOD, 't1': {**GOOD['t1'], 'tests': value}},
+                                    "not a supported count value")
+        code, problems = self.check({**GOOD, 't1': {**GOOD['t1'], 'tests': 34}})
+        self.assertEqual([], problems, 'a matching integer alias must be accepted')
+        self.assertEqual(0, code)
+
+    def test_skip_alias_is_compared_by_count_across_the_two_schemas(self):
+        # run_t6 reports an integer and run_t1/run_t2 a list. A T6 report that also
+        # carries an empty list agrees with skips 0 and must not be flagged.
+        code, problems = self.check({**GOOD, 't6': {**GOOD['t6'], 'skipped': []}})
+        self.assertEqual([], problems)
+        self.assertEqual(0, code)
+        self.assertRejected({**GOOD, 't6': {**GOOD['t6'], 'skipped': [['case', 'why']]}}, 'disagree')
+        for value in ('0', 1.0, None, {}):
+            with self.subTest(alias=value):
+                self.assertRejected({**GOOD, 't6': {**GOOD['t6'], 'skipped': value}},
+                                    'not a supported skip value')
+
     def test_conflicting_aliases_are_rejected(self):
         self.assertRejected({**GOOD, 't1': {**GOOD['t1'], 'tests': 1}}, 'disagree')
         self.assertRejected({**GOOD, 't6': {**GOOD['t6'], 'skipped': [['x', 'y']]}}, 'disagree')

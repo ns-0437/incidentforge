@@ -31,8 +31,19 @@ ALIASES = {'tests_run': 'tests', 'tests': 'tests_run', 'skipped': 'skips', 'skip
 
 
 def counted(value):
-    """A real nonnegative integer. bool is not a count."""
+    """A real nonnegative integer. bool is not a count, and neither is 34.0."""
     return type(value) is int and value >= 0
+
+
+def skips_of(value):
+    """Skip counts arrive as a list (run_t1, run_t2) or an integer (run_t6).
+
+    Returns None for anything else, so an unsupported alias type is reported
+    rather than compared. A list is never compared directly with an integer.
+    """
+    if isinstance(value, list):
+        return len(value)
+    return value if counted(value) else None
 
 
 def check_stage(stage, schema, directory, problems):
@@ -58,11 +69,23 @@ def check_stage(stage, schema, directory, problems):
         if field not in data:
             problems.append('%s: report.json has no %r field' % (stage, field))
     # An alias carrying a different value means the report is self-contradictory.
-    for field in (count_field, skip_field):
+    # Each alias is type-checked before comparison: plain equality would accept
+    # 34.0 or True for 34, and would compare a skip list directly with an integer.
+    for field, normalise in ((count_field, lambda v: v if counted(v) else None),
+                             (skip_field, skips_of)):
         other = ALIASES[field]
-        if other in data and data[other] != data.get(field):
+        if other not in data:
+            continue
+        theirs = normalise(data[other])
+        if theirs is None:
+            problems.append('%s: alias %r is %r, not a supported %s value'
+                            % (stage, other, data[other],
+                               'count' if field == count_field else 'skip'))
+            continue
+        mine = normalise(data.get(field))
+        if mine is not None and mine != theirs:
             problems.append('%s: %r and %r disagree (%r vs %r)'
-                            % (stage, field, other, data.get(field), data[other]))
+                            % (stage, field, other, mine, theirs))
     if problems and any(p.startswith('%s: report.json has no' % stage) for p in problems):
         return None
 
@@ -89,8 +112,14 @@ def check_stage(stage, schema, directory, problems):
             problems.append('%s: %r is %r, expected a nonnegative integer' % (stage, skip_field, skips))
     if skip_count:
         problems.append('%s: %d skipped; the Linux suite must not skip in CI' % (stage, skip_count))
-    if data[gate_field] is not gate_value and data[gate_field] != gate_value:
-        problems.append('%s: %r is %r, expected %r' % (stage, gate_field, data[gate_field], gate_value))
+    # Identity-or-equality would accept 1 and 1.0 for true, because both equal True
+    # in Python. The completion gate must be the JSON boolean, and status the string.
+    gate = data[gate_field]
+    if gate_value is True:
+        if gate is not True:
+            problems.append('%s: %r is %r, expected the JSON boolean true' % (stage, gate_field, gate))
+    elif type(gate) is not type(gate_value) or gate != gate_value:
+        problems.append('%s: %r is %r, expected %r' % (stage, gate_field, gate, gate_value))
     return {'stage': stage, 'tests_run': data.get(count_field), 'expected': schema['expected'],
             'failures': data.get('failures'), 'errors': data.get('errors'), 'skipped': skip_count,
             gate_field: data.get(gate_field), 'evidence': directory.name}
