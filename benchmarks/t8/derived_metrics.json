@@ -1,0 +1,80 @@
+{
+  "schema_version": 1,
+  "source": {
+    "path": "benchmarks/t8/summary.json",
+    "sha256": "27447a6d362bde2bee2bde5002b79bc06cff4ae667635a2a74f8678fe7a66e4f",
+    "freeze_sha256": "68ee6f0d191abc0789b8224001e7d1b25ee28d2d9fa4e37eaca0004c140f528f",
+    "note": "Derived view only. The frozen summary is never modified."
+  },
+  "attempts_preserved": {
+    "total": 12,
+    "outcomes": {
+      "unresolved": 8,
+      "accept_for_review": 2,
+      "reject_behavior": 2
+    },
+    "infrastructure_failed_attempts": 3,
+    "ranking_supported": false
+  },
+  "metrics": {
+    "reproduction_rate": {
+      "value": null,
+      "unavailable_reason": "No attempt records a reproduction outcome. Execution completing is not symptom reproduction, and the incident-specific reproduction assessment added after this campaign is not applied retroactively."
+    },
+    "time_to_reproduction_seconds": {
+      "value": null,
+      "unavailable_reason": "No reproduction timestamp or duration was retained per attempt."
+    },
+    "resolution_time_seconds": {
+      "value": {
+        "n": 4,
+        "min": 97.578,
+        "median": 158.04,
+        "max": 229.203
+      },
+      "unit": "seconds",
+      "denominator": "attempts reaching an independent final verdict (independently_verified true): 4 of 12",
+      "source_field": "attempts[].elapsed_seconds",
+      "note": "Runtime of an unresolved attempt is not a resolution time, so the 8 unresolved attempts are excluded here and reported as runtime below."
+    },
+    "runtime_seconds_all_attempts": {
+      "value": {
+        "n": 12,
+        "min": 67.063,
+        "median": 107.993,
+        "max": 229.203
+      },
+      "unit": "seconds",
+      "denominator": "all 12 launched attempts",
+      "source_field": "attempts[].elapsed_seconds",
+      "note": "Wall-clock runtime, not resolution time."
+    },
+    "clean_workload_regressions": {
+      "value": 0,
+      "unit": "failing clean case instances",
+      "denominator": "8 clean case instances across 4 independently evaluated attempts",
+      "clean_cases": [
+        "canonical_mixed_payload",
+        "contended_inventory"
+      ],
+      "clean_case_basis": "evaluation/holdout.py sets fault=True only for ('dual_restart_response_loss', 'cancel_after_dual_restart')",
+      "source_field": "attempts[].case_outcomes[].properties",
+      "detail": [],
+      "note": "Counts clean case instances with a failed property or a non-accepting case decision. Attempts that never reached evaluation contribute none."
+    },
+    "lost_orders": {
+      "value": null,
+      "unavailable_reason": "No order-level count was retained. P3 is a property verdict, not a count of lost orders. Attempts with a P3 failure: [10, 11]."
+    },
+    "duplicate_effects": {
+      "value": null,
+      "unavailable_reason": "No duplicate-effect count was retained. P1 and P6 are property verdicts, not counts, and P1 did not fail in any evaluated attempt."
+    }
+  },
+  "limitations": [
+    "Derived from retained fields only; no re-execution and no new measurement.",
+    "Property statuses are pass, fail or not_applicable. not_applicable is not a failure.",
+    "Metrics over evaluated attempts describe 4 of 12; the 8 unresolved attempts are preserved and counted in every denominator that mentions them.",
+    "No variant ranking is supported or implied, per the frozen campaign."
+  ]
+}
