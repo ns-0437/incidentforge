@@ -81,8 +81,21 @@ class OperatorHarness(unittest.TestCase):
                     self.watchers.append(thread)
 
     def record_handler_error(self, request, client_address):
+        """Separate a server fault from a client that has already gone away.
+
+        socketserver calls this for any handler exception. A write to a socket the
+        test client closed is a transport condition, counted and bounded with the
+        other transport failures. Anything else is a real fault and fails the test.
+        """
+        import sys
         import traceback
-        self.handler_errors.append(traceback.format_exc()[-1500:])
+        exc_type, exc, tb = sys.exc_info()
+        if isinstance(exc, (ConnectionAbortedError, ConnectionResetError, BrokenPipeError)):
+            self.transport_attempts.append('server write aborted: %r' % (exc,))
+            return
+        text = (''.join(traceback.format_exception(exc_type, exc, tb))[-1500:] if exc
+                else 'handler error reported with no active exception')
+        self.handler_errors.append(text)
 
     def record_thread_error(self, args):
         import traceback
