@@ -98,9 +98,14 @@ class Controller:
         protected_feedback=None;feedback_revision=None;developer_observations=[]
         initial_sources={name:self.workspace.read(name) for name in EDITABLE}
         try:
-            bundle={'revision':base,'image_digest':self.backend.image,'lock_hash':digest({'python':'3.12','dependencies':[]}),
+            # Dependency identity is measured from the allowlisted source rather than
+            # declared. The fixture's interpreter is the pinned image's, recorded as
+            # image_digest; no host Python version is asserted here.
+            provenance=self.workspace.dependency_provenance()
+            bundle={'revision':base,'image_digest':self.backend.image,'lock_hash':digest(provenance),
                 'topology':['Order -> Inventory HTTP','Order -> proxy -> Payment HTTP'],
-                'config':{'variant':self.variant,'max_calls':10,'max_edits':3,'max_requested_tests':2},
+                'config':{'variant':self.variant,'max_calls':10,'max_edits':3,'max_requested_tests':2,
+                          'dependency_provenance':provenance},
                 'evidence_refs':['INCIDENT.json'],'initial_state_hash':digest({'A':10,'B':10}),
                 'public_contract_hash':hashlib.sha256(self.workspace.read('CONTRACT.md').encode()).hexdigest(),
                 'declared_gaps':['No final holdout; fixed development fixture.']}

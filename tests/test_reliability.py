@@ -266,6 +266,30 @@ class ReliabilityTests(unittest.TestCase):
         verify(e.root)
         return report,model,backend
 
+    def test_investigator_sees_import_records_and_measured_dependencies(self):
+        """The index reaches the model, and the bundle records measured provenance."""
+        report,model,_=self.run_actions(iter([{'action':'finish','summary':'stop'}]*3))
+        index=None
+        for turn in model.history:
+            for message in turn:
+                if message['role']=='user' and 'source_index' in message['content']:
+                    index=json.loads(message['content'])['source_index'];break
+            if index: break
+        self.assertIsNotNone(index,'the repository index never reached the model')
+        for path,entry in index.items():
+            self.assertIn('symbols',entry,path)
+            self.assertIn('imports',entry,'import records were not exposed for '+path)
+            self.assertIsInstance(entry['imports'],list)
+        records=json.loads((self.root/'e'/'records.json').read_text())
+        bundle=next(r['data'] for r in records if r['kind']=='IncidentBundle')
+        provenance=bundle['config']['dependency_provenance']
+        self.assertEqual([],provenance['external_modules'])
+        self.assertIn('not measured',provenance['runtime_interpreter'])
+        self.assertNotIn('3.12',json.dumps(provenance))
+        # lock_hash is now derived from that provenance, not a hardcoded literal.
+        from incidentforge.records import digest
+        self.assertEqual(digest(provenance),bundle['lock_hash'])
+
     def test_contradictory_final_acceptance_remains_invalid(self):
         report,_,_=self.run_actions(iter([
             {'action':'replace','path':'fixture/app/service.py','old':'x=1','new':'x=2','reason':'repair'},

@@ -3,6 +3,7 @@ import ast
 import difflib
 import hashlib
 from pathlib import Path
+import sys
 from .records import digest
 
 EDITABLE={'fixture/app/service.py','fixture/app/common.py','fixture/app/contract.py'}
@@ -52,13 +53,54 @@ class Workspace:
             for number,line in enumerate(self.read(name).splitlines(),1):
                 if query.lower() in line.lower(): result.append({'path':name,'line':number,'text':line[:300]})
         return result[:40]
+    def imports(self,name):
+        """Deterministic AST import records for one allowlisted file.
+
+        Static text only: an import says a module is referenced, not that any call
+        happened at runtime, and never that one service called another over HTTP.
+        `level` is the relative-import depth, 0 for absolute imports.
+        """
+        records=[]
+        for node in ast.walk(ast.parse(self.read(name))):
+            if isinstance(node,ast.Import):
+                for alias in node.names:
+                    records.append({'module':alias.name,'name':None,'alias':alias.asname,
+                                    'level':0,'line':node.lineno})
+            elif isinstance(node,ast.ImportFrom):
+                for alias in node.names:
+                    records.append({'module':node.module,'name':alias.name,'alias':alias.asname,
+                                    'level':node.level,'line':node.lineno})
+        return sorted(records,key=lambda r:(r['line'],str(r['module']),str(r['name'])))
+
     def index(self):
         result={}
         for name in sorted(EDITABLE):
             tree=ast.parse(self.read(name))
-            result[name]=[{'symbol':node.name,'line':node.lineno} for node in ast.walk(tree)
-                          if isinstance(node,(ast.ClassDef,ast.FunctionDef,ast.AsyncFunctionDef))]
+            result[name]={'symbols':[{'symbol':node.name,'line':node.lineno} for node in ast.walk(tree)
+                                     if isinstance(node,(ast.ClassDef,ast.FunctionDef,ast.AsyncFunctionDef))],
+                          'imports':self.imports(name)}
         return result
+
+    def dependency_provenance(self):
+        """Measured from the allowlisted source, never declared or invented.
+
+        Top-level modules each editable file imports, split by whether this
+        interpreter reports them as standard library. Relative imports are
+        recorded as internal. The interpreter that runs the fixture is the
+        sandbox image's, not this host's, so no runtime version is asserted here;
+        image_digest carries the identity that is actually measured.
+        """
+        external,standard,internal=set(),set(),set()
+        for name in sorted(EDITABLE):
+            for record in self.imports(name):
+                if record['level']:
+                    internal.add('.'*record['level']+(record['module'] or ''));continue
+                top=(record['module'] or '').split('.')[0]
+                if not top: continue
+                (standard if top in sys.stdlib_module_names else external).add(top)
+        return {'source':'ast of allowlisted fixture source','external_modules':sorted(external),
+                'standard_library_modules':sorted(standard),'internal_relative_imports':sorted(internal),
+                'runtime_interpreter':'not measured on the host; the fixture runs in the pinned image'}
     def replace(self,name,old,new):
         path=self.path(name,edit=True);before=self.read(name)
         if before.count(old)!=1: raise EditMismatch(name,before,old)

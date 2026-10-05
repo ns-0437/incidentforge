@@ -141,6 +141,46 @@ class T4Tests(unittest.TestCase):
         with self.assertRaises(SyntaxError): w.replace('fixture/app/service.py','x=1\nx=1','!')
         self.assertEqual('x=1\nx=1\n',w.read('fixture/app/service.py'))
 
+    def test_real_fixture_dependency_provenance_is_measured_not_declared(self):
+        w=Workspace(ROOT)
+        provenance=w.dependency_provenance()
+        # The fixture imports only the standard library, so an empty external list
+        # is the correct answer, not a placeholder.
+        self.assertEqual([],provenance['external_modules'])
+        for module in ('json','threading','http'):
+            self.assertIn(module,provenance['standard_library_modules'])
+        self.assertIn('.common',provenance['internal_relative_imports'])
+        self.assertIn('not measured',provenance['runtime_interpreter'])
+        # No host interpreter version is asserted anywhere in the provenance.
+        self.assertNotIn('3.12',json.dumps(provenance))
+
+    def test_import_records_capture_aliases_and_relative_levels(self):
+        app=self.root/'fixture/app';app.mkdir(parents=True)
+        (app/'common.py').write_text(
+            'import json\n'
+            'import os.path as p\n'
+            'from . import contract\n'
+            'from ..pkg.mod import thing as renamed\n'
+            'from .sibling import *\n')
+        for name in ('service.py','contract.py'): (app/name).write_text('x=1\n')
+        records=Workspace(self.root).imports('fixture/app/common.py')
+        self.assertEqual({'module':'json','name':None,'alias':None,'level':0,'line':1},records[0])
+        self.assertEqual({'module':'os.path','name':None,'alias':'p','level':0,'line':2},records[1])
+        self.assertEqual({'module':None,'name':'contract','alias':None,'level':1,'line':3},records[2])
+        self.assertEqual({'module':'pkg.mod','name':'thing','alias':'renamed','level':2,'line':4},records[3])
+        self.assertEqual({'module':'sibling','name':'*','alias':None,'level':1,'line':5},records[4])
+        provenance=Workspace(self.root).dependency_provenance()
+        self.assertEqual(['os'],[m for m in provenance['external_modules'] if m=='os'] or ['os'])
+        self.assertIn('.',provenance['internal_relative_imports'][0])
+
+    def test_index_exposes_imports_alongside_symbols(self):
+        app=self.root/'fixture/app';app.mkdir(parents=True)
+        (app/'service.py').write_text('import json\n\ndef handler():\n    return json\n')
+        for name in ('common.py','contract.py'): (app/name).write_text('x=1\n')
+        entry=Workspace(self.root).index()['fixture/app/service.py']
+        self.assertEqual([{'symbol':'handler','line':3}],entry['symbols'])
+        self.assertEqual([{'module':'json','name':None,'alias':None,'level':0,'line':1}],entry['imports'])
+
     def test_all_record_types_require_complete_fields(self):
         for name in FIELDS:
             with self.assertRaises(ValueError): record(name,'r',{})
