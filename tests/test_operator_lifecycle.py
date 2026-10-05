@@ -149,6 +149,68 @@ class OperatorLifecycleTests(OperatorHarness):
         second = self.launch(incident='IF-001', variant='B0')
         self.assertNotEqual(run_id, second)
 
+    def test_watcher_survives_a_transient_guard_read_failure(self):
+        """_watch reads the guard before its protected release block."""
+        from unittest.mock import patch
+        import incidentforge.ui as ui
+        run_id = self.launch()
+        real = ui.read_json
+        hits = {'n': 0}
+
+        def flaky(path, *args, **kwargs):
+            if path.name == 'active.json' and hits['n'] < 1:
+                hits['n'] += 1
+                raise PermissionError(13, 'Permission denied')
+            return real(path, *args, **kwargs)
+
+        with patch.object(ui, 'read_json', flaky):
+            (self.controls[run_id] / 'proceed').write_text('go', encoding='utf-8')
+            receipt = self.settle(run_id)
+        self.assertEqual(1, hits['n'], 'the blocked read was never exercised')
+        self.assertTrue(receipt['terminal_confirmed'])
+        self.assertEqual(0, receipt['exit_code'])
+        self.assertNotIn('guard_read_error', receipt, 'a transient read should have recovered')
+        self.assertFalse(self.manager.guard.exists())
+        self.assertEqual([], self.thread_errors)
+
+    def test_watcher_records_a_permanently_unreadable_guard_and_keeps_it(self):
+        from unittest.mock import patch
+        import incidentforge.ui as ui
+        run_id = self.launch()
+        real = ui.read_json
+
+        def blocked(path, *args, **kwargs):
+            if path.name == 'active.json': raise PermissionError(13, 'Permission denied')
+            return real(path, *args, **kwargs)
+
+        receipt_path = self.manager.meta / (run_id + '.json')
+        with patch.object(ui, 'read_json', blocked):
+            (self.controls[run_id] / 'proceed').write_text('go', encoding='utf-8')
+            self.until(lambda: self.processes[-1].poll() is not None, 'the worker to exit')
+            self.until(receipt_path.exists, 'a receipt despite the unreadable guard')
+        receipt = json.loads(receipt_path.read_text())
+        # Local process termination is still recorded, with what is certain only.
+        self.assertTrue(receipt['terminal_confirmed'])
+        self.assertEqual(0, receipt['exit_code'])
+        self.assertEqual(run_id, receipt['run_id'])
+        self.assertIn('PermissionError', receipt.get('guard_read_error', ''))
+        self.assertIn('PermissionError', receipt.get('guard_release_error', ''))
+        # Ownership could not be established, so the guard is left alone.
+        self.assertTrue(self.manager.guard.exists(), 'an unattributable guard was erased')
+        self.assertEqual([], self.thread_errors, 'the watcher died instead of recording')
+        self.manager.release_guard(run_id=run_id)
+
+    def test_watcher_never_erases_a_guard_owned_by_another_run(self):
+        run_id = self.launch()
+        (self.controls[run_id] / 'proceed').write_text('go', encoding='utf-8')
+        self.until(lambda: self.processes[-1].poll() is not None, 'the worker to exit')
+        self.until(lambda: self.manager.active() is None, 'the guard to clear')
+        # A later launch writes its own guard; the finished run must not remove it.
+        self.manager.guard.write_text(json.dumps({'run_id': 'ui-' + 'f' * 32}))
+        self.assertFalse(self.manager.release_guard(run_id=run_id))
+        self.assertTrue(self.manager.guard.exists())
+        self.manager.guard.unlink()
+
     def test_a_permanently_stuck_guard_is_recorded_instead_of_killing_the_watcher(self):
         """Deterministic fault injection: the guard can never be unlinked.
 

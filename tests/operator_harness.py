@@ -24,6 +24,7 @@ import urllib.request
 PROCESS_WAIT = 15.0
 WATCHER_WAIT = 20.0
 HTTP_TIMEOUT = 15.0
+GET_ATTEMPTS = 3
 
 
 class OperatorHarness(unittest.TestCase):
@@ -40,14 +41,20 @@ class OperatorHarness(unittest.TestCase):
         self.controls = {}
         self.watchers = []
         self.thread_errors = []
-        self.transport_retries = []
+        self.transport_attempts = []
+        self.handler_errors = []
         # Registered first, so it runs last: everything else must already be quiet.
         self.addCleanup(self.remove_temp)
         self.previous_hook = threading.excepthook
         threading.excepthook = self.record_thread_error
         self.addCleanup(self.finish)
         self.manager = Manager(self.root, self.spawn)
+        self.opener = urllib.request.build_opener(urllib.request.ProxyHandler({}))
         self.server = make_server(self.root, 0, self.manager)
+        # socketserver swallows handler exceptions into handle_error, which
+        # threading.excepthook never sees. Record them so a server-side fault
+        # cannot look like a bare transport drop.
+        self.server.handle_error = self.record_handler_error
         self.thread = threading.Thread(target=self.server.serve_forever, daemon=True)
         self.thread.start()
         self.url = 'http://127.0.0.1:' + str(self.server.server_port)
@@ -72,6 +79,10 @@ class OperatorHarness(unittest.TestCase):
             if thread not in before and thread is not threading.current_thread():
                 if thread not in self.watchers:
                     self.watchers.append(thread)
+
+    def record_handler_error(self, request, client_address):
+        import traceback
+        self.handler_errors.append(traceback.format_exc()[-1500:])
 
     def record_thread_error(self, args):
         import traceback
@@ -136,9 +147,11 @@ class OperatorHarness(unittest.TestCase):
             problems.append('watcher threads still running: %r' % alive)
         if self.thread_errors:
             problems.append('%d exception(s) escaped a background thread' % len(self.thread_errors))
-        if len(self.transport_retries) > 5:
-            problems.append('%d loopback transport retries: %r'
-                            % (len(self.transport_retries), self.transport_retries[:5]))
+        if len(self.transport_attempts) > 5:
+            problems.append('%d loopback transport failures: %r'
+                            % (len(self.transport_attempts), self.transport_attempts[:5]))
+        if self.handler_errors:
+            problems.append('%d server-side handler exception(s)' % len(self.handler_errors))
         if [p for p in self.processes if p.poll() is None]:
             problems.append('a worker process survived teardown')
         if problems:
@@ -172,21 +185,26 @@ class OperatorHarness(unittest.TestCase):
             headers['X-IncidentForge-Token'] = token
         if origin:
             headers['Origin'] = origin
+        mutating = body is not None
         request = urllib.request.Request(
-            self.url + path, data=json.dumps(body).encode() if body else None, headers=headers)
-        # A loopback connection is occasionally dropped before any status line.
-        # HTTPError is a real response and is never retried.
+            self.url + path, data=json.dumps(body).encode() if mutating else None, headers=headers)
+        # A mutating request is issued exactly once. A dropped response does not
+        # mean the server did not act, so retrying could launch or cancel twice.
+        # Only idempotent reads are retried, and HTTPError is a real response.
+        attempts = 1 if mutating else GET_ATTEMPTS
+        method = 'POST' if mutating else 'GET'
         last = None
-        for _ in range(3):
+        for attempt in range(attempts):
             try:
-                with urllib.request.urlopen(request, timeout=HTTP_TIMEOUT) as response:
+                with self.opener.open(request, timeout=HTTP_TIMEOUT) as response:
                     return response.status, response.read(), response.headers
             except ConnectionResetError as exc:
                 last = exc
-                self.transport_retries.append('%s: %r' % (path, exc))
-                time.sleep(0.05)
-        raise AssertionError('loopback request to %s failed repeatedly: %r\n%s'
-                             % (path, last, self.diagnostics()))
+                self.transport_attempts.append('%s %s: %r' % (method, path, exc))
+                if attempt + 1 < attempts:
+                    time.sleep(0.05)
+        raise AssertionError('loopback %s to %s failed after %d attempt(s): %r\n%s'
+                             % (method, path, attempts, last, self.diagnostics()))
 
     def state(self):
         return json.loads(self.request('/api/state')[1])
