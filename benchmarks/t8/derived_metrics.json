@@ -3,8 +3,10 @@
   "source": {
     "path": "benchmarks/t8/summary.json",
     "sha256": "131c3e3fc9e126490bf83fb5f0fc08f4c30e787ee1598443927e3ec627a2997a",
+    "sha256_unavailable_reason": null,
     "freeze_sha256": "68ee6f0d191abc0789b8224001e7d1b25ee28d2d9fa4e37eaca0004c140f528f",
-    "note": "Derived view only. The frozen summary is never modified. The hash is of the canonical UTF-8 text, so it does not vary with checkout line endings."
+    "hash_basis": "sha256 of the LF-normalized UTF-8 text of the input actually used for this derivation, not of a separately read file and not of canonical JSON",
+    "note": "Derived view only. The frozen summary is never modified."
   },
   "attempts_preserved": {
     "total": 12,
@@ -25,7 +27,7 @@
       "value": null,
       "unavailable_reason": "No reproduction timestamp or duration was retained per attempt."
     },
-    "resolution_time_seconds": {
+    "time_to_final_verdict_seconds": {
       "value": {
         "n": 4,
         "min": 97.578,
@@ -35,7 +37,11 @@
       "unit": "seconds",
       "denominator": "attempts reaching an independent final verdict (independently_verified true): 4 of 12",
       "source_field": "attempts[].elapsed_seconds",
-      "note": "Runtime of an unresolved attempt is not a resolution time, so the 8 unresolved attempts are excluded here and reported as runtime below."
+      "note": "Time to a final verdict, accepting or rejecting. A rejected repair is a verdict, not a resolution, so this is not a resolution time. The 8 unresolved attempts are excluded and reported as runtime below."
+    },
+    "successful_resolution_time_seconds": {
+      "value": null,
+      "unavailable_reason": "elapsed_seconds measures wall-clock time to a verdict, not a resolution-specific interval, and no separate resolution timestamp was retained. The 2 accepted attempts are reported under time_to_final_verdict_seconds instead."
     },
     "runtime_seconds_all_attempts": {
       "value": {
@@ -49,7 +55,7 @@
       "source_field": "attempts[].elapsed_seconds",
       "note": "Wall-clock runtime, not resolution time."
     },
-    "clean_workload_regressions": {
+    "clean_workload_failures": {
       "value": 0,
       "unit": "failing clean case instances",
       "denominator": "8 clean case instances across 4 independently evaluated attempts",
@@ -60,7 +66,7 @@
       "clean_case_basis": "evaluation/holdout.py sets fault=True only for ('dual_restart_response_loss', 'cancel_after_dual_restart')",
       "source_field": "attempts[].case_outcomes[].properties",
       "detail": [],
-      "note": "Counts clean case instances with a failed property or a non-accepting case decision. Attempts that never reached evaluation contribute none."
+      "note": "Counts clean case instances with a failed property or a non-accepting case decision. Named failures, not regressions: the campaign retained no baseline run of these cases, so no baseline-to-candidate comparison is possible. Attempts that never reached evaluation contribute none."
     },
     "lost_orders": {
       "value": null,
