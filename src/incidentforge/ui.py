@@ -177,9 +177,25 @@ class Manager:
         return subprocess.Popen(args,stdout=log,stderr=log,stdin=subprocess.DEVNULL,cwd=self.root,
                                 creationflags=subprocess.CREATE_NO_WINDOW if os.name=='nt' else 0)
 
+    def read_guard(self,timeout=1.0):
+        """Read the launch guard, tolerating the moment it is being removed.
+
+        On Windows a file that another handle has open, or that is pending
+        deletion, raises PermissionError rather than FileNotFoundError. A console
+        poll landing in that window returned an error instead of state, so retry
+        briefly before giving up.
+        """
+        deadline=time.monotonic()+timeout
+        while True:
+            try: return read_json(self.guard)
+            except FileNotFoundError: return None
+            except PermissionError:
+                if time.monotonic()>=deadline: raise
+                time.sleep(.02)
+
     def active(self):
-        try: data=read_json(self.guard)
-        except FileNotFoundError:
+        data=self.read_guard()
+        if data is None:
             # The watcher removes the guard after confirming process termination.
             return None
         data['status']='live' if self.current==data['run_id'] else 'unknown'
@@ -201,8 +217,18 @@ class Manager:
             with self.guard.open('x',encoding='utf-8') as file: json.dump(metadata,file)
             log=(self.meta/(run_id+'.log')).open('wb')
             try: process=self.spawn(run_id,incident,variant,backend,log)
-            except Exception:
-                log.close();self.guard.unlink();raise
+            except Exception as spawn_error:
+                # Clean up our own guard only, and never let a transient sharing
+                # violation replace the spawn failure the operator has to act on.
+                log.close()
+                try: self.release_guard(run_id=run_id)
+                except OSError as cleanup_error:
+                    raise RuntimeError(
+                        'Launch failed and its guard could not be removed, so relaunch stays '
+                        'blocked until '+self.guard.name+' is cleared by hand. Original failure: '
+                        +type(spawn_error).__name__+': '+str(spawn_error)[:200]
+                        +'. Cleanup failure: '+str(cleanup_error)[:120]) from spawn_error
+                raise
             self.current=run_id;self.process=process
             threading.Thread(target=self._watch,args=(process,run_id,log),daemon=True).start()
             return metadata
@@ -211,22 +237,32 @@ class Manager:
         code=process.wait();log.close()
         metadata=read_json(self.guard) if self.guard.exists() else {}
         receipt={**metadata,'run_id':run_id,'exit_code':code,'terminal_confirmed':True}
-        (self.meta/(run_id+'.json')).write_text(json.dumps(receipt),encoding='utf-8')
         with self.lock:
             self.current=None;self.process=None
-            if self.guard.exists() and read_json(self.guard)['run_id']==run_id: self.release_guard()
+            # A guard that cannot be released is recorded rather than killing this
+            # thread, which would leave the run looking live with no explanation.
+            try: self.release_guard(run_id=run_id)
+            except OSError as exc: receipt['guard_release_error']=type(exc).__name__+': '+str(exc)[:120]
+        (self.meta/(run_id+'.json')).write_text(json.dumps(receipt),encoding='utf-8')
 
-    def release_guard(self,timeout=10.0):
+    def release_guard(self,timeout=10.0,run_id=None):
         """Remove the launch guard, tolerating a concurrent reader.
 
         Windows refuses to delete a file another handle has open, and the console
         polls this guard through /api/state. An unlink that raised would end the
         watcher thread and strand the guard, so every later launch would be
         refused with a live run that has already exited. Retry instead.
+
+        With run_id, only a guard recording that run is removed, so no cleanup
+        path can delete a guard another launch owns. Returns False in that case.
         """
         deadline=time.monotonic()+timeout
         while True:
             try:
+                if run_id is not None:
+                    try: owner=read_json(self.guard).get('run_id')
+                    except FileNotFoundError: return True
+                    if owner!=run_id: return False
                 self.guard.unlink();return True
             except FileNotFoundError: return True
             except PermissionError:

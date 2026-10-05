@@ -100,6 +100,89 @@ class UITests(unittest.TestCase):
         self.assertFalse(self.manager.guard.exists())
         self.assertGreaterEqual(attempts['n'],3,'the transient sharing violation was not retried')
 
+    def failing_manager(self,error):
+        """A Manager whose spawn fails, capturing the log handle it was given."""
+        from incidentforge.ui import Manager
+        captured={}
+        def spawn(run_id,incident,variant,backend,log):
+            captured['log']=log;captured['run_id']=run_id
+            raise error
+        return Manager(self.root/'failing',spawn),captured
+
+    def test_spawn_failure_cleans_up_through_a_transient_sharing_violation(self):
+        from unittest.mock import patch
+        original=ValueError('Set CONTREE_PYTHON to the installed ConTree SDK Python')
+        manager,captured=self.failing_manager(original)
+        real=Path.unlink;hits={'n':0}
+        def flaky(path,*args,**kwargs):
+            if path.name=='active.json' and hits['n']<1:
+                hits['n']+=1;raise PermissionError(32,'in use by another process')
+            return real(path,*args,**kwargs)
+        with patch.object(Path,'unlink',flaky):
+            with self.assertRaises(ValueError) as caught:
+                manager.launch('IF-002','B2')
+        # The operator still sees the actionable spawn failure, not a file error.
+        self.assertIn('CONTREE_PYTHON',str(caught.exception))
+        self.assertEqual(1,hits['n'],'the sharing violation was never exercised')
+        self.assertTrue(captured['log'].closed,'the worker log was left open')
+        self.assertFalse(manager.guard.exists(),'the guard was stranded by a transient error')
+        self.assertIsNone(manager.current);self.assertIsNone(manager.process)
+        # Cleanup succeeded, so the operator may try again.
+        manager.spawn=lambda *a,**k:None
+        self.assertEqual('IF-002',manager.launch('IF-002','B2')['incident'])
+
+    def test_persistent_cleanup_failure_is_explicit_and_blocks_relaunch(self):
+        from unittest.mock import patch
+        manager,captured=self.failing_manager(ValueError('preflight refused the launch'))
+        def always(path,*args,**kwargs):
+            if path.name=='active.json': raise PermissionError(32,'in use by another process')
+            return None
+        with patch.object(Path,'unlink',always):
+            with self.assertRaises(RuntimeError) as caught:
+                manager.launch('IF-002','B2')
+        message=str(caught.exception)
+        self.assertIn('preflight refused the launch',message,'original failure was lost')
+        self.assertIn('active.json',message,'residual guard was not named')
+        self.assertIsInstance(caught.exception.__cause__,ValueError)
+        self.assertTrue(captured['log'].closed)
+        self.assertTrue(manager.guard.exists(),'a stuck guard must remain, conservatively')
+        with self.assertRaises(ValueError): manager.launch('IF-002','B2')
+
+    def test_active_survives_a_guard_read_blocked_by_a_concurrent_delete(self):
+        # Windows raises PermissionError, not FileNotFoundError, for a file that
+        # is open elsewhere or pending deletion. active() caught only the latter,
+        # so a console poll during guard removal returned 400 instead of state.
+        from unittest.mock import patch
+        import incidentforge.ui as ui
+        self.manager.guard.write_text('{"run_id":"live-run"}')
+        real=ui.read_json;hits={'n':0}
+        def flaky(path,*args,**kwargs):
+            if path.name=='active.json' and hits['n']<2:
+                hits['n']+=1;raise PermissionError(13,'Permission denied')
+            return real(path,*args,**kwargs)
+        with patch.object(ui,'read_json',flaky):
+            data=self.manager.active()
+        self.assertEqual('live-run',data['run_id'])
+        self.assertEqual(2,hits['n'],'the blocked read was never exercised')
+
+    def test_active_still_reports_a_guard_that_stays_unreadable(self):
+        from unittest.mock import patch
+        import incidentforge.ui as ui
+        self.manager.guard.write_text('{"run_id":"live-run"}')
+        def blocked(path,*args,**kwargs):
+            if path.name=='active.json': raise PermissionError(13,'Permission denied')
+            return ui.read_json(path,*args,**kwargs)
+        with patch.object(ui,'read_json',blocked):
+            with self.assertRaises(PermissionError): self.manager.read_guard(timeout=.2)
+        self.manager.guard.unlink()
+
+    def test_release_guard_never_removes_another_runs_guard(self):
+        self.manager.guard.write_text('{"run_id":"someone-else"}')
+        self.assertFalse(self.manager.release_guard(run_id='mine'))
+        self.assertTrue(self.manager.guard.exists())
+        self.assertTrue(self.manager.release_guard(run_id='someone-else'))
+        self.assertFalse(self.manager.guard.exists())
+
     def test_guard_release_gives_up_rather_than_spinning_forever(self):
         from unittest.mock import patch
         self.manager.guard.write_text('{"run_id":"stuck"}')
