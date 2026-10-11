@@ -1,8 +1,7 @@
 # Recording handoff
 
-The existing demo link https://ns-0437.github.io/incidentforge-demo/ is retained
-but returned 404 on October 4. Until the main repository Pages release, record
-the retained frontend locally:
+The live frontend is https://ns-0437.github.io/incidentforge/.
+Alternatively, serve the same frontend locally:
 
 ```powershell
 cd C:\Documents2\resume-optimizer\incidentforge
@@ -10,8 +9,7 @@ python -m http.server 8766 --bind 127.0.0.1 --directory site
 ```
 
 Open http://127.0.0.1:8766 and follow [VIDEO_SCRIPT.md](VIDEO_SCRIPT.md).
-The planned release URL is https://ns-0437.github.io/incidentforge/; it is not
-published yet. Update the final recording links only after successful deployment.
+The main-repository Pages frontend was published on October 11, 2026.
 Target 2:45; keep the final video strictly under three minutes.
 
 1. Rehearse overview, IF-001 Observe/Investigate/Repair/Verify, IF-002,
@@ -37,8 +35,8 @@ Target 2:45; keep the final video strictly under three minutes.
 
 The owner confirmed October 4 that free provider access lasts through December 15
 and they can record the video. Credential delivery and fresh-user execution remain
-separate open gates. Keep the main source repository private until the owner
-chooses final release. Recording the replay needs no new inference calls.
+separate open gates. Main source is public with owner approval.
+Recording the replay needs no new inference calls.
 
 Owner clarification, October 4: confirmation covers continued access to the owner
 account only. Separate judge credentials/access have **not** been confirmed.

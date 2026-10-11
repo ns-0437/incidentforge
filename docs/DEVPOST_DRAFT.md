@@ -98,8 +98,8 @@ Evidence: [frozen results](../benchmarks/t8/summary.json),
 [successful development example](../benchmarks/reliability/v25-pilot.json).
 
 ## Maintainer notes — resolve before pasting the final entry
-- Recorded demo: https://ns-0437.github.io/incidentforge-demo/
-- Source: https://github.com/ns-0437/incidentforge (PRIVATE until release)
+- Recorded demo: https://ns-0437.github.io/incidentforge/
+- Source: https://github.com/ns-0437/incidentforge (public since October 11, 2026)
 - Video: NOT RECORDED / NOT PUBLISHED
 - Free provider availability through December 15: owner-confirmed October 4.
 - Working judge access delivery and fresh-user rehearsal: PENDING.
@@ -112,8 +112,6 @@ YouTube video and final Devpost entry are separate release actions.
 Owner clarification, October 4: confirmation covers continued access to the owner
 account only. Separate judge credentials/access have **not** been confirmed.
 
-Release check October 4: the recorded demo URL returns HTTP 404. The requested
-link remains unchanged, but deployment is not currently available. Restore
-working hosting before submission. The private source returning signed-out 404
-is expected until the owner authorizes publication. Nebius access/credit email
-has been sent by the owner; reply pending.
+Release check October 11: the main repository is public and its Pages frontend
+is deployed at https://ns-0437.github.io/incidentforge/. Public asset checks passed.
+Nebius access/credit email has been sent by the owner; reply status is unchanged.

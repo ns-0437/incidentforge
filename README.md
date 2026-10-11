@@ -9,7 +9,7 @@
 [![Sandbox](https://img.shields.io/badge/Execution-Nebius%20Sandbox-ff9d5c)](docs/ARCHITECTURE.md)
 [![Nemotron](https://img.shields.io/badge/Model-NVIDIA%20Nemotron-76b900)](src/incidentforge/llm.py)
 
-[Interactive judge demo](https://ns-0437.github.io/incidentforge-demo/) · [Quick start](#try-it) · [Architecture](#architecture) · [Experiments](#two-incidents-three-protocols) · [Results](#measured-results) · [Trust](#trust-boundaries)
+[Interactive judge demo](https://ns-0437.github.io/incidentforge/) · [Quick start](#try-it) · [Architecture](#architecture) · [Experiments](#two-incidents-three-protocols) · [Results](#measured-results) · [Trust](#trust-boundaries)
 
 </div>
 
@@ -17,9 +17,9 @@
 
 ## Why this exists
 
-**Hosting status:** the retained demo URL currently returns 404. Main-repository Pages deployment is prepared for public release. Until then, [run the viewer locally](docs/RECORDING_HANDOFF.md).
+**Hosting status:** the [frontend is live on GitHub Pages](https://ns-0437.github.io/incidentforge/). It is served independently of the developer computer.
 
-Explore the [recorded investigation desk](https://ns-0437.github.io/incidentforge-demo/): two synthetic incidents, measured observations, proposed patches, verification results, and an interactive architecture diagram. The static demo spends no inference credits. Its development runs are separate from the completed T8 campaign and its disclosed failures. [Publishing guide](docs/JUDGE_FRONTEND.md).
+Explore the [recorded investigation desk](https://ns-0437.github.io/incidentforge/): two synthetic incidents, measured observations, proposed patches, verification results, and an interactive architecture diagram. The static demo spends no inference credits. Its development runs are separate from the completed T8 campaign and its disclosed failures. [Publishing guide](docs/JUDGE_FRONTEND.md).
 
 A payment response disappears **after the charge commits**. A retry uses a fresh
 identity. The order looks healthy—and the customer is charged twice.
@@ -35,7 +35,7 @@ proof that the model's explanation was correct, either.
 
 > Built for the **Coding and Agentic Engineering Track** of the Nebius Global AI
 > Hackathon, using real Token Factory inference and real Sandbox execution.
-> This repository remains private during development.
+> Source published with owner approval on October 11, 2026.
 
 ## Follow an incident
 

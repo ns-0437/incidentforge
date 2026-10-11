@@ -1,9 +1,11 @@
 # Judge frontend release plan
 
-Owner selected main-repository GitHub Pages at release on October 4.
-The existing About link is retained as requested; it returned 404 on October 4.
-The intended replacement URL is https://ns-0437.github.io/incidentforge/.
-It is not deployed yet. The main repository remains private.
+Owner authorized public source and deployment on October 11, 2026.
+Live URL: https://ns-0437.github.io/incidentforge/
+Deployment: https://github.com/ns-0437/incidentforge/actions/runs/38141923974
+Public HTTP checks passed for the page, scripts, styles, icon and evidence.
+GitHub serves this static frontend independently of the developer computer;
+it is recorded evidence, not an always-running inference backend.
 
 ## Prepared deployment
 
