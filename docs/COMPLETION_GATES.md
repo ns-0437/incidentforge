@@ -1,6 +1,6 @@
 # Completion gates
 
-Updated October 4, 2026. The original brief remains the scope authority.
+Hosting status updated October 13, 2026; other gates retain their recorded evidence. The original brief remains the scope authority.
 A delivered component is not evidence of reliable autonomous performance.
 
 | Requirement | Current evidence | Remaining acceptance work |
@@ -14,14 +14,14 @@ A delivered component is not evidence of reliable autonomous performance.
 | Frozen comparison | All twelve T8 outcomes retained | Timeout threshold prevents ranking; subsequent development cannot replace T8 |
 | Operator UI and export | Browser launch/terminal receipt exercised; source/test evidence views; verified export archives | Browser download and immediate cancellation passed; in-flight request cancellation is not newly claimed |
 | Reproducible setup | Fresh-checkout rehearsal, CI, no-spend setup diagnostic | Fresh-user funded access rehearsal pending |
-| Public source and hosted replay | MIT, private repo, manual public-main-only Pages workflow, curated publishing checks | Owner-approved public release, Pages deployment and signed-out link check |
+| Public source and hosted replay | Public MIT repository and [live Pages replay](https://ns-0437.github.io/incidentforge/); October 11 deployment and public asset checks passed | No live inference hosting is implied |
 | Submission | Draft, notices, recording script and local recording instructions | Owner authorship review, public video under three minutes, access instructions, final Devpost submission |
 
 ## Release constraints
 
-Keep the main repository private until the owner chooses release. Keep the old
-About/README demo link until the replacement has actually deployed. Do not recreate
-the separate demo repository. The static replay is not an inference service.
+Owner approved public release on October 11; the replacement deployed and the
+About/README links were updated. Do not recreate the separate demo repository.
+The static replay is not an inference service.
 
 The persistent development allocation is at most $0.40 total, including conservative
 reservations for unknown usage. Do not reset the ledger or spend the other trial
