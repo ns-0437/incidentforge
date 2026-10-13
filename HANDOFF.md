@@ -1,6 +1,9 @@
 # Handoff
 
-**State, October 5, 2026.** HEAD `a14cc30`, working tree clean, repository private.
+**Hosting state verified October 13, 2026.** Source is public with owner approval.
+Frontend: https://ns-0437.github.io/incidentforge/
+Deployment succeeded October 11: [Pages run](https://github.com/ns-0437/incidentforge/actions/runs/38141923974).
+Engineering results below describe the October 5 checkpoint.
 `docs/ORIGINAL_BRIEF.md` unchanged at sha256 `4a2d5f78…29af`. Frozen T8
 `summary.json` and `freeze.json` untouched.
 
@@ -47,6 +50,6 @@ pending polish.
 
 ## Constraints
 
-Private repository. No paid inference, remote Sandbox calls or production ledger
-writes. Preserve the brief and frozen benchmark. No submission, release,
-publication or demo-link work.
+Public repository; hosted frontend is recorded evidence, not a live AI backend.
+No paid inference, remote Sandbox calls or production ledger writes in this pass.
+Preserve the brief and frozen benchmark. Submission remains separate.
