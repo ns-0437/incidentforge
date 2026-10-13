@@ -38,7 +38,7 @@ budget; repeatedly tuning against old schedules cannot support that claim.
 3. Rehearse delivery of free working judge access through December 15. The owner
    confirmed provider availability on October 4; the actual judge access path remains open.
 4. Record the under-three-minute demonstration using VIDEO_SCRIPT.md; publish the
-   reviewed video, release the main repository when the owner chooses, check all
+   reviewed video, retain the completed October 11 public release, check all
    links signed out and submit the completed entry.
 
 ## Budget and access
@@ -46,7 +46,8 @@ budget; repeatedly tuning against old schedules cannot support that claim.
 Cumulative accounted exposure: **$0.337380 / $0.40**. Remaining allocation:
 **$0.062620**. Includes retained development attempts through v25; no inference remains pending.
 The other trial credits are unallocated. The GitHub Pages site is a recorded replay,
-not a hosted inference service. The main source repository stays private until release.
+not a hosted inference service. The main source is public with owner approval
+since October 11, and the recorded frontend is live at https://ns-0437.github.io/incidentforge/
 
 Validation for the backend selector: **115 portable tests passed** and JavaScript
 syntax validation passed. Tests verify HTTP allowlisting, recorded selection,
