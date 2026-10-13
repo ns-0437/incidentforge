@@ -40,8 +40,8 @@ observed in the submission UI.** References elsewhere in this file such as
 | 1 | Working project running on Token Factory or AI Cloud, using an NVIDIA open source model. Rules define this as "makes a runtime call to the Token Factory inference API, or is deployed/run using Nebius AI Cloud compute (Serverless Jobs, Serverless Endpoints, or DevPods)" | Runtime Nemotron Nano calls through Token Factory, retained in [v22](../benchmarks/reliability/v22-pilot.json) and [v25](../benchmarks/reliability/v25-pilot.json) | **None.** Satisfied by the inference-API clause |
 | 2 | A category / track | "Coding and Agentic Engineering" in [DEVPOST_DRAFT.md](DEVPOST_DRAFT.md) | None |
 | 3 | Project description explaining features and functionality | DEVPOST_DRAFT.md sections through "What's next" | None, pending owner review of claims |
-| 4 | URL to a working demo, hosted application, or test build | Static replay prepared in `site/`; Pages not deployed | **Open.** Depends on release and Pages deployment. See placeholder P-1 |
-| 5 | Public repo on GitHub/GitLab/Bitbucket with all source, assets and instructions | github.com/ns-0437/incidentforge, currently private | **Open on release authorization only.** Content is ready |
+| 4 | URL to a working demo, hosted application, or test build | Static replay deployed at https://ns-0437.github.io/incidentforge/ | **Hosting delivered October 11.** Full live execution access remains separate |
+| 5 | Public repo on GitHub/GitLab/Bitbucket with all source, assets and instructions | github.com/ns-0437/incidentforge, public since October 11 | **Public source delivered.** |
 | 6 | Open source license **file**, "detectable and visible at the top of the repository page (in the About section)" | `LICENSE`, MIT. GitHub API reports `license.spdx_id = MIT` | **None.** Detection verified 2026-10-04; it will render in About once public |
 | 7 | README with setup instructions and clear guidance for running the project | README plus [JUDGE_GUIDE.md](JUDGE_GUIDE.md) | None |
 | 8 | README must highlight Nemotron use, where Token Factory accelerated the workflow, and other Nebius tools used | Present in README and DEVPOST_DRAFT | None |
@@ -165,9 +165,9 @@ in [DEVPOST_DRAFT.md](DEVPOST_DRAFT.md) and are not duplicated here.
 
 | ID | Placeholder | Resolves when |
 |---|---|---|
-| **P-1** | Demo URL. The retained link `https://ns-0437.github.io/incidentforge-demo/` returned 404 on October 4 and is kept only until a replacement deploys. Planned replacement `https://ns-0437.github.io/incidentforge/` is not deployed | Repository is public and the Pages workflow has run and been verified signed out |
+| **P-1** | Resolved: https://ns-0437.github.io/incidentforge/ deployed October 11 | Public asset checks passed; use this URL |
 | **P-2** | Video URL. Not recorded, not uploaded | Owner records, verifies duration under three minutes, uploads public, checks signed-out playback |
-| **P-3** | Repository URL is live but private, so it returns 404 when signed out | Owner authorizes public release |
+| **P-3** | Resolved: main repository is public | Owner authorized and source published October 11 |
 | **P-4** | Live-execution access for judges beyond the credential-free replay and test suite | Nebius reply arrives and a supported path is rehearsed. Whether the credential-free build alone suffices is unconfirmed |
 
 ## Owner actions this audit cannot perform
