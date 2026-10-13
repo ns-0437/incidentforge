@@ -2,7 +2,8 @@
 
 Prepared October 4, 2026. Core demonstrations and local reproducibility checks are
 recorded. This package is ready for owner review, not yet for final submission.
-Main source remains private. No publication or provider call is triggered by these files.
+Main source is public and the recorded frontend is deployed. No provider call is
+triggered by these files.
 
 ## Copy and recording
 
@@ -47,15 +48,14 @@ closes a demonstration gap, not a repeat-reliability evaluation.
 6. Recheck the live hackathon entry requirements, source/demo/video links and free
    access instructions; submit the reviewed entry and retain confirmation.
 
-The existing link https://ns-0437.github.io/incidentforge-demo/ stays unchanged
-until replacement deployment is verified. The planned main-repository URL is
-https://ns-0437.github.io/incidentforge/; it is not currently a deployed deliverable.
-Do not recreate the deleted demo repository.
+Hosting steps 4 and 5 were completed October 11 with owner approval.
+Live frontend: https://ns-0437.github.io/incidentforge/
+About and README now use that URL. Do not recreate the deleted demo repository.
 
 ## Current constraints
 
 Exposure: $0.337380 of the $0.40 cumulative development limit; $0.062620 remains.
 No pending inference at this checkpoint. Do not reset the ledger or spend the
 unallocated trial credits. Recording the static replay requires no model calls.
-Video, supported judge access, public release and actual submission remain open.
+Video, supported judge access and actual submission remain open.
 See [completion gates](COMPLETION_GATES.md) for the detailed status.
