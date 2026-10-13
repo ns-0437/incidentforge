@@ -14,8 +14,8 @@ cd incidentforge
 python --version
 ```
 
-The repository is private during development; public cloning becomes available
-at release. A signed-out 404 before release is not a setup failure.
+The repository is public as of October 11, 2026; no GitHub login is required
+to clone it.
 All commands below run from this checkout directory. If `python` is not found,
 try `py -3 --version` and use `py -3` instead of `python` in the commands below.
 If neither command works, install Python 3.12 or newer and reopen PowerShell.
@@ -23,8 +23,8 @@ No pip installation is needed for the replay or portable tests.
 
 ## Start with the recorded evidence
 
-The retained URL https://ns-0437.github.io/incidentforge-demo/ returned 404 on October 4.
-Until the main-repository Pages release, run `python -m http.server 8766 --bind 127.0.0.1 --directory site`
+Open https://ns-0437.github.io/incidentforge/ for the hosted replay.
+For an optional local copy, run `python -m http.server 8766 --bind 127.0.0.1 --directory site`
 and open http://127.0.0.1:8766. This is a static recorded replay,
 not a hosted inference service. It cannot spend credits or launch a sandbox.
 
