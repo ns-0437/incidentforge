@@ -1,4 +1,4 @@
-# Release checklist — October 4, 2026
+# Release checklist — hosting updated October 13, 2026
 
 [Submission package](SUBMISSION_PACKAGE.md) contains the copy, recording walkthrough
 and claim-to-evidence map. [Completion gates](COMPLETION_GATES.md) tracks limitations.
@@ -27,11 +27,9 @@ Passing development examples do not establish repeat autonomous repair reliabili
 - [ ] Owner reviews authorship, reuse/model notices and final claims in [THIRD_PARTY_NOTICES.md](THIRD_PARTY_NOTICES.md) and [DEVPOST_DRAFT.md](DEVPOST_DRAFT.md).
 - [ ] Incorporate Nebius's reply into a concrete free judge-access path and rehearse it with a fresh user.
 - [ ] Record the walkthrough, verify duration, publish on YouTube and check signed-out playback.
-- [ ] Make the main repository public at owner-approved release.
-- [ ] Deploy Pages from the main repository. Expand into the ordered sub-steps in
-      [Pages deployment is unexercised](#pages-deployment-is-unexercised) below; the
-      workflow has never executed, so treat this as a first run rather than a repeat.
-- [ ] Only after successful deployment, replace the retained old About/README demo link and other submission links.
+- [x] Main repository made public October 11 with owner approval.
+- [x] Pages deploy job succeeded and public assets were checked October 11.
+- [x] About/README and primary recording/submission links point to the new site.
 - [ ] Check final CI, source/demo/video links, setup instructions and actual hackathon entry requirements.
 - [ ] Submit the reviewed Devpost entry and retain confirmation.
 
@@ -40,40 +38,14 @@ does not establish judge access. The owner has sent the support email and will
 provide the reply. Never share the owner's personal key or require judges to buy
 credits. The static recorded viewer alone does not settle live execution access.
 
-## Pages deployment is unexercised
+## Pages deployment verified
 
-Observed October 4, 2026 against ns-0437/incidentforge:
-
-- `gh run list --workflow pages.yml` returns nothing. The workflow has **never run**.
-- `gh api repos/ns-0437/incidentforge/pages` returns **404**. No Pages site is
-  configured, so no publishing source has been selected yet.
-- The repository is private, which is why neither of the above has happened.
-
-The deploy job is guarded by `github.repository`, `github.event.repository.private
-== false` and `github.ref == 'refs/heads/main'`. **A guard that evaluates false
-skips the job, and a run whose only job is skipped still reports as successful.**
-On release day that reads as a green run with nothing deployed, which is the one
-outcome most likely to be mistaken for success. Check the job's own status, not
-the run's colour, and confirm a `page_url` was emitted.
-
-The deployment sequence itself lives in [JUDGE_FRONTEND.md](JUDGE_FRONTEND.md) and
-is not restated here. Two additions to it, both consequences of the above:
-
-- Its step 1 and step 2 are prerequisites for the guard, not formalities. The job
-  cannot pass while the repository is private, and it has nowhere to publish until
-  the Pages source is set to GitHub Actions.
-- At its step 3, read the **job** status. A skipped job is the failure mode to
-  watch for, and it does not look like a failure.
-- At its step 4, `python scripts/check-site.py` validates the local artifact only.
-  Confirming what is actually served needs a signed-out fetch of
-  `https://ns-0437.github.io/incidentforge/` returning 200.
-
-The workflow pins `ubuntu-24.04` and uses `actions/checkout@v6`,
-`configure-pages@v5`, `upload-pages-artifact@v4` and `deploy-pages@v4`. Newer
-majors exist (`configure-pages@v6`, `upload-pages-artifact@v5`, `deploy-pages@v5`)
-and were deliberately not adopted: an untested bump to an untested workflow adds
-risk at the moment there is least time to absorb it. If the first dispatch fails
-on a deprecated action, bumping these is the first thing to try.
+[Deployment run](https://github.com/ns-0437/incidentforge/actions/runs/38141923974) succeeded October 11.
+The page, JavaScript, styles, icon and evidence were fetched publicly and checked
+against source. Live frontend: https://ns-0437.github.io/incidentforge/
+For future manual deployments follow [JUDGE_FRONTEND.md](JUDGE_FRONTEND.md);
+confirm the deploy job actually runs rather than relying on a green skipped run.
+GitHub serves the static replay independently of the owner computer.
 
 ## Timing and constraints
 
@@ -89,7 +61,5 @@ The cumulative development allocation remains $0.40. Current accounted exposure
 is $0.337380, including unknown historical usage reserved at full cost; $0.062620
 remains and no inference is pending. Do not reset the ledger or expand spending.
 
-Main source remains private. The old demo link is retained as requested and was
-last observed returning 404; the replacement main-repository Pages site is prepared
-but not deployed. Follow [JUDGE_FRONTEND.md](JUDGE_FRONTEND.md) at release. Do not
-recreate the separate demo repository. Recording setup needs no inference calls.
+Main source and the recorded Pages frontend are public. This does not deploy
+the live inference backend. Recording the replay needs no inference calls.
