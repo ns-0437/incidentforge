@@ -122,6 +122,12 @@ class OperatorHarness(unittest.TestCase):
                     lines.append('worker log %s tail:\n%s' % (run_id, tail))
         for error in self.thread_errors:
             lines.append('watcher thread exception:\n' + error)
+        # These were recorded but never printed, so a failure reported a count
+        # without the traceback that explains it.
+        for error in self.handler_errors:
+            lines.append('server handler exception:\n' + error)
+        if self.transport_attempts:
+            lines.append('loopback transport failures: %r' % (self.transport_attempts,))
         return '\n'.join(lines)
 
     # ----- teardown --------------------------------------------------------------
