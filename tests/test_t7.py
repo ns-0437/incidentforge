@@ -231,6 +231,33 @@ class UITests(unittest.TestCase):
             with self.assertRaises(PermissionError): self.manager.release_guard(timeout=.2)
         self.manager.guard.unlink()
 
+    def test_unreadable_run_is_surfaced_not_hidden_or_fatal(self):
+        """A run whose evidence cannot be summarised must stay visible.
+
+        The receipt loop called overview() unguarded, so one unreadable run took
+        the whole /api/state response down with it.
+        """
+        from unittest.mock import patch
+        import incidentforge.ui as ui
+        run_id='ui-'+'a'*32
+        evidence=Evidence(self.root/'runs'/run_id,run_id)
+        evidence.event('transition',{'from':'INGEST','to':'REPRODUCE'})
+        (self.manager.meta/(run_id+'.json')).write_text(json.dumps(
+            {'run_id':run_id,'incident':'IF-002','variant':'B2','terminal_confirmed':True}))
+        real=ui.overview
+        def unreadable(root,name):
+            if name==run_id: raise ValueError('Artifact outside bounds')
+            return real(root,name)
+        with patch.object(ui,'overview',unreadable):
+            status,raw,_=self.request('/api/state')
+        self.assertEqual(200,status,'one unreadable run must not break state')
+        listed={r['run_id']:r for r in json.loads(raw)['runs']}
+        self.assertIn(run_id,listed,'the unreadable run was silently omitted')
+        row=listed[run_id]
+        self.assertEqual('UNREADABLE',row['state'])
+        self.assertIn('Artifact outside bounds',row['unreadable'])
+        self.assertIsNone(row['decision'],'an unreadable run must not imply a verdict')
+
     def test_pending_usage_prevents_launch(self):
         b=Budget(self.root/'runs/t4-budget.sqlite',200000);b.reserve('previous',100,200000,10)
         with self.assertRaises(ValueError): self.manager.launch('IF-001','B0')

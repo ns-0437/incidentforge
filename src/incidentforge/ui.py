@@ -345,7 +345,17 @@ def make_server(root=ROOT,port=8765,manager=None):
                     known={r['run_id'] for r in runs}
                     for p in manager.meta.glob('ui-*.json'):
                         if p.stem not in known:
-                            item=overview(root,p.stem)
+                            try: item=overview(root,p.stem)
+                            except (ValueError,OSError,KeyError) as exc:
+                                # Surface the run as unreadable rather than letting it
+                                # break the whole response or vanish from the list. A
+                                # run whose evidence exists but cannot be summarised is
+                                # exactly what an operator needs to see.
+                                runs.append({'run_id':p.stem,'incident':'unknown','variant':'unknown',
+                                    'process_terminal':False,'process_exit':None,'decision':None,
+                                    'state':'UNREADABLE','report':None,'started':None,'event_count':0,
+                                    'unreadable':type(exc).__name__+': '+str(exc)[:120]})
+                                continue
                             if item['variant'] in ('B0','B1','B2'): runs.append(item)
                     return self.send(200,{'token':token,'incidents':INCIDENTS,'budget':budget_status(root),'active':manager.active(),
                         'runs':sorted(runs,key=lambda r:r['started'] or '',reverse=True)})
