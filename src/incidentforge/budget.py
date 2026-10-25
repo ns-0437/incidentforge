@@ -9,13 +9,20 @@ class Budget:
     def __init__(self,path,project_cap_microusd):
         self.path=path
         self.project_cap_microusd=project_cap_microusd
-        with closing(sqlite3.connect(path)) as db:
-            db.execute('CREATE TABLE IF NOT EXISTS settings(cap INTEGER NOT NULL)')
-            row=db.execute('SELECT cap FROM settings').fetchone()
-            if row is None: db.execute('INSERT INTO settings VALUES(?)',(project_cap_microusd,))
-            elif row[0]!=project_cap_microusd: raise ValueError('project cap cannot change implicitly')
-            db.execute('CREATE TABLE IF NOT EXISTS calls(id TEXT PRIMARY KEY,run TEXT,cap INTEGER,actual INTEGER,status TEXT)')
-            db.commit()
+        # SQLite autocommits DDL, so creating settings and inserting the cap in
+        # separate transactions published an empty settings table that concurrent
+        # readers could observe. One IMMEDIATE transaction publishes both at once.
+        with closing(sqlite3.connect(path,isolation_level=None)) as db:
+            db.execute('BEGIN IMMEDIATE')
+            try:
+                db.execute('CREATE TABLE IF NOT EXISTS settings(cap INTEGER NOT NULL)')
+                row=db.execute('SELECT cap FROM settings').fetchone()
+                if row is None: db.execute('INSERT INTO settings VALUES(?)',(project_cap_microusd,))
+                elif row[0]!=project_cap_microusd: raise ValueError('project cap cannot change implicitly')
+                db.execute('CREATE TABLE IF NOT EXISTS calls(id TEXT PRIMARY KEY,run TEXT,cap INTEGER,actual INTEGER,status TEXT)')
+                db.execute('COMMIT')
+            except BaseException:
+                db.execute('ROLLBACK');raise
 
     @classmethod
     def existing(cls,path,default_cap=200000):

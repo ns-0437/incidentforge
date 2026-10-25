@@ -58,7 +58,18 @@ def budget_status(root):
     path=root/'runs/t4-budget.sqlite'
     if not path.exists(): return {'cap_usd':.20,'estimated_usd':0,'reserved_usd':0,'pending':0,'remaining_usd':.20,'unknown_usd':0,'unknown_calls':0}
     with closing(sqlite3.connect(path.resolve().as_uri()+'?mode=ro',uri=True)) as db:
-        cap=db.execute('SELECT cap FROM settings').fetchone()[0]
+        try: settings=db.execute('SELECT cap FROM settings').fetchone()
+        except sqlite3.OperationalError:
+            # Schema not published yet, or the ledger is locked by its writer.
+            # Either way the allocation is unknown, which is the same condition.
+            settings=None
+        if settings is None or type(settings[0]) is not int:
+            # The ledger exists but carries no usable allocation. Report that
+            # plainly: inventing a cap or a zero spend here would understate real
+            # usage, and remaining_usd 0 keeps launching blocked while unknown.
+            return {'state':'incomplete','cap_usd':None,'estimated_usd':None,'reserved_usd':None,
+                    'pending':None,'remaining_usd':0,'unknown_usd':None,'unknown_calls':None}
+        cap=settings[0]
         unknown,unknown_calls=db.execute('SELECT COALESCE(SUM(cap),0),COUNT(*) FROM calls WHERE actual IS NULL').fetchone()
         spent,reserved,pending=db.execute("SELECT COALESCE(SUM(actual),0),COALESCE(SUM(CASE WHEN actual IS NULL THEN cap ELSE actual END),0),COALESCE(SUM(status='reserved'),0) FROM calls").fetchone()
     return {'cap_usd':cap/1e6,'estimated_usd':spent/1e6,'reserved_usd':reserved/1e6,
@@ -221,6 +232,8 @@ class Manager:
         with self.lock:
             if self.guard.exists(): raise ValueError('A live or unconfirmed launch already exists')
             budget=budget_status(self.root)
+            if budget.get('state')=='incomplete':
+                raise ValueError('Project ledger is initializing or incomplete; budget state unknown, launch blocked')
             if budget['pending']: raise ValueError('An inference call is pending or unreconciled; new launch blocked')
             from .llm import CALL_RESERVATION
             if budget['remaining_usd']<CALL_RESERVATION/1e6: raise ValueError('Insufficient remaining project allocation')
