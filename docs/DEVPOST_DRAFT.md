@@ -1,71 +1,49 @@
-# Devpost draft — review before submission
+# Devpost draft — saved technical copy, October 25, 2026
 
-## Project name
-IncidentForge
+Project name: IncidentForge
 
-## Tagline
-Investigate incidents, propose repairs, and verify business behavior with evidence.
+Pitch: Investigate distributed incidents, propose source repairs, and verify business behavior with independent evidence—powered by NVIDIA Nemotron on Nebius Token Factory.
+
+The project story below was saved in Devpost and reopened to verify persistence.
+It is draft content, not a submitted entry.
 
 ## Inspiration
-An API can return success while charging a customer twice. A restart can leave
-inventory reserved forever. We wanted a coding agent that investigates those
-failures and submits a reviewable patch with independently checked evidence.
+An API can return success while charging a customer twice. A restart can leave inventory reserved indefinitely. IncidentForge helps backend engineers inspect a proposed repair together with the evidence supporting it.
 
 ## What it does
-IncidentForge runs a synthetic three-service application: Order, Inventory and
-Payment. It reproduces two distributed failure mechanisms, asks a model to compare
-hypotheses and run a controlled experiment, then allows bounded source edits and
-developer assertions. A protected evaluator checks durable effects, recovery,
-inventory and idempotency. The result is a patch for human review or an explicit
-rejection/unresolved report. No production deployment occurs.
+IncidentForge investigates two synthetic failures across Order, Inventory and Payment: duplicate payment after a lost response (IF-001), and stranded compensation after restart (IF-002). A bounded NVIDIA Nemotron agent compares hypotheses, runs controlled experiments, edits allowed source and authors assertions. A protected evaluator independently checks durable effects, recovery, inventory and idempotency. The result is a patch accepted for human review, a rejection, or an explicit unresolved outcome. It never deploys to production.
+
+The public frontend is a recorded evidence viewer. Select an incident and follow Observe, Investigate, Repair and Verify; expand the campaign attempts and download the evidence. A separate local operator console supports bounded live execution and review exports. The hosted viewer cannot launch new investigations or spend credits.
 
 ## How we built it
-Python implements the controller, HTTP services, persistence broker, evidence
-chain and local UI. NVIDIA Nemotron Nano is called through Nebius Token Factory
-at runtime. Nebius Sandboxes execute isolated candidate workloads; an independent
-restricted Docker reader recomputes protected results from exported evidence.
-The static frontend explores recorded synthetic evidence without
-exposing keys or triggering paid operations.
+Python implements the controller, HTTP services, persistence broker, evidence records and local operator. SQLite preserves the inference allocation. The runtime model is nvidia/NVIDIA-Nemotron-3-Nano-30B-A3B through Nebius Token Factory. Nebius Sandboxes/ConTree execute candidate workloads; a separate restricted Docker reader recomputes protected results from exported evidence. HTML, CSS and JavaScript render the GitHub Pages frontend. Model proposals cannot replace the independent final verdict.
 
-## Challenges and measured results
-The frozen twelve-attempt B0/B1/B2 comparison produced two accepted final repairs,
-two rejected frozen candidates and eight unresolved attempts. Three inference
-timeouts crossed the predeclared infrastructure threshold, so we make no variant
-ranking claim. All attempts remain in the published results.
+## Challenges and results
+The frozen twelve-attempt B0/B1/B2 campaign retained two accepted repairs, two rejected candidates and eight unresolved attempts. Three inference timeouts crossed the predeclared infrastructure threshold; these data do not support a variant ranking. Later successful examples do not replace frozen results.
 
-Later development added constrained action formats, compile checks, source rereads
-after rejected edits, and required authored assertions on the final revision.
-The recorded IF-001 repair passed protected checks, but its retry-count assertion
-also passed before repair and therefore does not detect the original defect.
-The recorded IF-002 repair has a restart assertion that fails before repair and
-passes afterward; eight protected cases accepted the candidate in each of two
-executions. These are development examples, not replacement benchmark results.
-Repeat autonomous repair reliability remains unproven.
+The displayed IF-001 repair passed protected checks, but its authored retry-count assertion also passed before repair and does not detect the original defect. The IF-002 restart assertion fails before repair and passes afterward; its candidate passed eight protected cases per validation. These finite examples do not establish repeat autonomous repair reliability or universal correctness.
 
-A clean checkout passed 115 portable tests and 19 Linux behavioral/isolation checks
-with no skips. The local console and static replay started without model calls.
-Evidence: [frozen results](../benchmarks/t8/summary.json),
-[IF-001](../benchmarks/reliability/v22-pilot.json),
-[IF-002](../benchmarks/reliability/v25-pilot.json),
-[clean checkout](../benchmarks/release/rehearsal-v25.json).
+Later work added compile checks, mandatory source rereads after rejected edits, final-revision assertions, evidence-integrity checks and atomic budget initialization. CI at code revision cbfcb63 collected 267 portable tests (206 passed, 61 explicitly skipped); 37 Windows operator tests and the Linux isolation job also passed. Scripted controller integration consumes simulated protected results and is not live-model reliability evidence.
 
 ## What we learned
-Correct measurements, plausible explanations, useful edits and a completed agent
-workflow are different outcomes. We retain failures and costs rather than selecting
-only successful demos. Intermediate feedback cannot replace post-freeze validation.
+Plausible explanations, useful edits and independently accepted repairs are different outcomes. Request counts are not committed effects. We retain unresolved attempts, limitations and unknown usage instead of treating them as successes or free calls. Intermediate feedback cannot replace post-freeze validation.
+
+## Try it and inspect the evidence
+- [Recorded demo](https://ns-0437.github.io/incidentforge/)
+- [Public MIT-licensed source](https://github.com/ns-0437/incidentforge)
+- [Setup and test-build guide](https://github.com/ns-0437/incidentforge/blob/main/docs/JUDGE_GUIDE.md)
+- [Frozen campaign results](https://github.com/ns-0437/incidentforge/blob/main/docs/T8_RESULTS.md)
+
+The viewer and portable tests need no provider credentials. Live inference and Sandbox execution require separately arranged Nebius access; the viewer is not a hosted live agent.
 
 ## What's next
-Improve compensation-repair reliability, extend
-fault coverage with new incident mechanisms, and finish durable judge access.
-The current system does not establish universal repair correctness or reliable
-completion on arbitrary repositories.
+Improve repeat repair reliability and broaden incident mechanisms without rewriting frozen results. This prototype does not claim production readiness or reliable completion on arbitrary repositories.
 
-## Built with / track
-Python, Docker, SQLite, Nebius Token Factory, Nebius Sandboxes/ConTree,
-NVIDIA Nemotron, HTML/CSS/JavaScript. GitHub Pages deployment is prepared for release.
-Track: Coding and Agentic Engineering.
+## Development assistance
+Claude Code and Codex assisted development. NVIDIA Nemotron performs runtime investigation and repair proposals. Third-party runtime and model notices are documented in the repository.
 
-## Platform feedback
+
+## Platform feedback — supporting evidence
 Nebius Sandboxes let us run isolated repairs and export artifacts for independent
 checks. Token Factory served the NVIDIA Nemotron Nano agent at runtime. The
 IF-002 development example completed eight model calls and produced a patch whose
@@ -97,21 +75,13 @@ Evidence: [frozen results](../benchmarks/t8/summary.json),
 [edit mismatch](../benchmarks/reliability/v24-pilot.json),
 [successful development example](../benchmarks/reliability/v25-pilot.json).
 
-## Maintainer notes — resolve before pasting the final entry
+## Maintainer notes
+
+- Public source: https://github.com/ns-0437/incidentforge (MIT detected).
 - Recorded demo: https://ns-0437.github.io/incidentforge/
-- Source: https://github.com/ns-0437/incidentforge (public since October 11, 2026)
-- Video: NOT RECORDED / NOT PUBLISHED
-- Free provider availability through December 15: owner-confirmed October 4.
-- Working judge access delivery and fresh-user rehearsal: PENDING.
-- AI assistance disclosure: developed with Claude Code and Codex assistance;
-  Navin Kumar must review authorship, reused components and final claims.
-
-Do not submit this draft with unresolved placeholders. Publishing the repository,
-YouTube video and final Devpost entry are separate release actions.
-
-Owner clarification, October 4: confirmation covers continued access to the owner
-account only. Separate judge credentials/access have **not** been confirmed.
-
-Release check October 11: the main repository is public and its Pages frontend
-is deployed at https://ns-0437.github.io/incidentforge/. Public asset checks passed.
-Nebius access/credit email has been sent by the owner; reply status is unchanged.
+- Draft submission ID: 1262170; project preview: https://devpost.com/software/incidentforge-73tvfa
+- Track: Coding and agentic engineering.
+- Video and working judge-access completion deferred by the owner; neither is certified complete.
+- The owner must review eligibility, authorship, reused components and final terms before submission.
+- Ratings and private organizer-facing answers are saved in the authenticated draft, not published here.
+- See [actual form audit](SUBMISSION_FORM_AUDIT.md) for field-level status.

@@ -20,12 +20,14 @@ the `python:3.12-slim` image and the externally installed ConTree CLI/SDK retain
 their own licenses and terms. Runtime image IDs are recorded with executions;
 these images and external SDKs are not bundled as repository source.
 Nebius Token Factory and Sandbox access remain subject to their service terms.
-The static demonstration is prepared for main-repository GitHub Pages at public release; it is not currently deployed.
+The recorded static demonstration is deployed from the public main repository at
+https://ns-0437.github.io/incidentforge/ (verified October 25, 2026).
+It does not host the live inference backend.
 
 ## Attribution and ownership review
 
 AIOpsLab is acknowledged as prior art in the README; an acknowledgment is not
 permission to copy its implementation. Claude Code and Codex assisted development.
-Before public release, the owner must confirm the authorship and reuse disclosure
+Before final submission, the owner must confirm the authorship and reuse disclosure
 in the submission draft and review any assets added for the final video.
 This inventory is not a claim that model terms are identical to the MIT license.

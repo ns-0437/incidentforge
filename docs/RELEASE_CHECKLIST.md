@@ -1,4 +1,4 @@
-# Release checklist — hosting updated October 13, 2026
+# Release checklist — submission audit updated October 25, 2026
 
 [Submission package](SUBMISSION_PACKAGE.md) contains the copy, recording walkthrough
 and claim-to-evidence map. [Completion gates](COMPLETION_GATES.md) tracks limitations.
@@ -49,11 +49,11 @@ GitHub serves the static replay independently of the owner computer.
 
 ## Timing and constraints
 
-Official rules rechecked October 4 at https://nebiusglobalaihackathon.devpost.com/rules:
+Official rules rechecked October 25 at https://nebiusglobalaihackathon.devpost.com/rules:
 October 30, 10:00 PDT (22:30 IST) submission; judging through December 15; public
 licensed source, working demo/test build, English description, public YouTube video
-under three minutes, track and platform feedback. Recheck the live rules and entry
-form before submitting; the signed-in submission form has not been audited.
+under three minutes, track and platform feedback. The signed-in form was audited October 25 and the technical draft saved;
+see [field-level audit](SUBMISSION_FORM_AUDIT.md). Final submission is pending.
 Separate provider accounts for judges are not explicitly required. The supported
 access method still needs to satisfy free working access through judging.
 
@@ -63,3 +63,14 @@ remains and no inference is pending. Do not reset the ledger or expand spending.
 
 Main source and the recorded Pages frontend are public. This does not deploy
 the live inference backend. Recording the replay needs no inference calls.
+
+## October 25 draft preparation
+
+- [x] Rechecked public repository, MIT detection, Pages link and CI at `888afc0`.
+- [x] Audited authenticated Devpost fields and saved story, source/demo links, technical feedback and owner-supplied survey answers.
+- [ ] Owner reviews eligibility declarations and final terms.
+- [ ] Video and working-access items remain deferred by the owner.
+- [ ] Submit and retain confirmation after the remaining requirements are fulfilled.
+
+No inference was dispatched during this audit. Application code, original brief,
+frozen campaign artifacts and the budget ledger were not changed.

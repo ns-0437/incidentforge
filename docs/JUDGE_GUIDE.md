@@ -45,9 +45,9 @@ Both commands in this section need only Python 3.12 or newer. Docker is **not**
 required here; it is needed for the Linux behavioral checks further below and for
 live validation. Verified on October 4 by running both commands from a clean
 tracked-source copy with no Docker involvement. The source repository is
-https://github.com/ns-0437/incidentforge; it remains private during development and
-must become public before submission. Do not claim this guide provides judge access
-until that release step is complete.
+https://github.com/ns-0437/incidentforge and is public. The recorded frontend and
+portable tests are available without provider credentials; live execution access
+is a separate requirement described below.
 
 ```powershell
 python -m unittest discover -s tests -t .
@@ -55,9 +55,11 @@ python scripts/serve-ui.py --port 8765
 ```
 
 The suite discovers every test module, so nothing can be silently omitted from a
-hand-maintained list. Expect 128 passed and 61 skipped on Windows or as a
-non-root user: the skips are the Linux root isolation checks described below,
-and they are reported as skips rather than silently dropped.
+hand-maintained list. At code revision `cbfcb63`, the portable CI job collected
+267 tests: 206 passed and 61 skipped. Counts can change with later revisions.
+The skips are the Linux root isolation checks described below and are reported
+explicitly. The separate Windows operator job passed 37 tests and the Linux
+isolation job passed; see [CI evidence](https://github.com/ns-0437/incidentforge/actions/runs/40165895175).
 
 Visit http://127.0.0.1:8765. A fresh checkout has empty run history; raw local runs
 are intentionally excluded from Git. The public replay supplies curated examples.
