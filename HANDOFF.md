@@ -25,8 +25,35 @@ derived T8 metric view with corrected labels.
 
 ## Latest results
 
-Run [37341854060](https://github.com/ns-0437/incidentforge/actions/runs/37341854060),
-all three jobs green: portable, windows-operator, linux-isolation.
+HEAD `cbfcb63`. Run
+[40165895175](https://github.com/ns-0437/incidentforge/actions/runs/40165895175),
+all three jobs green: portable 267 collected, 61 skipped, 206 executed;
+windows-operator 37 passed; linux-isolation passed.
+
+The intermittent windows-operator failure is closed. Its captured traceback was
+`TypeError: 'NoneType' object is not subscriptable` in `budget_status`: SQLite
+autocommits DDL, so `Budget.__init__` published an empty `settings` table before
+committing the cap, and a concurrent `/api/state` read subscripted `None`.
+`TypeError` is outside `do_GET`'s caught tuple, so the handler died without
+writing a response.
+
+Ledger initialization now runs in one `BEGIN IMMEDIATE` transaction, so a reader
+sees either no schema or the complete allocation. `budget_status` reports
+`state: incomplete` when the row is absent, the cap is not an integer, or the
+schema is unpublished, fabricating no cap, spend or available funds, and
+launching is blocked while the budget state is unknown. Existing ledgers,
+reservations and the $0.40 allocation are unchanged. Separately, a run whose
+evidence cannot be summarised now stays visible as `state: UNREADABLE` with its
+error rather than being omitted or breaking the whole state response.
+
+Validation: a deterministic regression pauses the writer at its commit boundary
+with a barrier and reads from another thread, plus 8 of 8 clean local
+repetitions of the Windows job's module set at this revision. Reverting either
+half of the fix fails the regression.
+
+**Not every historical `RemoteDisconnected` is proven to share this cause.** The
+captured traceback explains the one that was reproduced; earlier observations
+were never traced.
 
 ## Limitations, unchanged
 
